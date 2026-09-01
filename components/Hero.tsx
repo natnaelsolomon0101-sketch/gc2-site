@@ -1,40 +1,25 @@
-import { HERO, TICKER } from "@/content/site";
+import { HERO } from "@/content/site";
+import Emphasis from "./Emphasis";
 
 export default function Hero() {
-  const last = HERO.headline.length - 1;
-
   return (
-    <section className="hero" id="top">
-      <div className="hero-glow" aria-hidden="true" />
-      <div className="wrap hero-in">
-        <p className="hero-eyebrow">{HERO.eyebrow}</p>
-        <h1 className="h-display">
-          {HERO.headline.map((line, i) => (
-            <span key={line}><i>{i === last ? <em>{line}</em> : line}</i></span>
-          ))}
-        </h1>
-        <p className="lede hero-lede">{HERO.standfirst}</p>
-        <div className="hero-cta">
-          <a className="btn btn-primary" href={HERO.primaryCta.href}>
-            {HERO.primaryCta.label}<span className="arw" aria-hidden="true">→</span>
-          </a>
-          <a className="btn btn-ghost" href={HERO.secondaryCta.href}>{HERO.secondaryCta.label}</a>
-        </div>
-        <div className="hero-pad" />
+    <section id="top" className="relative flex min-h-[90vh] items-center overflow-hidden bg-white">
+      {/* very subtle slow-moving abstract gradient */}
+      <div aria-hidden className="pointer-events-none absolute inset-0">
+        <div className="gc2-drift absolute -left-[15%] top-[-20%] h-[80vh] w-[70vw] rounded-full opacity-[0.55]
+                        bg-[radial-gradient(circle_at_50%_50%,#E8EFEB_0%,rgba(232,239,235,0)_68%)]" />
+        <div className="gc2-drift-2 absolute right-[-20%] bottom-[-25%] h-[75vh] w-[65vw] rounded-full opacity-[0.5]
+                        bg-[radial-gradient(circle_at_50%_50%,#F1EFE9_0%,rgba(241,239,233,0)_70%)]" />
       </div>
 
-      <div className="ticker" aria-hidden="true">
-        <div className="ticker-track">
-          {[0, 1].map((set) => (
-            <div className="ticker-set" key={set}>
-              {TICKER.map((t) => (
-                <div className="tick" key={`${set}-${t.symbol}`}>
-                  <b>{t.symbol}</b><span>{t.label}</span>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
+      <div className="relative mx-auto w-full max-w-[1280px] px-6 pt-24 md:px-10">
+        <h1 className="display h-hero max-w-[17ch]">
+          <Emphasis text={HERO.headline} word={HERO.emphasis} />
+        </h1>
+        <p className="body-copy mt-8 text-[17px] md:mt-10 md:text-[18px]">
+          {HERO.supporting}
+          <sup className="ml-1 text-[11px] text-ink-45">{HERO.footnote}</sup>
+        </p>
       </div>
     </section>
   );
