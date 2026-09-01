@@ -79,3 +79,5 @@
                        50%     { transform: translate3d(-4%,-3%,0) scale(1); } }
 .gc2-drift  { animation: gc2Drift  38s ease-in-out infinite; }
 .gc2-drift-2{ animation: gc2Drift2 46s ease-in-out infinite; }
+
+@keyframes gc2Ticker { from { transform: translate3d(0,0,0); } to { transform: translate3d(-50%,0,0); } }
