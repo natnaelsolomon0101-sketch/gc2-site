@@ -3,7 +3,7 @@
 - [x] 1.1 Environment check → docs/ENV.md
 - [x] 1.2 Skill installed and verified
 - [x] 1.3 QA tooling installed
-- [ ] 2 Baseline audit → docs/baseline/
+- [x] 2 Baseline audit → docs/baseline/
 - [x] 3 Design system generate + reconcile + persist
 - [x] 4.1 Inventory + delete (done on this branch)
 - [x] 4.2 Tokens + shell
