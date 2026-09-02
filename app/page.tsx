@@ -5,7 +5,6 @@ import Firm from "@/components/Firm";
 import Strategies from "@/components/Strategies";
 import Insights from "@/components/Insights";
 import Newsletter from "@/components/Newsletter";
-import Ticker from "@/components/Ticker";
 import Footer from "@/components/Footer";
 import { FUND, SITE_URL, CONTACT } from "@/content/site";
 
@@ -41,7 +40,6 @@ export default function Page() {
         <Insights />
         <Newsletter />
       </main>
-      <Ticker />
       <Footer />
       <script type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
