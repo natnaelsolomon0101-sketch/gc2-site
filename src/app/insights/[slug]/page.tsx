@@ -34,7 +34,7 @@ export default async function Note({ params }: { params: Promise<{ slug: string 
         <div className="section-y">
           <div className="measure-prose">
             <p className="t-small text-slate">
-              {formatDate(note.date)} &nbsp; {note.category}
+              <time dateTime={note.date}>{formatDate(note.date)}</time> &nbsp; {note.category}
             </p>
             <h1
               className="t-article-title mt-6 text-black"

@@ -22,7 +22,7 @@ export default function Insights() {
             <HairlineList>
               {notes.map((n) => (
                 <HairlineRow key={n.slug} href={`/insights/${n.slug}`}>
-                  <span className="t-small col-span-4 text-slate lg:col-span-2">{formatDate(n.date)}</span>
+                  <span className="t-small col-span-4 text-slate lg:col-span-2"><time dateTime={n.date}>{formatDate(n.date)}</time></span>
                   <span className="col-span-4 lg:col-span-8">
                     <span className="t-h3 block text-black">{n.title}</span>
                     <span className="t-body measure-body mt-2 block text-slate">{n.dek}</span>
