@@ -6,23 +6,36 @@ const fmt = (iso: string) =>
 
 export default function Insights() {
   return (
-    <section id="insights" className="bg-white">
-      <div className="mx-auto max-w-[1280px] px-6 py-band md:px-10">
-        <p className="eyebrow">Insights</p>
-        <h2 className="display h-sec mt-7 max-w-[16ch]">Notes from the desk.</h2>
+    <section id="insights" className="border-b border-rule bg-band">
+      <div className="mx-auto max-w-[1440px] px-6 py-24 md:px-10 md:py-32 lg:px-16">
+        <div className="flex flex-wrap items-end justify-between gap-6">
+          <div>
+            <p className="eyebrow">Insights</p>
+            <h2 className="display h-sec mt-7">Notes from the desk.</h2>
+          </div>
+          <a href="#insights" className="border-b border-ink pb-1 text-[14px] transition-colors hover:border-accent hover:text-accent">
+            All notes
+          </a>
+        </div>
 
-        <div className="mt-14 grid gap-8 md:mt-20 md:grid-cols-3 md:gap-7">
-          {INSIGHTS.map((p) => (
+        <div className="mt-16 grid gap-x-7 gap-y-14 md:mt-20 md:grid-cols-3">
+          {INSIGHTS.map((p, i) => (
             <article key={p.slug} className="group">
-              {/* muted abstract gradient cover — no stock photography */}
-              <div className={`aspect-[4/5] w-full bg-gradient-to-br ${p.cover} transition-opacity duration-500 group-hover:opacity-90`} />
-              <div className="mt-6 flex items-center gap-3 text-[11px] uppercase tracking-[0.14em]">
-                <span className="text-accent">{p.category}</span>
-                <span className="text-ink-45">{fmt(p.date)}</span>
-              </div>
-              <h3 className="display mt-3 max-w-[22ch] text-[21px] tracking-[-0.02em] md:text-[24px]">
-                {p.title}
-              </h3>
+              <a href={`#${p.slug}`} className="block">
+                <div className={`relative aspect-[3/4] w-full overflow-hidden bg-gradient-to-br ${p.cover}`}>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/25 to-transparent" />
+                  <span className="absolute left-5 top-5 text-[10px] uppercase tracking-[0.18em] text-white/85">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                </div>
+                <div className="mt-6 flex items-center gap-3 text-[11px] uppercase tracking-[0.14em]">
+                  <span className="text-accent">{p.category}</span>
+                  <span className="text-ink-45">{fmt(p.date)}</span>
+                </div>
+                <h3 className="display mt-3 max-w-[24ch] text-[22px] leading-[1.18] tracking-[-0.02em] transition-colors group-hover:text-accent md:text-[26px]">
+                  {p.title}
+                </h3>
+              </a>
             </article>
           ))}
         </div>

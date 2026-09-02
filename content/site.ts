@@ -47,8 +47,14 @@ export const HERO = {
 /* Scale — ONE headline figure. Rendered server-side, never animated. -------- */
 export const SCALE = {
   label: "Scale",
-  statement:
-    "A deliberately small firm. Every position is owned by a named researcher who defends it in front of the desk.",
+  statement: "A deliberately small firm.",
+  support:
+    "Every position is owned by a named researcher who defends it in front of the desk. No committee, no consensus trade, no closet indexing.",
+  facts: [
+    { k: "Mandate", v: "Liquid markets, global" },
+    { k: "Structure", v: "Private partnership" },
+    { k: "Strategies", v: "Six, one risk framework" },
+  ],
   /** null until confirmed — the section omits the figure rather than invent one. */
   value: null as string | null,
   unit: null as string | null,
