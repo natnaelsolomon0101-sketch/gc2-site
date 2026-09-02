@@ -16,3 +16,16 @@ One line of reasoning each, per Orchestration §0.
   than Instrument Sans. A.4 already assigns Newsreader to the wordmark; an
   all-serif card is more coherent than mixing two families at card scale.
   Accepted rather than fixed.
+
+## Skill conflicts (Orchestration 9.6)
+
+The ui-ux-pro-max design-system generator recommended, and Appendix A overrode:
+- **Palette.** Generator: blue `#2563EB` primary, orange `#EA580C` accent,
+  `#F8FAFC` ground. A.3 is 95% achromatic on paper with one `ledger` green used
+  for links and focus only. A wins.
+- **Typefaces.** Generator: Outfit + Work Sans, both geometric sans. A.4 makes a
+  serif display the identity: Newsreader 300 + Instrument Sans. A wins.
+- **Shadows.** Generator defines four elevation levels. A.5 is explicit: zero
+  shadows, hairlines and surface steps only. A wins.
+- **Spacing.** Generator's scale stops at 64px. A.5 runs to 160 with 120px
+  section padding, because whitespace is the hierarchy here. A wins.
