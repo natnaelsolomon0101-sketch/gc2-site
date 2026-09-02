@@ -32,8 +32,7 @@ export default function Home() {
     <>
       {/* ---- hero ---- */}
       <section className="relative overflow-hidden bg-paper">
-        <Surface className="absolute right-0 top-0 hidden h-full w-3/5 md:block
-                            [mask-image:linear-gradient(to_left,#000_35%,transparent_92%)]" />
+        <Surface className="surface-mask absolute right-0 top-0 hidden h-full w-3/5 md:block" />
         <Container className="relative">
           <div className="hero-frame flex flex-col justify-center">
             <h1 className="t-display reveal reveal-1 measure-hero text-black">
