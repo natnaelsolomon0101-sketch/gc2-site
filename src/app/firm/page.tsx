@@ -42,8 +42,8 @@ export default function Firm() {
         <section key={s.h} className="bg-paper">
           <Container>
             <div className="grid-gc2 rule-t py-16 md:py-24">
-              <h2 className="t-h2 col-span-4 text-black md:col-span-5">{s.h}</h2>
-              <div className="col-span-4 md:col-span-6 md:col-start-7">
+              <h2 className="t-h2 col-span-4 text-black lg:col-span-5">{s.h}</h2>
+              <div className="col-span-4 lg:col-span-6 lg:col-start-7">
                 {s.p.map((t, i) => (
                   <p key={i} className={`t-body measure-body text-ink ${i ? "mt-6" : ""}`}>{t}</p>
                 ))}

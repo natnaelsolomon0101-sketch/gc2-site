@@ -19,7 +19,7 @@ export default function Strategies() {
         <section key={s.slug} id={s.slug} className="scroll-mt-24 bg-paper">
           <Container>
             <div className="grid-gc2 rule-t py-16 md:py-24">
-              <div className="col-span-4 md:col-span-5">
+              <div className="col-span-4 lg:col-span-5">
                 <h2 className="t-h2 text-black">{s.name}</h2>
                 <dl className="mt-8">
                   <div className="rule-t grid grid-cols-3 gap-6 py-3">
@@ -32,7 +32,7 @@ export default function Strategies() {
                   </div>
                 </dl>
               </div>
-              <div className="col-span-4 md:col-span-6 md:col-start-7">
+              <div className="col-span-4 lg:col-span-6 lg:col-start-7">
                 {s.body.map((t, i) => (
                   <p key={i} className={`t-body measure-body text-ink ${i ? "mt-6" : ""}`}>{t}</p>
                 ))}

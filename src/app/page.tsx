@@ -60,8 +60,8 @@ export default function Home() {
       <section className="bg-paper">
         <Container>
           <div className="grid-gc2 section-y">
-            <h2 className="t-h2 measure-head col-span-4 text-black md:col-span-5">A research house that trades.</h2>
-            <div className="col-span-4 md:col-span-6 md:col-start-7">
+            <h2 className="t-h2 measure-head col-span-4 text-black lg:col-span-5">A research house that trades.</h2>
+            <div className="col-span-4 lg:col-span-6 lg:col-start-7">
               <p className="t-body measure-body text-ink">
                 Durable returns in liquid markets come from process, not prediction. We
                 build our own data, write our own models, and put every idea through
@@ -88,8 +88,8 @@ export default function Home() {
                 {strategies.map((s) => (
                   <HairlineRow key={s.slug} href={`/strategies#${s.slug}`}>
                     <span className="t-h3 col-span-4 text-black">{s.name}</span>
-                    <span className="t-body col-span-4 text-ink md:col-span-5">{s.oneLiner}</span>
-                    <span className="t-small col-span-4 text-slate md:col-span-3">{s.markets}</span>
+                    <span className="t-body col-span-4 text-ink lg:col-span-5">{s.oneLiner}</span>
+                    <span className="t-small col-span-4 text-slate lg:col-span-3">{s.markets}</span>
                   </HairlineRow>
                 ))}
               </HairlineList>
@@ -116,12 +116,12 @@ export default function Home() {
               <HairlineList>
                 {notes.map((n) => (
                   <HairlineRow key={n.slug} href={`/insights/${n.slug}`}>
-                    <span className="t-small col-span-4 text-slate md:col-span-2">{formatDate(n.date)}</span>
-                    <span className="col-span-4 md:col-span-8">
+                    <span className="t-small col-span-4 text-slate lg:col-span-2">{formatDate(n.date)}</span>
+                    <span className="col-span-4 lg:col-span-8">
                       <span className="t-h3 block text-black">{n.title}</span>
                       <span className="t-body measure-body mt-2 block text-slate">{n.dek}</span>
                     </span>
-                    <span className="t-small col-span-4 text-slate md:col-span-2">{n.category}</span>
+                    <span className="t-small col-span-4 text-slate lg:col-span-2">{n.category}</span>
                   </HairlineRow>
                 ))}
               </HairlineList>
@@ -134,14 +134,14 @@ export default function Home() {
       <section className="on-black bg-black text-stone">
         <Container>
           <div className="grid-gc2 section-y">
-            <div className="col-span-4 md:col-span-5">
+            <div className="col-span-4 lg:col-span-5">
               <h2 className="t-h2 text-stone">Inquiries</h2>
               <p className="t-body measure-body mt-6 text-muted-on-black">
                 We speak with a small number of aligned partners each year. Introductions
                 are welcome.
               </p>
             </div>
-            <dl className="col-span-4 grid grid-cols-1 gap-8 md:col-span-6 md:col-start-7 lg:grid-cols-3">
+            <dl className="col-span-4 grid grid-cols-1 gap-8 lg:col-span-6 lg:col-start-7 lg:grid-cols-3">
               <div>
                 <dt className="t-caption text-muted-on-black">Investors</dt>
                 <dd className="t-small mt-2">
