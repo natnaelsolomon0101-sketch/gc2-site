@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { DM_Serif_Display, Inter, Roboto_Mono } from "next/font/google";
 import { site, siteUrl } from "@/config/site";
-import Nav from "@/components/Nav";
+import Nav from "@/components/sections/SiteNav";
 import Footer from "@/components/Footer";
 import "./globals.css";
 

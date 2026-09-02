@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import PinnedStrategies from "@/components/PinnedStrategies";
+import MarketsBand from "@/components/sections/MarketsBand";
+import Approach from "@/components/sections/Approach";
+import Insights from "@/components/sections/Insights";
 import { site, siteUrl } from "@/config/site";
 import { notes, formatDate } from "@/content/notes";
 
@@ -39,6 +42,10 @@ export default function Home() {
       </section>
 
       {/* the pinned scroll section */}
+      <MarketsBand />
+
+      <Approach />
+
       <PinnedStrategies />
 
       {/* inverted stat card — breaks the dark rhythm once */}
@@ -52,23 +59,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* insights */}
-      <section className="wrap band">
-        <p className="t-mono">Insights</p>
-        <h2 className="t-display-sm mt-6">Notes from the desk.</h2>
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
-          {notes.map((n) => (
-            <Link key={n.slug} href={`/insights/${n.slug}`} className="card-dark block p-8">
-              <p className="t-mono-xs">{n.category}</p>
-              <h3 className="t-heading-sm mt-5 text-cloud">
-                {n.title}
-              </h3>
-              <p className="t-small mt-4">{n.dek}</p>
-              <p className="t-small mt-6 text-fog">{formatDate(n.date)}</p>
-            </Link>
-          ))}
-        </div>
-      </section>
+      <Insights />
 
       {/* contact */}
       <section className="wrap band">
