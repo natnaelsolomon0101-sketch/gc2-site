@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import PinnedStrategies from "@/components/PinnedStrategies";
+import Strategies from "@/components/sections/Strategies";
 import MarketsBand from "@/components/sections/MarketsBand";
 import Approach from "@/components/sections/Approach";
 import Insights from "@/components/sections/Insights";
@@ -47,7 +47,7 @@ export default function Home() {
 
       <Approach />
 
-      <PinnedStrategies />
+      <Strategies />
 
       {/* inverted stat card — breaks the dark rhythm once */}
       <section className="wrap band">
