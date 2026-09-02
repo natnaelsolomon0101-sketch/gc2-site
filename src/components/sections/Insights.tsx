@@ -14,16 +14,18 @@ import { notes, formatDate } from "@/content/notes";
  * each. Nothing here is invented: no read times, no authors, no metrics.
  */
 const QUOTES: Record<string, string> = {
-  // src/content/notes/trade-the-regime-not-the-forecast.mdx, lines 18–19
-  "trade-the-regime-not-the-forecast":
-    "A position sized to a state comes off when the state changes.",
-  // src/content/notes/the-honest-cost-of-convexity.mdx, line 38
-  "the-honest-cost-of-convexity":
-    "The cost of convexity is real. It is also the smaller number.",
   // src/content/notes/capacity-is-a-research-problem.mdx, lines 14–15
   "capacity-is-a-research-problem":
     "Nobody lies; the number simply drifts toward the one that lets the work continue.",
 };
+
+/* Every note needs its quote. Throws at module load rather than rendering a
+   pair of empty quotation marks on the home page. */
+for (const n of notes) {
+  if (!QUOTES[n.slug]) {
+    throw new Error(`Insights: no pull-quote for note "${n.slug}".`);
+  }
+}
 
 function Arrow() {
   return (
@@ -55,7 +57,9 @@ export default function Insights() {
           <h2 className="t-display-sm mt-6">Notes from the desk.</h2>
         </div>
         <p className="t-mono-xs max-w-xs text-fog">
-          Three notes. Each one argues a position we actually hold.
+          {notes.length === 1
+            ? "One note. It argues a position we actually hold."
+            : `${notes.length} notes. Each one argues a position we actually hold.`}
         </p>
       </div>
 
@@ -103,7 +107,10 @@ export default function Insights() {
         </div>
       </Link>
 
-      {/* ---- the other two: type-led hairline rows ---- */}
+      {/* ---- the rest: type-led hairline rows. Absent, not empty, when the
+           index is a single note — an empty bordered box reads as a note that
+           failed to load. ---- */}
+      {rest.length ? (
       <div className="mt-12 md:mt-16">
         {rest.map((n, i) => (
           <Link
@@ -137,9 +144,10 @@ export default function Insights() {
           </Link>
         ))}
       </div>
+      ) : null}
 
       {/* closing rule + index link */}
-      <div className="flex justify-end border-t border-steel pt-6">
+      <div className={`flex justify-end border-t border-steel ${rest.length ? "pt-6" : "mt-12 pt-6 md:mt-16"}`}>
         <Link
           href="/insights"
           className="t-mono-xs group inline-flex min-h-11 items-center gap-3 text-pure"
