@@ -87,7 +87,7 @@ const HUE: Record<string, string> = {
 const COUNT = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven"];
 
 const ledger: { label: string; value: string }[] = [
-  { label: "Formed", value: String(site.founded) }, //      site.founded
+  { label: "Formed", value: site.foundedLabel }, //  site.foundedLabel
   { label: "Domicile", value: site.city }, //               site.city
   { label: "Structure", value: site.structure }, //         site.structure
   { label: "Mandate", value: site.mandate }, //             site.mandate

@@ -22,7 +22,7 @@ export const fund = {
     fund: null as string | null,          // the onshore fund
     offshore: null as string | null,      // offshore feeder, if any
     jurisdiction: null as string | null,
-    inception: null as string | null,     // fund inception, distinct from firm founding (2019)
+    inception: null as string | null,     // fund inception, distinct from firm founding
   },
 
   regulatory: {

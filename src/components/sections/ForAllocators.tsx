@@ -20,6 +20,10 @@ import { allocatorNav } from "@/config/nav";
  * null.
  */
 const COPY: Record<string, { q: string; a: string }> = {
+  "/team": {
+    q: "Who is actually running this?",
+    a: "The seats that exist, what each one holds, and what to demand of a biography.",
+  },
   "/partnership": {
     q: "How can a family hold capital here?",
     a: "Three structures, what alignment means in each, and how a relationship starts.",

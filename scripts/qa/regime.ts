@@ -32,7 +32,7 @@ const PROHIBITED_506C = [
 ];
 
 const ROUTES = ["/", "/firm", "/strategies", "/insights", "/diligence", "/governance",
-                "/partnership", "/letters", "/tearsheet", "/questions", "/access",
+                "/team", "/partnership", "/letters", "/tearsheet", "/questions", "/access",
                 "/contact", "/legal", "/legal/terms", "/legal/privacy", "/disclosures"];
 
 async function main() {

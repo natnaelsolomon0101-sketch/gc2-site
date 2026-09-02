@@ -113,12 +113,16 @@ export default function Approach() {
       </div>
 
       {/* ------------------------------------------------------------- the rail */}
-      <div className="mt-16 border-l border-steel md:mt-24">
+      {/* No left rail. The rail plus each stage's top rule closed three sides of
+          every band, so the stages read as boxes rather than as a sequence. The
+          horizontal rules alone carry the order, which is how the rest of the
+          site separates bands. */}
+      <div className="mt-16 md:mt-24">
         <ol>
           {stages.map((s) => (
             <li
               key={s.n}
-              className="border-t border-steel pt-10 pb-14 pl-6 md:pt-12 md:pb-20 md:pl-12"
+              className="border-t border-steel pt-10 pb-14 md:pt-12 md:pb-20"
             >
               <div className="grid gap-6 md:grid-cols-12 md:gap-8">
                 {/* who — the column that never moves */}
@@ -148,7 +152,7 @@ export default function Approach() {
           ))}
 
           {/* -------------------------------------------- 04 breaks the staircase */}
-          <li className="border-t border-steel pt-10 pb-14 pl-6 md:pt-12 md:pb-20 md:pl-12">
+          <li className="border-t border-steel pt-10 pb-14 md:pt-12 md:pb-20">
             <div className="card-dark p-8 md:p-12">
               <div className="grid gap-6 md:grid-cols-12 md:gap-8">
                 <div className="md:col-span-3">
@@ -177,7 +181,7 @@ export default function Approach() {
         </ol>
 
         {/* ------------------------------------- underneath all of it, permanently */}
-        <div className="border-t border-steel pt-10 pl-6 md:pt-12 md:pl-12">
+        <div className="border-t border-steel pt-10 md:pt-12">
           <div className="rounded-card border-t-2 border-iris-gleam bg-abyss p-8 md:p-12">
             <div className="grid gap-8 lg:grid-cols-12">
               <div className="lg:col-span-7">

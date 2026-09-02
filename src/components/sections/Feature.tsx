@@ -82,7 +82,7 @@ const COUNT = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven"];
 
 /** site.ts, verbatim. No AUM, no people, no address — none exist. */
 const ledger: { label: string; value: string }[] = [
-  { label: "Formed", value: String(site.founded) },
+  { label: "Formed", value: site.foundedLabel },
   { label: "Domicile", value: site.city },
   { label: "Structure", value: site.structure },
   { label: "Mandate", value: site.mandate },

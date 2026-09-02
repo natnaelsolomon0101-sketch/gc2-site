@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 const jsonLd = {
   "@context": "https://schema.org", "@type": "Organization",
   name: site.name, alternateName: site.mark, url: siteUrl,
-  email: site.emails.investors, foundingDate: String(site.founded),
+  email: site.emails.investors, foundingDate: site.foundedISO,
   address: { "@type": "PostalAddress", addressLocality: "Miami", addressRegion: "FL", addressCountry: "US" },
 };
 

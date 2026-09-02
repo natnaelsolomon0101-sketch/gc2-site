@@ -1,7 +1,7 @@
 import { site } from "@/config/site";
 
 const facts = [
-  { label: "Founded", value: String(site.founded) },
+  { label: "Founded", value: site.foundedLabel },
   { label: "Headquarters", value: site.city },
   { label: "Structure", value: site.structure },
   { label: "Mandate", value: site.mandate },

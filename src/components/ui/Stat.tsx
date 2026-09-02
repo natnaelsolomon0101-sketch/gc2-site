@@ -17,7 +17,7 @@ import { strategies } from "@/content/strategies";
  * the firm's real structural facts. There is no prop through which a figure can
  * be introduced, and no string in this file that a designer typed from memory.
  *
- *     <Stat fact="founded" />                    // -> Founded / 2019
+ *     <Stat fact="founded" />                    // -> Founded / September 2026
  *
  * `assertNoFigures()` runs at module load and throws — failing the build — if a
  * future edit puts a percentage, a currency amount, or a performance word into
@@ -68,7 +68,7 @@ type Fact = { readonly label: string; readonly value: string };
  * value is read from source, never written here.
  */
 export const STRUCTURAL_FACTS = Object.freeze({
-  founded: { label: "Founded", value: String(site.founded) },
+  founded: { label: "Founded", value: site.foundedLabel },
   base: { label: "Base", value: site.city },
   structure: { label: "Structure", value: site.structure },
   mandate: { label: "Mandate", value: site.mandate },

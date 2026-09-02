@@ -3,7 +3,12 @@ export const site = {
   mark: "GC2",
   domain: "gc2.fund",
   city: "Miami, Florida",
-  founded: 2019,
+  // The month matters: the firm is weeks old, and "2026" alone would let a
+  // reader assume January. Anything that prints a founding fact reads these
+  // two, never a literal.
+  founded: 2026,
+  foundedLabel: "September 2026",
+  foundedISO: "2026-09",
   structure: "Private partnership",
   mandate: "Liquid markets, global",
   emails: { investors: "investors@gc2.fund", press: "press@gc2.fund" },

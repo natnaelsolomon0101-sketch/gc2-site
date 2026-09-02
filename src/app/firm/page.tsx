@@ -49,7 +49,7 @@ type Section = { h: string; p: string[]; node?: React.ReactNode };
 
 const sections: Section[] = [
   { h: "Origins", p: [
-    `${site.name} was founded in ${site.founded} in ${site.city} on a narrow premise: durable returns in liquid markets come from process, not prediction.`,
+    `${site.name} was founded in ${site.foundedLabel} in ${site.city} on a narrow premise: durable returns in liquid markets come from process, not prediction.`,
     "The firm was built small and has stayed small. Headcount is a constraint we chose, because every position has to be defensible by the person who owns it.",
   ]},
   { h: "How we work", p: [
