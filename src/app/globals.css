@@ -124,11 +124,20 @@
   .card-lite { background: var(--color-silver); color: var(--color-void); border-radius: 30px; padding: 32px; }
 }
 
-/* atmospheric reveal — the spec's 2.5s curve */
-@keyframes originFade { from { opacity: 0; transform: translate3d(0,14px,0); }
-                        to   { opacity: 1; transform: none; } }
-.fade-in { animation: originFade 2.5s cubic-bezier(.455,.03,.515,.955) both; }
-.fade-1 { animation-delay: 0ms; } .fade-2 { animation-delay: 160ms; } .fade-3 { animation-delay: 320ms; }
+/* Atmospheric reveal. Opacity and transform are split deliberately: the h1 is
+   the LCP element, and gating it behind a 2.5s ease-in-out left the page
+   looking blank for ~2s (measured: FCP 140ms, h1 still at opacity .37 after
+   2s). Opacity now lands fast on an ease-out; the 14px rise keeps the slow
+   atmospheric feel the spec asks for. */
+@keyframes originFadeIn { from { opacity: 0 } to { opacity: 1 } }
+@keyframes originRise   { from { transform: translate3d(0,14px,0) } to { transform: none } }
+.fade-in {
+  animation: originFadeIn 620ms cubic-bezier(.22,.61,.36,1) both,
+             originRise  1600ms cubic-bezier(.455,.03,.515,.955) both;
+}
+.fade-1 { animation-delay: 0ms,  0ms;  }
+.fade-2 { animation-delay: 90ms, 90ms; }
+.fade-3 { animation-delay: 180ms,180ms;}
 
 @media (prefers-reduced-motion: reduce) {
   .fade-in { animation: none; opacity: 1; transform: none; }
