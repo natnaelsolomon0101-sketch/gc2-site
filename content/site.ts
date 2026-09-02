@@ -97,13 +97,13 @@ export const STRATEGIES = [
 export const INSIGHTS = [
   { slug: "regime-not-forecast", date: "2026-07-14", category: "Research",
     title: "Trade the regime, not the forecast",
-    cover: "from-[#1d3b34] via-[#2c554a] to-[#7f9c92]" },
+    tone: "#32302f", surface: "#faf8f5" },
   { slug: "cost-of-convexity", date: "2026-05-02", category: "Risk",
     title: "The honest cost of convexity",
-    cover: "from-[#23303a] via-[#3a4b58] to-[#8e9aa4]" },
+    tone: "#686664", surface: "#f1f0f0" },
   { slug: "capacity-first", date: "2026-02-20", category: "Process",
     title: "Capacity is a research problem",
-    cover: "from-[#2e2a24] via-[#4a4237] to-[#9c9184]" },
+    tone: "#3a3525", surface: "#faf8f5" },
 ];
 
 /* Newsletter --------------------------------------------------------------- */

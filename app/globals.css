@@ -1,87 +1,86 @@
 @import "tailwindcss";
 
 /* ===========================================================================
-   SLASH — midnight vault with gilded ledger lines
+   WEALTHSIMPLE — cashmere-lined vault with gallery lighting
+   Warm near-monochrome. No shadows, no gradients, no accent hues.
    ========================================================================= */
 @theme {
-  --color-obsidian:  #08080a;
-  --color-onyx:      #040406;
-  --color-carbon:    #121317;
-  --color-graphite:  #1c1d22;
-  --color-slate:     #2e3038;
-  --color-smoke:     #464853;
-  --color-ash:       #5e616e;
-  --color-steel:     #777a88;
-  --color-fog:       #9194a1;
-  --color-mist:      #acafb9;
-  --color-silver:    #c7c9d1;
-  --color-bone:      #e2e3e9;
-  --color-paper-white:#ffffff;
-  --color-copper:    #cc9166;
+  --color-graphite-ink: #32302f;
+  --color-paper-white:  #fcfcfc;
+  --color-linen-cream:  #faf8f5;
+  --color-fog-veil:     #f1f0f0;
+  --color-stone:        #e4e2e1;
+  --color-pebble:       #686664;
+  --color-charcoal:     #09090a;
+  --color-bronze-field: #3a3525;
 
-  --font-display: var(--font-presto), "Iowan Old Style", Georgia, serif;
-  --font-ui:      var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-tiempos: var(--font-serif), Georgia, "Times New Roman", serif;
+  --font-future:  var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 
-  --radius-nav: 2px;
-  --radius-cards: 10px;
-  --radius-full: 9999px;
+  --radius-soft: 12px;
+  --radius-card: 100px;
+  --radius-pill: 1600px;
 }
 
-:root {
-  --gilded: linear-gradient(103deg, rgb(174,147,87), rgb(255,240,204) 40%, rgb(174,147,87) 70%, rgba(189,157,79,0));
-  --page-max: 1216px;
-  --section-gap: clamp(88px, 11vw, 160px);
-}
+:root { --page-max: 1200px; --section-gap: clamp(56px, 7vw, 80px); }
 
 @layer base {
-  html { -webkit-text-size-adjust:100%; scroll-behavior:smooth; color-scheme: dark; }
+  html { -webkit-text-size-adjust:100%; scroll-behavior:smooth; }
   body {
-    background: var(--color-obsidian);
-    color: var(--color-bone);
-    font-family: var(--font-ui);
-    font-size: 16px; line-height: 1.5; font-weight: 400;
+    background: var(--color-paper-white);
+    color: var(--color-graphite-ink);
+    font-family: var(--font-future);
+    font-size: 16px; line-height: 1.5; letter-spacing: .005em; font-weight: 400;
     -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
   }
-  ::selection { background: var(--color-copper); color: #08080a; }
-  :focus-visible { outline: 2px solid var(--color-copper); outline-offset: 3px; border-radius: 2px; }
+  ::selection { background: var(--color-graphite-ink); color: var(--color-paper-white); }
+  :focus-visible { outline: 2px solid var(--color-graphite-ink); outline-offset: 3px; border-radius: 2px; }
+  .on-bronze :focus-visible { outline-color: var(--color-paper-white); }
 }
 
 @layer components {
-  /* Serif never below 28px. Sans never above 48px. */
-  .ivy      { font-family: var(--font-display); font-weight: 400; letter-spacing: .01em; color: var(--color-paper-white); }
-  .t-display{ font-size: clamp(44px, 7.2vw, 88px); line-height: 1; }
-  .t-h-lg   { font-size: clamp(36px, 5vw, 64px);  line-height: 1.13; }
-  .t-h      { font-size: clamp(32px, 4.2vw, 52px);line-height: 1.13; }
-  .t-h-sm   { font-size: clamp(28px, 3vw, 44px);  line-height: 1.2; }
+  /* Serif for display only. Sans for body only. Never crossed. */
+  .tiempos  { font-family: var(--font-tiempos); font-weight: 500; letter-spacing: -0.01em; }
+  .t-display{ font-size: clamp(44px, 6.6vw, 84px); line-height: 1.08; }
+  .t-h-lg   { font-size: clamp(34px, 4.4vw, 56px); line-height: 1.1; }
+  .t-h      { font-size: clamp(28px, 3vw, 36px);   line-height: 1.2; }
 
-  .eyebrow  { font-size: 13px; line-height: 1; letter-spacing: -0.26px;
-              font-weight: 600; color: var(--color-fog); }
-  .eyebrow-copper { color: var(--color-copper); }
+  .eyebrow  { font-size: 14px; line-height: 1.4; letter-spacing: .005em;
+              font-weight: 400; color: var(--color-pebble); }
+  .t-lede   { font-size: 18px; line-height: 1.4; color: var(--color-graphite-ink); }
+  .t-body   { font-size: 16px; line-height: 1.5; color: var(--color-graphite-ink); }
+  .t-caption{ font-size: 14px; line-height: 1.4; letter-spacing: .07px; color: var(--color-pebble); }
 
-  .t-body   { font-size: 20px; line-height: 1.38; letter-spacing: -0.8px;  color: var(--color-mist); }
-  .t-body-sm{ font-size: 18px; line-height: 1.38; letter-spacing: -0.36px; color: var(--color-mist); }
-  .t-body-xs{ font-size: 16px; line-height: 1.5;  color: var(--color-bone); }
+  .wrap { max-width: var(--page-max); margin-inline:auto; padding-inline: clamp(20px,5vw,24px); }
+  .band { padding-block: var(--section-gap); }
 
-  .wrap  { max-width: var(--page-max); margin-inline: auto; padding-inline: clamp(20px,5vw,32px); }
-  .band  { padding-block: var(--section-gap); }
+  /* Every interactive element is a 1600px pill. Label tracked to 0.025em. */
+  .ws-label { font-size:16px; line-height:1.2; letter-spacing:.025em; font-weight:400; }
+  .btn-fill { background:var(--color-charcoal); color:var(--color-paper-white);
+              border-radius:1600px; padding:12px 28px; display:inline-flex; align-items:center;
+              justify-content:center; transition:opacity .2s; }
+  .btn-fill:hover { opacity:.88; }
+  .btn-out  { background:transparent; color:var(--color-graphite-ink);
+              border:1px solid var(--color-graphite-ink); border-radius:1600px;
+              padding:12px 28px; display:inline-flex; align-items:center; justify-content:center;
+              transition:background .2s,color .2s; }
+  .btn-out:hover { background:var(--color-graphite-ink); color:var(--color-paper-white); }
+  .btn-out-light { border-color:var(--color-paper-white); color:var(--color-paper-white); }
+  .btn-out-light:hover { background:var(--color-paper-white); color:var(--color-graphite-ink); }
+  .btn-ghost{ background:var(--color-linen-cream); color:var(--color-graphite-ink);
+              border-radius:1600px; padding:12px 28px; display:inline-flex; align-items:center;
+              justify-content:center; transition:background .2s; }
+  .btn-ghost:hover { background:var(--color-fog-veil); }
 
-  /* Pill controls — 9999px on buttons, inputs, tags */
-  .btn-primary { background:#fff; color:#000; border-radius:9999px; padding:10px 20px;
-                 font-size:14px; font-weight:500; display:inline-flex; align-items:center;
-                 transition:opacity .2s; }
-  .btn-primary:hover { opacity:.88; }
-  .btn-ghost   { background:transparent; color:#fff; border:1px solid #fff; border-radius:9999px;
-                 padding:10px 20px; font-size:14px; font-weight:500; display:inline-flex;
-                 align-items:center; transition:background .2s,color .2s; }
-  .btn-ghost:hover { background:#fff; color:#000; }
-  .pill-tag    { border:1px solid var(--color-steel); border-radius:9999px; padding:6px 10px;
-                 font-size:12px; color:#fff; display:inline-flex; align-items:center; }
+  /* Signature: 100px radius on cards, 100px on inputs. No shadow, ever. */
+  .soft-card { background:var(--color-linen-cream); border-radius:100px; padding:32px; }
+  .ws-input  { background:var(--color-paper-white); border:1px solid var(--color-stone);
+               border-radius:100px; padding:16px 24px; font-size:16px; outline:none; }
+  .ws-input:focus { border-color:var(--color-graphite-ink); }
+  .ws-input::placeholder { color:var(--color-pebble); }
 
-  .card { background: var(--color-onyx); border-radius: 10px; }
-  .hair { border-color: var(--color-graphite); }
-
-  .gilded-text { background: var(--gilded); -webkit-background-clip: text;
-                 background-clip: text; color: transparent; }
+  /* Feature columns: a hairline on top is the only chrome. */
+  .rule-top { border-top:1px solid var(--color-stone); }
 }
 
 @media (prefers-reduced-motion: reduce) {

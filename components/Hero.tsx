@@ -4,32 +4,28 @@ import Surface from "./Surface";
 
 export default function Hero() {
   return (
-    <section id="top" className="relative overflow-hidden border-b border-graphite bg-obsidian">
-      <div className="mx-auto grid min-h-[88vh] max-w-[1216px] grid-cols-12 items-stretch">
-        {/* type column */}
-        <div className="col-span-12 flex flex-col justify-center px-6 pb-16 pt-32 md:col-span-7 md:px-10 md:pb-20 md:pt-36 lg:col-span-6 lg:pl-16">
-          <p className="eyebrow">{FUND.city}, {FUND.state}</p>
-          <h1 className="ivy t-display mt-8 max-w-[13ch]">
+    <section id="top" className="on-bronze relative overflow-hidden bg-bronze-field text-paper-white">
+      <div className="wrap relative grid grid-cols-12 items-center gap-y-14 py-20 md:py-28 lg:py-32">
+        <div className="col-span-12 md:col-span-6 lg:col-span-5">
+          <p className="eyebrow text-paper-white/70">{FUND.city}, {FUND.state}</p>
+          <h1 className="tiempos t-display mt-4 text-paper-white">
             <Emphasis text={HERO.headline} word={HERO.emphasis} />
           </h1>
-          <p className="mt-8 max-w-[52ch] text-[17px] leading-[1.7] text-mist md:mt-10">
+          <p className="t-lede mt-6 max-w-[44ch] text-paper-white/80">
             {HERO.supporting}
-            <sup className="ml-1 text-[11px] text-fog">{HERO.footnote}</sup>
+            <sup className="ml-1 text-[11px] text-paper-white/60">{HERO.footnote}</sup>
           </p>
-          <div className="mt-12 flex flex-wrap items-center gap-x-10 gap-y-4 border-t border-graphite pt-7 md:mt-16">
-            {[["Mandate", "Liquid markets"], ["Structure", "Private partnership"], ["Strategies", "Six"]].map(([k, v]) => (
-              <div key={k}>
-                <div className="text-[10px] uppercase tracking-[0.16em] text-fog">{k}</div>
-                <div className="mt-1 text-[15px]">{v}</div>
-              </div>
-            ))}
+          <div className="mt-9 flex flex-wrap gap-3">
+            <a href="#contact" className="btn-fill ws-label">Get started</a>
+            <a href="#firm" className="btn-out btn-out-light ws-label">Learn more</a>
           </div>
         </div>
 
-        {/* full-bleed visual anchor */}
-        <div className="relative col-span-12 min-h-[46vh] bg-onyx md:col-span-5 md:min-h-0 lg:col-span-6">
-          <Surface className="absolute inset-0 h-full w-full" lines={38} />
-          <div className="absolute inset-0 bg-gradient-to-r from-obsidian via-obsidian/60 to-transparent md:w-2/5" />
+        {/* sculptural form, gallery-lit, never cropped by text */}
+        <div className="col-span-12 md:col-span-6 lg:col-span-6 lg:col-start-7">
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[100px] md:aspect-[5/4]">
+            <Surface className="absolute inset-0 h-full w-full" lines={44} tone="#faf8f5" opacity={0.9} />
+          </div>
         </div>
       </div>
     </section>
