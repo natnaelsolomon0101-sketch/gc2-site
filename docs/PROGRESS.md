@@ -4,7 +4,7 @@
 - [x] 1.2 Skill installed and verified
 - [x] 1.3 QA tooling installed
 - [ ] 2 Baseline audit → docs/baseline/
-- [ ] 3 Design system generate + reconcile + persist
+- [x] 3 Design system generate + reconcile + persist
 - [x] 4.1 Inventory + delete (done on this branch)
 - [x] 4.2 Tokens + shell
 - [x] 4.3 The surface
