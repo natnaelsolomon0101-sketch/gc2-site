@@ -29,7 +29,7 @@ captured at 390/768/1280/1600 in `docs/baseline/`. The rebuild is
 
 | | Live (baseline) | Rebuild |
 |---|---|---|
-| Overall rubric | **1.9 / 5** | **4.15 → 4.81 → 4.88** |
+| Overall rubric | **1.9 / 5** | **4.15 → 4.81 → 4.88 → 4.95** |
 | Canvas | Dark by default (A.7.1) | Paper, one black band |
 | Whitespace | ~950px of dead black mid-page | Sections on a 120px rhythm |
 | Kill list | 6 A.7 entries present | Empty, four rounds running |
@@ -50,7 +50,10 @@ A viewport-only review never sees it.
 | 1 | empty | 0 | 0 | 53/53 | 98/100/96/100 | 4.81 (0 high, 4 med, 9 low) |
 | 2 | empty | 0 | 0 | 53/53 | 96/100/96/100 | 4.88 (0 high, 3 med, 10 low) |
 | 3 | empty | 0 | 0 | 53/53 | 98/100/96/100 | not critiqued (interim capture) |
-| 4 | empty | 0 | 0 | 53/53 | 98/100/96/100 | confirming round |
+| 4 | empty | 0 | 0 | 53/53 | 98/100/96/100 | 4.95 (0 high, 0 med, 5 low) |
+| 5 | empty | 0 | 0 | 53/53 | 98/100/96/100 | 4.95 (0 high, 0 med, 4 low) — §5.2 MET |
+| 6 | empty | 0 | 0 | 53/53 | 98/100/96/100 | post ui-review |
+| 7 | empty | 0 | 0 | 53/53 | 98/100/96/100 | zero code changes vs round 6 |
 
 Fix logs: `docs/qa/round-0/FIXES.md`, `docs/qa/round-1/FIXES.md`.
 
