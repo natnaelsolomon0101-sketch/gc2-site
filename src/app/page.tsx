@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Strategies from "@/components/sections/Strategies";
-import Atmosphere from "@/components/sections/Atmosphere";
+import HeroTicker from "@/components/sections/HeroTicker";
 import Feature from "@/components/sections/Feature";
 import Approach from "@/components/sections/Approach";
 import Insights from "@/components/sections/Insights";
@@ -25,28 +25,7 @@ const jsonLd = {
 export default function Home() {
   return (
     <>
-      {/* hero */}
-      <section className="relative isolate overflow-hidden" style={{ paddingBlock: "120px" }}>
-        <Atmosphere />
-        <div className="wrap relative z-10 mx-auto max-w-4xl text-center">
-          <span className="chip fade-in fade-1">
-            <span className="t-mono" style={{ letterSpacing: ".16em" }}>{site.city}</span>
-          </span>
-          <h1 className="t-display fade-in fade-2 mt-8">Evidence first. Then capital.</h1>
-          <p className="t-sub fade-in fade-3 mx-auto mt-8 max-w-xl text-ash">
-            {site.name} runs concentrated, systematic strategies across liquid global
-            markets, underwritten by our own research and a single risk framework.
-          </p>
-          <div className="fade-in fade-3 mt-10 flex flex-wrap items-center justify-center gap-4">
-            <Link href="/firm" className="btn">Our approach</Link>
-            <Link href="/contact" className="btn btn-ghost">Investor inquiries</Link>
-          </div>
-        </div>
-      </section>
-
-      {/* the pinned scroll section */}
-
-      <Approach />
+      <HeroTicker />
 
       <Feature />
 
