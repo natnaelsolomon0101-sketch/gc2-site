@@ -24,6 +24,19 @@ critic-brand is under. Not met this round.
 | `/firm` surface runs through the h1 at 390 | critic-lp (high) | Hidden below md; header has only 72px of 348px clear |
 | Contact values 7px off one baseline | critic-brand | `.link-block` bought 44px by growing the box; now padding + negative margin |
 | Link underline near-black under green glyphs | critic-craft | `currentColor` at rest, hover to black |
+| Focused skip link invisible behind the sticky header | a11y-auditor (high) | Restacked skip 50 > header 40 > drawer 30 |
+| `<main>` not focusable, so the skip link only worked in Chromium | a11y-auditor | `tabindex="-1"` |
+| Kill list did not catch `z-[` arbitrary values | found while fixing the above | Rule extended, canary-tested |
+
+## a11y-auditor — 26 contrast pairs, 0 failures
+
+Lowest is `slate` on `stone` at **4.60:1** against a 4.5 floor. It explicitly
+warns not to "correct" `slate` back to A.3's tabled `#6B7178`, which measures
+**4.47:1** on stone and would fail. Focus rings: ledger on paper 9.93:1, stone
+on black 19.02:1, and ledger on near-black would be 2.12:1 — which is why the
+black band's stone override is load-bearing. Reflow clean at 640/512/320/280px.
+Its second high (drawer focus return) was **stale**: it tested before that fix
+landed, and a clean-build probe confirms focus returns to the hamburger.
 
 ## Open, ranked
 
