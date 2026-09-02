@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { site } from "@/config/site";
+import { palette } from "@/config/tokens";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
@@ -21,20 +22,20 @@ export default async function OG() {
     (
       <div style={{
         width: "100%", height: "100%", display: "flex", flexDirection: "column",
-        justifyContent: "space-between", background: "#FFFFFF", padding: 72,
+        justifyContent: "space-between", background: palette.paper, padding: 72,
       }}>
-        <div style={{ display: "flex", fontSize: 30, color: "#1F2326", letterSpacing: -0.3 }}>
+        <div style={{ display: "flex", fontSize: 30, color: palette.ink, letterSpacing: -0.3 }}>
           {site.mark}
         </div>
         <div style={{
-          display: "flex", fontSize: 82, lineHeight: 1.02, color: "#000000",
+          display: "flex", fontSize: 82, lineHeight: 1.02, color: palette.black,
           letterSpacing: -1, maxWidth: 940, fontFamily: "Newsreader",
         }}>
           Evidence first. Then capital.
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <div style={{ display: "flex", height: 1, background: "#E3E5E1" }} />
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 24, color: "#6B7178" }}>
+          <div style={{ display: "flex", height: 1, background: palette.hairline }} />
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 24, color: palette.slate }}>
             <div style={{ display: "flex" }}>{site.name}</div>
             <div style={{ display: "flex" }}>{site.city}</div>
           </div>

@@ -56,6 +56,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+  html { color-scheme: light; }
   ::selection { background: var(--color-ledger); color: var(--color-paper); }
   h1,h2,h3,h4 { font-family: var(--font-display); font-weight: 300; }
 }
