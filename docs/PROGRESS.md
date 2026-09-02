@@ -12,7 +12,7 @@ the existing build was never held to.
 - [x] Secret scan `git grep 21st_sk_` clean
 - [x] `docs/SWARM.md` written
 - [x] Roster written to `.claude/agents/` (16 agents; the brief's prose says fifteen, its table lists sixteen)
-- [ ] 21st tool names discovered -> `docs/ENV.md` under 21ST_TOOLS
+- [x] 21st tool names discovered -> `docs/ENV.md` under 21ST_TOOLS
 - [x] ui-ux-pro-max installed and verified; design-system persisted; DESIGN.md and site.ts written
 - [x] Baseline of the live site captured (`docs/baseline/`)
 
