@@ -24,58 +24,43 @@ export default function Nav() {
 
   return (
     <>
-      <header
-        className={cn(
-          "fixed inset-x-0 top-0 z-50 h-16 bg-white/85 backdrop-blur-md transition-colors duration-300",
-          scrolled ? "border-b border-rule" : "border-b border-transparent"
-        )}
-      >
-        <div className="mx-auto flex h-full max-w-[1280px] items-center justify-between px-6 md:px-10">
-          <a href="#top" className="text-[19px] font-600 tracking-tight" aria-label={`${FUND.mark} home`}>
-            <span className="font-semibold">{FUND.mark}</span>
-          </a>
+      <header className={cn(
+        "fixed inset-x-0 top-0 z-50 h-[68px] transition-colors duration-300",
+        scrolled ? "border-b border-graphite bg-obsidian/92 backdrop-blur-md" : "border-b border-transparent"
+      )}>
+        <div className="wrap flex h-full items-center justify-between">
+          <a href="#top" className="ivy text-[22px]" aria-label={`${FUND.mark} home`}>{FUND.mark}</a>
 
-          <nav aria-label="Primary" className="hidden items-center gap-10 md:flex">
+          <nav aria-label="Primary" className="hidden items-center gap-1 md:flex">
             {NAV.map((n) => (
               <a key={n.href} href={n.href}
-                 className="text-[14px] text-ink-70 transition-colors hover:text-ink">
+                 className="rounded-[2px] px-[10px] py-[6px] text-[14px] text-fog transition-colors hover:text-white">
                 {n.label}
               </a>
             ))}
           </nav>
 
-          <a href={NAV_CTA.href}
-             className={cn(buttonVariants({ variant: "outline", size: "sm" }), "hidden md:inline-flex")}>
-            {NAV_CTA.label}
-          </a>
+          <div className="hidden items-center gap-2 md:flex">
+            <a href="#contact" className="px-[10px] py-[6px] text-[14px] text-fog transition-colors hover:text-white">Sign in</a>
+            <a href={NAV_CTA.href} className={buttonVariants({ variant: "primary", size: "md" })}>{NAV_CTA.label}</a>
+          </div>
 
-          <button
-            onClick={() => setOpen(!open)}
-            aria-label={open ? "Close menu" : "Open menu"}
-            aria-expanded={open}
-            className="-mr-2 flex h-11 w-11 flex-col items-center justify-center gap-[5px] md:hidden"
-          >
-            <span className={cn("block h-px w-5 bg-ink transition-transform", open && "translate-y-[3px] rotate-45")} />
-            <span className={cn("block h-px w-5 bg-ink transition-transform", open && "-translate-y-[3px] -rotate-45")} />
+          <button onClick={() => setOpen(!open)} aria-label={open ? "Close menu" : "Open menu"}
+                  aria-expanded={open}
+                  className="-mr-2 flex h-11 w-11 flex-col items-center justify-center gap-[5px] md:hidden">
+            <span className={cn("block h-px w-5 bg-white transition-transform", open && "translate-y-[3px] rotate-45")} />
+            <span className={cn("block h-px w-5 bg-white transition-transform", open && "-translate-y-[3px] -rotate-45")} />
           </button>
         </div>
       </header>
 
-      <div
-        className={cn(
-          "fixed inset-0 z-40 flex flex-col justify-center gap-2 bg-white px-6 transition-opacity duration-300 md:hidden",
-          open ? "opacity-100" : "pointer-events-none opacity-0"
-        )}
-        hidden={!open}
-      >
+      <div className={cn("fixed inset-0 z-40 flex flex-col justify-center gap-1 bg-obsidian px-6 transition-opacity duration-300 md:hidden",
+                          open ? "opacity-100" : "pointer-events-none opacity-0")} hidden={!open}>
         {NAV.map((n) => (
-          <a key={n.href} href={n.href} onClick={() => setOpen(false)}
-             className="display h-sub py-3">{n.label}</a>
+          <a key={n.href} href={n.href} onClick={() => setOpen(false)} className="ivy t-h-sm py-3">{n.label}</a>
         ))}
         <a href={NAV_CTA.href} onClick={() => setOpen(false)}
-           className={cn(buttonVariants({ variant: "outline", size: "md" }), "mt-6 w-fit")}>
-          {NAV_CTA.label}
-        </a>
+           className={cn(buttonVariants({ variant: "primary", size: "md" }), "mt-8 w-fit")}>{NAV_CTA.label}</a>
       </div>
     </>
   );

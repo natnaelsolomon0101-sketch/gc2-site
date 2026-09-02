@@ -6,14 +6,14 @@ const fmt = (iso: string) =>
 
 export default function Insights() {
   return (
-    <section id="insights" className="border-b border-rule bg-band">
-      <div className="mx-auto max-w-[1440px] px-6 py-24 md:px-10 md:py-32 lg:px-16">
+    <section id="insights" className="border-b border-graphite bg-onyx">
+      <div className="mx-auto max-w-[1216px] px-6 py-24 md:px-10 md:py-32 lg:px-16">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>
             <p className="eyebrow">Insights</p>
-            <h2 className="display h-sec mt-7">Notes from the desk.</h2>
+            <h2 className="ivy t-h mt-7">Notes from the desk.</h2>
           </div>
-          <a href="#insights" className="border-b border-ink pb-1 text-[14px] transition-colors hover:border-accent hover:text-accent">
+          <a href="#insights" className="border-b border-graphite pb-1 text-[14px] transition-colors hover:border-accent hover:text-copper">
             All notes
           </a>
         </div>
@@ -29,10 +29,10 @@ export default function Insights() {
                   </span>
                 </div>
                 <div className="mt-6 flex items-center gap-3 text-[11px] uppercase tracking-[0.14em]">
-                  <span className="text-accent">{p.category}</span>
-                  <span className="text-ink-45">{fmt(p.date)}</span>
+                  <span className="text-copper">{p.category}</span>
+                  <span className="text-fog">{fmt(p.date)}</span>
                 </div>
-                <h3 className="display mt-3 max-w-[24ch] text-[22px] leading-[1.18] tracking-[-0.02em] transition-colors group-hover:text-accent md:text-[26px]">
+                <h3 className="ivy mt-3 max-w-[24ch] text-[22px] leading-[1.18] tracking-[-0.02em] transition-colors group-hover:text-copper md:text-[26px]">
                   {p.title}
                 </h3>
               </a>

@@ -58,10 +58,10 @@ export const SCALE = {
     { k: "Structure", v: "Private partnership" },
     { k: "Strategies", v: "Six, one risk framework" },
   ],
-  /** null until confirmed — the section omits the figure rather than invent one. */
-  value: null as string | null,
-  unit: null as string | null,
-  caption: "Assets under management",
+  /** Client-supplied performance figure. Needs an as-of date before publishing. */
+  value: "94" as string | null,
+  unit: "%" as string | null,
+  caption: "Win rate",
   /** ISO date the figure is current as of. Rendered as "All figures as of …". */
   asOf: null as string | null,
 };

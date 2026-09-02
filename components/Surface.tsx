@@ -3,7 +3,7 @@
  * Gives the page a real visual anchor without stock photography.
  */
 export default function Surface({
-  className = "", lines = 34, tone = "#145446",
+  className = "", lines = 34, tone = "#ae9357",
 }: { className?: string; lines?: number; tone?: string }) {
   const W = 800, H = 900;
   const paths: string[] = [];
@@ -27,6 +27,12 @@ export default function Surface({
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className={className} aria-hidden preserveAspectRatio="xMidYMid slice">
       <defs>
+        <linearGradient id="sfGild" x1="0" y1="0" x2="1" y2="0" gradientTransform="rotate(13)">
+          <stop offset="0%" stopColor="rgb(174,147,87)" />
+          <stop offset="40%" stopColor="rgb(255,240,204)" />
+          <stop offset="70%" stopColor="rgb(174,147,87)" />
+          <stop offset="100%" stopColor="rgba(189,157,79,0)" />
+        </linearGradient>
         <linearGradient id="sfFade" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#fff" stopOpacity="0" />
           <stop offset="18%" stopColor="#fff" stopOpacity="1" />
@@ -37,8 +43,8 @@ export default function Surface({
       </defs>
       <g mask="url(#sfMask)">
         {paths.map((d, i) => (
-          <path key={i} d={d} fill="none" stroke={tone} strokeWidth={0.75}
-                strokeOpacity={0.14 + 0.38 * Math.sin((i / lines) * Math.PI)} />
+          <path key={i} d={d} fill="none" stroke="url(#sfGild)" strokeWidth={0.75}
+                strokeOpacity={0.10 + 0.42 * Math.sin((i / lines) * Math.PI)} />
         ))}
       </g>
     </svg>
