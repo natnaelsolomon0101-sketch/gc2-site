@@ -1,0 +1,31 @@
+{
+  "round": "round-2",
+  "killist": "empty",
+  "axeViolations": 0,
+  "consoleErrors": 0,
+  "checklist": "53/53",
+  "checklistFailures": [],
+  "lighthouse": {
+    "home-mobile": {
+      "performance": 96,
+      "accessibility": 100,
+      "best-practices": 96,
+      "seo": 100,
+      "agentic-browsing": 100
+    },
+    "strategies-mobile": {
+      "performance": 97,
+      "accessibility": 100,
+      "best-practices": 96,
+      "seo": 100,
+      "agentic-browsing": 100
+    },
+    "home-desktop": {
+      "performance": 100,
+      "accessibility": 100,
+      "best-practices": 96,
+      "seo": 100,
+      "agentic-browsing": 100
+    }
+  }
+}
