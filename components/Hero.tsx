@@ -5,6 +5,9 @@ import Surface from "./Surface";
 export default function Hero() {
   return (
     <section id="top" className="on-bronze relative overflow-hidden bg-bronze-field text-paper-white">
+      {/* radial fade into the warm wash below — the spec forbids a hard edge */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[38%]"
+           style={{ background: "radial-gradient(120% 100% at 50% 100%, #faf8f5 0%, rgba(250,248,245,.55) 42%, rgba(250,248,245,0) 78%)" }} />
       <div className="wrap relative grid grid-cols-12 items-center gap-y-14 py-20 md:py-28 lg:py-32">
         <div className="col-span-12 md:col-span-6 lg:col-span-5">
           <p className="eyebrow text-paper-white/70">{FUND.city}, {FUND.state}</p>
