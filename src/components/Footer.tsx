@@ -11,7 +11,7 @@ export default function Footer() {
         <div className="rule-t-black py-12">
           <div className="flex flex-wrap items-center justify-between gap-6">
             <Wordmark onBlack />
-            <nav aria-label="Footer" className="flex flex-wrap gap-6">
+            <nav aria-label="Footer" className="flex w-full flex-col sm:w-auto sm:flex-row sm:flex-wrap sm:gap-x-6">
               {footerNav.map((n) => (
                 <Link key={n.href} href={n.href}
                   className="t-small flex min-h-11 items-center text-stone">
