@@ -45,7 +45,7 @@ export default function Home() {
             </p>
             <div className="reveal reveal-3 mt-12 flex flex-wrap items-center gap-6">
               <Button href="/firm">Our approach</Button>
-              <TextLink href="/contact">Investor inquiries</TextLink>
+              <TextLink standalone href="/contact">Investor inquiries</TextLink>
             </div>
           </div>
         </Container>
@@ -72,7 +72,7 @@ export default function Home() {
                 defends it in front of the desk, and we size to survive the tail rather
                 than to flatter the mean.
               </p>
-              <p className="mt-8"><TextLink href="/firm">About the firm</TextLink></p>
+              <p className="mt-8"><TextLink standalone href="/firm">About the firm</TextLink></p>
             </div>
           </div>
         </Container>
@@ -110,7 +110,7 @@ export default function Home() {
           <div className="section-y">
             <div className="flex flex-wrap items-baseline justify-between gap-4">
               <h2 className="t-h2 text-black">Notes from the desk.</h2>
-              <TextLink href="/insights">All notes</TextLink>
+              <TextLink standalone href="/insights">All notes</TextLink>
             </div>
             <div className="mt-12">
               <HairlineList>
@@ -145,13 +145,13 @@ export default function Home() {
               <div>
                 <dt className="t-caption text-muted-on-black">Investors</dt>
                 <dd className="t-body mt-2">
-                  <TextLink href={`mailto:${site.emails.investors}`} onBlack>{site.emails.investors}</TextLink>
+                  <TextLink standalone href={`mailto:${site.emails.investors}`} onBlack>{site.emails.investors}</TextLink>
                 </dd>
               </div>
               <div>
                 <dt className="t-caption text-muted-on-black">Press</dt>
                 <dd className="t-body mt-2">
-                  <TextLink href={`mailto:${site.emails.press}`} onBlack>{site.emails.press}</TextLink>
+                  <TextLink standalone href={`mailto:${site.emails.press}`} onBlack>{site.emails.press}</TextLink>
                 </dd>
               </div>
               <div>

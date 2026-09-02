@@ -34,7 +34,7 @@ export default function Nav() {
               return (
                 <Link key={n.href} href={n.href}
                   aria-current={active ? "page" : undefined}
-                  className={`t-small font-medium ${active ? "nav-active text-black" : "text-ink"}`}
+                  className={`t-small inline-flex min-h-11 items-center font-medium ${active ? "nav-active text-black" : "text-ink"}`}
                 >
                   {n.label}
                 </Link>

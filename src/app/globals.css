@@ -132,8 +132,12 @@
     transition: background var(--dur-hover) var(--ease-gc2);
   }
   .btn:hover { background: var(--color-ink); }
+  .btn { min-height: 44px; }
   .btn-inverted { background: var(--color-stone); color: var(--color-black); }
   .btn-inverted:hover { background: var(--color-paper); }
+
+  /* Standalone links: their own control, not a word inside a sentence. */
+  .link-block { display: inline-flex; align-items: center; min-height: 44px; }
 
   .link {
     color: var(--color-ledger);

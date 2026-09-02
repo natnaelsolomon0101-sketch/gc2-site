@@ -73,3 +73,13 @@ The ui-ux-pro-max design-system generator recommended, and Appendix A overrode:
   entry in the document outline that leads nowhere, and screen-reader users
   navigating by heading would land on decorative copy. Visual spec honoured,
   semantics kept honest.
+- **Nav link widths stay at their text width.** After the tap-target pass every
+  interactive element clears 44px in HEIGHT. Short nav words ("Firm", 32.2px)
+  are narrower than 44px horizontally. WCAG 2.5.8 (AA) sets the floor at 24x24,
+  which they clear comfortably; the 44x44 figure is the AAA/platform guideline
+  and is about the touch area, which for a horizontal nav is governed by the
+  spacing between links, not by padding each word out to a uniform box. Padding
+  "Firm" to 44px would visibly disturb the nav rhythm A.8 specifies.
+- **The /disclosures email stays under 44px.** It sits inside a sentence
+  ("...may be sent to <email>."), where WCAG 2.5.8 explicitly exempts inline
+  links and a 44px box would break the line.
