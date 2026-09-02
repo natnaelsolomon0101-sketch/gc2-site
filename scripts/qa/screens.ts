@@ -66,8 +66,8 @@ export async function runScreens(base: string, outDir: string, routes: string[])
   await browser.close();
   fs.writeFileSync(path.join(outDir, "axe.json"), JSON.stringify(axeResults, null, 2));
   fs.writeFileSync(path.join(outDir, "console-errors.json"), JSON.stringify(consoleErrors, null, 2));
-  const violations = Object.values(axeResults).reduce(
-    (n, r) => n + ((r as { violations: unknown[] }).violations.length), 0) as number;
-  const cErrs = Object.values(consoleErrors).reduce((n, e) => n + e.length, 0);
+  const violations = Object.values(axeResults).reduce<number>(
+    (n, r) => n + (r as { violations: unknown[] }).violations.length, 0);
+  const cErrs = Object.values(consoleErrors).reduce<number>((n, e) => n + e.length, 0);
   return { violations, consoleErrors: cErrs };
 }
