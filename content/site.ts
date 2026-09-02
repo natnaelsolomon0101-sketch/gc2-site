@@ -8,19 +8,22 @@
    placeholder. See NEEDS_CONFIRMATION at the bottom for the open list.
    ========================================================================== */
 
-const NAME = "Girlscantrade2";
+const NAME  = "Girlscantrade2";
+const CITY  = "Miami";
+const STATE = "FL";
+const STATE_LONG = "Florida";
 
 export const FUND = {
   name: NAME,
   mark: "GC2",
   kind: "Private Trading Fund",
-  city: "Austin",
-  state: "TX",
+  city: CITY,
+  state: STATE,
   domain: "gc2.fund",
   /** Removed: prior value (2019) was fabricated. Awaiting a real founding year. */
   founded: null as number | null,
   description:
-    `${NAME} is a private trading fund in Austin, Texas, running concentrated systematic strategies across liquid markets.`,
+    `${NAME} is a private trading fund in ${CITY}, ${STATE_LONG}, running concentrated systematic strategies across liquid markets.`,
 } as const;
 
 /* Nav ---------------------------------------------------------------------- */
