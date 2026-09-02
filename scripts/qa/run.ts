@@ -55,6 +55,15 @@ async function main() {
     const kill = execFileSync("bash", ["scripts/qa/killist.sh"], { encoding: "utf8" });
     fs.writeFileSync(path.join(outDir, "killist.txt"), kill);
 
+    // SWARM §4.1 and §7. Both must be empty; the secret scan exits non-zero on a hit.
+    console.log("[qa] punctuation + secret scan");
+    const punct = execFileSync("bash", ["scripts/qa/punctuation.sh"], { encoding: "utf8" });
+    fs.writeFileSync(path.join(outDir, "punctuation.txt"), punct);
+    let secrets = "";
+    try { execFileSync("bash", ["scripts/qa/secretscan.sh"], { encoding: "utf8" }); }
+    catch (e) { secrets = String((e as { stdout?: string }).stdout ?? "committed key detected"); }
+    fs.writeFileSync(path.join(outDir, "secretscan.txt"), secrets);
+
     console.log("[qa] screens + axe");
     const s = await runScreens(base, outDir, first);
 
@@ -81,6 +90,8 @@ async function main() {
     const summary = {
       round: path.basename(outDir),
       killist: kill.trim() === "" ? "empty" : kill.trim(),
+      punctuation: punct.trim() === "" ? "clean" : punct.trim(),
+      secrets: secrets.trim() === "" ? "clean" : "COMMITTED KEY",
       axeViolations: s.violations,
       consoleErrors: s.consoleErrors,
       checklist: `${c.total - c.failed}/${c.total}`,
@@ -91,7 +102,7 @@ async function main() {
     console.log(JSON.stringify(summary, null, 2));
 
     stop();
-    if (kill.trim() !== "") process.exit(1);
+    if (kill.trim() !== "" || punct.trim() !== "" || secrets.trim() !== "") process.exit(1);
   } catch (e) { stop(); throw e; }
 }
 main().catch((e) => { console.error(e); process.exit(1); });
