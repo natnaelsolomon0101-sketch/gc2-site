@@ -4,14 +4,14 @@ import { cn } from "@/lib/utils";
 
 /** Slash controls: every button, input and tag is a 9999px pill. */
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-full font-medium transition-colors disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-[12px] font-medium transition-colors disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
         // The white fill is a scarce resource — one per viewport.
-        primary: "bg-white text-black hover:opacity-88",
-        ghost:   "border border-white text-white hover:bg-white hover:text-black",
-        tag:     "border border-steel text-white hover:border-white",
+        primary: "bg-ink text-white hover:bg-ink-3",
+        ghost:   "border border-line bg-white text-ink hover:border-muted-2",
+        tag:     "bg-surface text-ink hover:bg-line",
       },
       size: { sm: "px-[10px] py-[6px] text-[12px]", md: "px-5 py-[10px] text-[14px]" },
     },

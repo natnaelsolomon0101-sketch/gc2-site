@@ -9,7 +9,7 @@ const AccordionItem = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>
 >(({ className, ...props }, ref) => (
-  <AccordionPrimitive.Item ref={ref} className={cn("border-b border-rule", className)} {...props} />
+  <AccordionPrimitive.Item ref={ref} className={cn("border-b border-line", className)} {...props} />
 ));
 AccordionItem.displayName = "AccordionItem";
 
@@ -27,7 +27,7 @@ const AccordionTrigger = React.forwardRef<
       {...props}
     >
       {children}
-      <span className="justify-self-end text-ink-45 transition-transform duration-300 group-data-[state=open]:rotate-45">
+      <span className="justify-self-end text-muted-2 transition-transform duration-300 group-data-[state=open]:rotate-45">
         <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden>
           <path d="M8 1v14M1 8h14" stroke="currentColor" strokeWidth="1" />
         </svg>

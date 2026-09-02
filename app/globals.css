@@ -1,95 +1,77 @@
 @import "tailwindcss";
 
 /* ===========================================================================
-   WEALTHSIMPLE — cashmere-lined vault with gallery lighting
-   Warm near-monochrome. No shadows, no gradients, no accent hues.
+   MERCURY — alpine banking at blue hour
+   Light canvas, deep ink, one blue accent. Tokens from the published spec.
    ========================================================================= */
 @theme {
-  --color-graphite-ink: #32302f;
-  --color-paper-white:  #fcfcfc;
-  --color-linen-cream:  #faf8f5;
-  --color-fog-veil:     #f1f0f0;
-  --color-stone:        #e4e2e1;
-  --color-pebble:       #686664;
-  --color-charcoal:     #09090a;
-  --color-bronze-field: #3a3525;
+  --color-ink:        #171721;
+  --color-ink-2:      #1e1e2a;
+  --color-ink-3:      #272735;
+  --color-blue:       #5266eb;
+  --color-muted:      #70707d;
+  --color-muted-2:    #c3c3cc;
+  --color-line:       #e2e3ed;
+  --color-surface:    #ededf3;
+  --color-white:      #ffffff;
 
-  --font-tiempos: var(--font-serif), Georgia, "Times New Roman", serif;
-  --font-future:  var(--font-sans), ui-sans-serif, system-ui, sans-serif;
-
-  --radius-soft: 12px;
-  --radius-card: 100px;
-  --radius-pill: 1600px;
+  --font-ui: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --radius-md: 12px;
 }
 
-:root { --page-max: 1200px; --section-gap: clamp(56px, 7vw, 80px); }
+:root { --page-max: 1200px; }
 
 @layer base {
   html { -webkit-text-size-adjust:100%; scroll-behavior:smooth; }
   body {
-    background: var(--color-paper-white);
-    color: var(--color-graphite-ink);
-    font-family: var(--font-future);
-    font-size: 16px; line-height: 1.5; letter-spacing: .005em; font-weight: 400;
+    background: var(--color-white);
+    color: var(--color-ink);
+    font-family: var(--font-ui);
+    font-size: 16px; line-height: 1.55; font-weight: 400;
+    letter-spacing: -0.011em;
     -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
   }
-  ::selection { background: var(--color-graphite-ink); color: var(--color-paper-white); }
-  :focus-visible { outline: 2px solid var(--color-graphite-ink); outline-offset: 3px; border-radius: 2px; }
-  .on-bronze :focus-visible { outline-color: var(--color-paper-white); }
+  ::selection { background: var(--color-blue); color: #fff; }
+  :focus-visible { outline: 2px solid var(--color-blue); outline-offset: 2px; border-radius: 4px; }
+  .on-ink :focus-visible { outline-color: #93a0f5; }
 }
 
 @layer components {
-  /* Serif for display only. Sans for body only. Never crossed. */
-  .tiempos  { font-family: var(--font-tiempos); font-weight: 500; letter-spacing: -0.01em; }
-  .t-display{ font-size: clamp(44px, 6.6vw, 84px); line-height: 1.08; }
-  .t-h-lg   { font-size: clamp(34px, 4.4vw, 56px); line-height: 1.1; }
-  .t-h      { font-size: clamp(28px, 3vw, 36px);   line-height: 1.2; }
+  .wrap { max-width: var(--page-max); margin-inline:auto; padding-inline: clamp(20px,4vw,24px); }
+  .band { padding-block: clamp(72px,9vw,112px); }
 
-  .eyebrow  { font-size: 14px; line-height: 1.4; letter-spacing: .005em;
-              font-weight: 400; color: var(--color-pebble); }
-  .t-lede   { font-size: 18px; line-height: 1.4; color: var(--color-graphite-ink); }
-  .t-body   { font-size: 16px; line-height: 1.5; color: var(--color-graphite-ink); }
-  .t-caption{ font-size: 14px; line-height: 1.4; letter-spacing: .07px; color: var(--color-pebble); }
+  /* Type scale — one family, weight and size carry hierarchy */
+  .t-display { font-size: clamp(40px,5.6vw,72px); line-height:1.04; letter-spacing:-0.035em; font-weight:500; }
+  .t-h1      { font-size: clamp(32px,4vw,56px);  line-height:1.08; letter-spacing:-0.03em;  font-weight:500; }
+  .t-h2      { font-size: clamp(24px,2.6vw,40px);line-height:1.15; letter-spacing:-0.025em; font-weight:500; }
+  .t-h3      { font-size: 20px; line-height:1.3; letter-spacing:-0.018em; font-weight:500; }
+  .t-lede    { font-size: 18px; line-height:1.55; color: var(--color-muted); }
+  .t-body    { font-size: 16px; line-height:1.6;  color: var(--color-muted); }
+  .t-cap     { font-size: 14px; line-height:1.45; color: var(--color-muted); }
+  .eyebrow   { font-size:13px; font-weight:500; letter-spacing:.02em; color: var(--color-blue); }
 
-  .wrap { max-width: var(--page-max); margin-inline:auto; padding-inline: clamp(20px,5vw,24px); }
-  .band { padding-block: var(--section-gap); }
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px;
+         border-radius:12px; font-size:15px; font-weight:500; padding:11px 20px;
+         transition:background .18s,color .18s,border-color .18s,opacity .18s; }
+  .btn-primary { background:var(--color-ink); color:#fff; }
+  .btn-primary:hover { background:var(--color-ink-3); }
+  .btn-blue    { background:var(--color-blue); color:#fff; }
+  .btn-blue:hover { opacity:.9; }
+  .btn-secondary{ background:var(--color-surface); color:var(--color-ink); }
+  .btn-secondary:hover { background:var(--color-line); }
+  .btn-ghost   { border:1px solid var(--color-line); color:var(--color-ink); background:#fff; }
+  .btn-ghost:hover { border-color:var(--color-muted-2); }
 
-  /* Every interactive element is a 1600px pill. Label tracked to 0.025em. */
-  .ws-label { font-size:16px; line-height:1.2; letter-spacing:.025em; font-weight:400; }
-  .btn-fill { background:var(--color-charcoal); color:var(--color-paper-white);
-              border-radius:1600px; padding:12px 28px; display:inline-flex; align-items:center;
-              justify-content:center; transition:opacity .2s; }
-  .btn-fill:hover { opacity:.88; }
-  .btn-out  { background:transparent; color:var(--color-graphite-ink);
-              border:1px solid var(--color-graphite-ink); border-radius:1600px;
-              padding:12px 28px; display:inline-flex; align-items:center; justify-content:center;
-              transition:background .2s,color .2s; }
-  .btn-out:hover { background:var(--color-graphite-ink); color:var(--color-paper-white); }
-  .btn-out-light { border-color:var(--color-paper-white); color:var(--color-paper-white); }
-  .btn-out-light:hover { background:var(--color-paper-white); color:var(--color-graphite-ink); }
-  .btn-ghost{ background:var(--color-linen-cream); color:var(--color-graphite-ink);
-              border-radius:1600px; padding:12px 28px; display:inline-flex; align-items:center;
-              justify-content:center; transition:background .2s; }
-  .btn-ghost:hover { background:var(--color-fog-veil); }
-
-  /* Signature: 100px radius on cards, 100px on inputs. No shadow, ever. */
-  .soft-card { background:var(--color-linen-cream); border-radius:100px; padding:32px; }
-  .ws-input  { background:var(--color-paper-white); border:1px solid var(--color-stone);
-               border-radius:100px; padding:16px 24px; font-size:16px; outline:none; }
-  .ws-input:focus { border-color:var(--color-graphite-ink); }
-  .ws-input::placeholder { color:var(--color-pebble); }
-
-  /* Feature columns: a hairline on top is the only chrome. */
-  .rule-top { border-top:1px solid var(--color-stone); }
+  .card { background:#fff; border:1px solid var(--color-line); border-radius:12px; }
+  .card-soft { background:var(--color-surface); border-radius:12px; }
+  .hair { border-color: var(--color-line); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   *,*::before,*::after { animation-duration:.001ms !important; animation-iteration-count:1 !important;
                          transition-duration:.001ms !important; scroll-behavior:auto !important; }
 }
-
-@keyframes gc2Ticker { from{transform:translate3d(0,0,0)} to{transform:translate3d(-50%,0,0)} }
 @keyframes gc2Expand   { from{height:0} to{height:var(--radix-accordion-content-height)} }
 @keyframes gc2Collapse { from{height:var(--radix-accordion-content-height)} to{height:0} }
-.animate-gc2-expand   { animation: gc2Expand .42s cubic-bezier(.22,.61,.36,1); }
-.animate-gc2-collapse { animation: gc2Collapse .34s cubic-bezier(.22,.61,.36,1); }
+.animate-gc2-expand   { animation: gc2Expand .38s cubic-bezier(.22,.61,.36,1); }
+.animate-gc2-collapse { animation: gc2Collapse .3s cubic-bezier(.22,.61,.36,1); }
