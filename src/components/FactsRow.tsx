@@ -9,7 +9,7 @@ const facts = [
 
 export default function FactsRow() {
   return (
-    <dl className="rule-t rule-b grid grid-cols-2 md:grid-cols-4">
+    <dl className="rule-t rule-b grid grid-cols-2 lg:grid-cols-4">
       {facts.map((f) => (
         <div key={f.label} className="py-8 pr-6">
           <dt className="t-caption text-slate">{f.label}</dt>

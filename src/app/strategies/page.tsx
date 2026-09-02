@@ -22,13 +22,13 @@ export default function Strategies() {
               <div className="col-span-4 md:col-span-5">
                 <h2 className="t-h2 text-black">{s.name}</h2>
                 <dl className="mt-8">
-                  <div className="rule-t flex justify-between gap-6 py-3">
+                  <div className="rule-t grid grid-cols-3 gap-6 py-3">
                     <dt className="t-small text-slate">Markets</dt>
-                    <dd className="t-body text-right text-ink">{s.markets}</dd>
+                    <dd className="t-body col-span-2 text-ink">{s.markets}</dd>
                   </div>
-                  <div className="rule-t rule-b flex justify-between gap-6 py-3">
+                  <div className="rule-t rule-b grid grid-cols-3 gap-6 py-3">
                     <dt className="t-small text-slate">Instruments</dt>
-                    <dd className="t-body text-right text-ink">{s.instruments}</dd>
+                    <dd className="t-body col-span-2 text-ink">{s.instruments}</dd>
                   </div>
                 </dl>
               </div>

@@ -24,7 +24,9 @@ const sections = [
     "The tail overlay is permanent, not discretionary. It is never switched off to improve a quarter.",
   ]},
   { h: "Where we are", p: [
-    `${site.city}.`,
+    `The partnership is based in ${site.city}. The desk, the research, and the risk function sit in one room, which is deliberate: the review that decides whether an idea earns capital happens in person, and it happens often.`,
+    `Being outside a financial center costs us some proximity and saves us a great deal of noise. We do not need to be near the flow to model it, and the people who join us tend to be the kind who would rather read the data than the tape.`,
+    `We hold no branch offices and run no external sales desk. Introductions come through people who already know the work.`,
   ]},
 ];
 

@@ -32,7 +32,7 @@ export default function Home() {
     <>
       {/* ---- hero ---- */}
       <section className="relative overflow-hidden bg-paper">
-        <Surface className="surface-mask absolute right-0 top-0 hidden h-full w-3/5 md:block" />
+        <Surface className="surface-mask absolute right-0 top-0 h-full w-4/5 md:w-3/5" />
         <Container className="relative">
           <div className="hero-frame flex flex-col justify-center">
             <h1 className="t-display reveal reveal-1 measure-hero text-black">
