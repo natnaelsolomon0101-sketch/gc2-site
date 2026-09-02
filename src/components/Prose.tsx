@@ -1,12 +1,6 @@
 export default function Prose({ children }: { children: React.ReactNode }) {
-  return (
-    <div
-      className="measure-prose t-prose
-        [&>p]:t-body [&>p]:mt-6 [&>p]:text-ink
-        [&>h2]:font-display [&>h2]:mt-12 [&>h2]:text-black
-        [&>ul]:mt-6 [&>ul]:list-disc [&>ul]:pl-6 [&>li]:mt-2"
-    >
-      {children}
-    </div>
-  );
+  // Styles live in globals.css (.prose-gc2). They were inline arbitrary
+  // variants, and the h2 rule set a family but no size, so in-article headings
+  // rendered at body size and the hierarchy read inverted.
+  return <div className="prose-gc2">{children}</div>;
 }

@@ -29,3 +29,14 @@ The ui-ux-pro-max design-system generator recommended, and Appendix A overrode:
   shadows, hairlines and surface steps only. A wins.
 - **Spacing.** Generator's scale stops at 64px. A.5 runs to 160 with 120px
   section padding, because whitespace is the hierarchy here. A wins.
+
+## Critic finding rejected — round 0
+
+- **The fund name stays "Girlscantrade2".** The round-0 critic made this its
+  single highest-priority finding and asked for "Girls Can Trade 2", reading
+  A.1 literally. A.1 marks that value `// CONFIRM` and §0.2 names it an
+  assumption. The user confirmed a different spelling explicitly earlier in this
+  engagement: one word, no spaces, no apostrophe. A confirmed user value
+  outranks the spec's placeholder, so the finding is rejected, not deferred.
+  The critic could not have known this: it is barred from reading `src/` and the
+  correction lives in conversation, not in the brief.

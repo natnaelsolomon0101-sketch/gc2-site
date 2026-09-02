@@ -60,18 +60,17 @@ export default function Home() {
       <section className="bg-paper">
         <Container>
           <div className="grid-gc2 section-y">
-            <h2 className="t-h2 col-span-4 text-black md:col-span-5">The firm</h2>
+            <h2 className="t-h2 measure-head col-span-4 text-black md:col-span-5">A research house that trades.</h2>
             <div className="col-span-4 md:col-span-6 md:col-start-7">
               <p className="t-body measure-body text-ink">
                 Durable returns in liquid markets come from process, not prediction. We
-                build our own data, write our own models, and hold an idea to a single
-                standard: it earns capital only when the evidence survives adversarial
-                review.
+                build our own data, write our own models, and put every idea through
+                adversarial review before it earns capital.
               </p>
               <p className="t-body measure-body mt-6 text-ink">
-                Every position has a named owner who defends it in front of the desk. We
-                carry no external mandate that would force us into a trade we do not
-                believe, and we size to survive the tail rather than to flatter the mean.
+                The firm is deliberately small. Each position has a named owner who
+                defends it in front of the desk, and we size to survive the tail rather
+                than to flatter the mean.
               </p>
               <p className="mt-8"><TextLink href="/firm">About the firm</TextLink></p>
             </div>
@@ -142,7 +141,7 @@ export default function Home() {
                 are welcome.
               </p>
             </div>
-            <dl className="col-span-4 grid grid-cols-1 gap-8 sm:grid-cols-3 md:col-span-6 md:col-start-7">
+            <dl className="col-span-4 grid grid-cols-1 gap-8 md:col-span-6 md:col-start-7 lg:grid-cols-3">
               <div>
                 <dt className="t-caption text-muted-on-black">Investors</dt>
                 <dd className="t-small mt-2">

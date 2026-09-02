@@ -110,7 +110,8 @@
   .measure-legal     { max-width: 60em; }
   .measure-body { max-width: 34em; }
   .measure-lead { max-width: 30em; }
-  .measure-prose{ max-width: 680px; }
+  /* 680px at 17px is 40em / ~88 characters. A.4 caps body measure at 34em. */
+  .measure-prose{ max-width: 34em; }
 
   /* one-off type roles, tokenized so no component carries a raw size */
   .t-wordmark      { font-family: var(--font-display); font-weight: 400; font-size: 22px; line-height: 1; }
@@ -179,4 +180,20 @@
     -webkit-mask-image: linear-gradient(to left, #000 35%, transparent 92%);
     mask-image: linear-gradient(to left, #000 35%, transparent 92%);
   }
+}
+
+@layer components {
+  /* Long-form article typography (A.8 /insights/[slug]).
+     Measure is 34em, not A.8's literal 680px: at 18px that is 38em and ~86
+     characters per line, which A.4's "body measure <= 34em" and the 5.4 hunt
+     list ("body measure over 75 characters") both rule out. The narrower of the
+     two conflicting spec lines wins because it is the readability floor. */
+  .prose-gc2 { max-width: 34em; }
+  .prose-gc2 > p { font-size: 18px; line-height: 1.7; color: var(--color-ink); margin-top: 24px; }
+  .prose-gc2 > h2 {
+    font-family: var(--font-display); font-weight: 400; font-size: 30px;
+    line-height: 1.2; color: var(--color-black); margin-top: 48px;
+  }
+  .prose-gc2 > ul { margin-top: 24px; padding-left: 24px; list-style: disc; }
+  .prose-gc2 > ul > li { margin-top: 8px; font-size: 18px; line-height: 1.7; color: var(--color-ink); }
 }

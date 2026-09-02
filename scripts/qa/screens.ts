@@ -21,10 +21,29 @@ export async function runScreens(base: string, outDir: string, routes: string[])
       await page.goto(base + route, { waitUntil: "networkidle" });
       // A.6 reveals run once on load; wait them out so shots are of the settled page.
       await page.waitForTimeout(900);
+      // Native-resolution fold shot: never scaled, always trustworthy.
       await page.screenshot({
-        path: path.join(outDir, "screens", `${slug}-${width}.png`),
-        fullPage: true,
+        path: path.join(outDir, "screens", `${slug}-${width}-fold.png`),
       });
+      // Full page, but clipped so Chromium never scales it down. Anything past
+      // MAX_TALL is captured as a second frame rather than shrunk.
+      const MAX_TALL = 4000;
+      const full = await page.evaluate(() => document.documentElement.scrollHeight);
+      if (full <= MAX_TALL) {
+        await page.screenshot({
+          path: path.join(outDir, "screens", `${slug}-${width}.png`),
+          fullPage: true,
+        });
+      } else {
+        let i = 0;
+        for (let y = 0; y < full; y += MAX_TALL, i++) {
+          const h = Math.min(MAX_TALL, full - y);
+          await page.screenshot({
+            path: path.join(outDir, "screens", `${slug}-${width}${i === 0 ? "" : `-part${i + 1}`}.png`),
+            clip: { x: 0, y, width, height: h },
+          });
+        }
+      }
       if (width === 1280) {
         consoleErrors[slug] = errs;
         const axe = await new AxeBuilder({ page })
@@ -38,6 +57,23 @@ export async function runScreens(base: string, outDir: string, routes: string[])
       }
       await ctx.close();
     }
+  }
+
+  // Focus states. A.9 mandates a 2px ledger ring on paper and a stone ring on
+  // the black band; neither axe nor Lighthouse tests ring visibility.
+  for (const route of ["/", "/contact"]) {
+    const slug = route === "/" ? "home" : route.slice(1);
+    const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+    const page = await ctx.newPage();
+    await page.goto(base + route, { waitUntil: "networkidle" });
+    await page.waitForTimeout(700);
+    await page.keyboard.press("Tab");
+    await page.keyboard.press("Tab");
+    await page.screenshot({ path: path.join(outDir, "screens", `${slug}-focus-nav.png`) });
+    // Walk into the black band at the foot of the page.
+    for (let i = 0; i < 40; i++) await page.keyboard.press("Tab");
+    await page.screenshot({ path: path.join(outDir, "screens", `${slug}-focus-black.png`) });
+    await ctx.close();
   }
 
   // Reduced motion: the hero must render in its final state (A.6).
