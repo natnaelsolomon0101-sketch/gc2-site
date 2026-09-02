@@ -40,7 +40,7 @@ export default function MobileNav({ open, onClose }: { open: boolean; onClose: (
           {n.label}
         </Link>
       ))}
-      <a href={`mailto:${site.emails.investors}`} className="t-small mt-6 text-slate">
+      <a href={`mailto:${site.emails.investors}`} className="t-small link link-block mt-6">
         {site.emails.investors}
       </a>
     </div>
