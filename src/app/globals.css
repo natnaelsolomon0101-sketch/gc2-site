@@ -214,13 +214,19 @@
   .link {
     color: var(--color-ledger);
     text-decoration: underline;
-    text-decoration-color: var(--color-ink);
+    /* A.6 describes the hover as "underline ink -> ledger" because it assumed
+       ink-coloured links. A.3 assigns ledger to links, and the accent was
+       restored at rest in an earlier round, so the literal A.6 reading leaves a
+       near-black rule under green glyphs. The rule matches the text at rest and
+       the hover moves the decoration, which is what §4.1 actually protects
+       ("transition text-decoration-color, not color"). */
+    text-decoration-color: currentColor;
     text-underline-offset: 0.18em;
     text-decoration-thickness: 1px;
     text-decoration-skip-ink: auto;
     transition: text-decoration-color var(--dur-hover) var(--ease-gc2);
   }
-  .link:hover { text-decoration-color: var(--color-ledger); }
+  .link:hover { text-decoration-color: var(--color-black); }
   /* Inside the black band the same two-step runs on the inverted pair. */
   .link-on-black { color: var(--color-stone); text-decoration-color: var(--color-muted-on-black); }
   .link-on-black:hover { text-decoration-color: var(--color-stone); }
