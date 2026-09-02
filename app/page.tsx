@@ -6,6 +6,7 @@ import Strategies from "@/components/Strategies";
 import Insights from "@/components/Insights";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
+import Launcher from "@/components/Launcher";
 import { FUND, SITE_URL, CONTACT } from "@/content/site";
 
 /* Only emit fields we actually have. No invented facts in structured data. */
@@ -41,6 +42,7 @@ export default function Page() {
         <Newsletter />
       </main>
       <Footer />
+      <Launcher />
       <script type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
     </>

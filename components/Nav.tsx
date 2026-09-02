@@ -40,8 +40,8 @@ export default function Nav() {
           </nav>
 
           <div className="hidden items-center gap-3 md:flex">
-            <a href={`mailto:${CONTACT.email}`} className="btn-out ws-label !py-[9px] !px-6">Log in</a>
-            <a href={NAV_CTA.href} className="btn-fill ws-label !py-[9px] !px-6">Get started</a>
+            <a href={`mailto:${CONTACT.email}`} className="btn-out ws-label !py-3 !px-6">Log in</a>
+            <a href={NAV_CTA.href} className="btn-fill ws-label !py-3 !px-6">Get started</a>
           </div>
 
           <button onClick={() => setOpen(!open)} aria-label={open ? "Close menu" : "Open menu"}
