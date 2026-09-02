@@ -22,13 +22,13 @@ export default function Contact() {
             <div>
               <dt className="t-caption text-slate">Investors</dt>
               <dd className="t-lead mt-3">
-                <TextLink href={`mailto:${site.emails.investors}`}>{site.emails.investors}</TextLink>
+                <TextLink standalone href={`mailto:${site.emails.investors}`}>{site.emails.investors}</TextLink>
               </dd>
             </div>
             <div>
               <dt className="t-caption text-slate">Press</dt>
               <dd className="t-lead mt-3">
-                <TextLink href={`mailto:${site.emails.press}`}>{site.emails.press}</TextLink>
+                <TextLink standalone href={`mailto:${site.emails.press}`}>{site.emails.press}</TextLink>
               </dd>
             </div>
             <div>
