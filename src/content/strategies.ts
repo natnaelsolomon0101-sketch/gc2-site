@@ -45,7 +45,7 @@ export const strategies: Strategy[] = [
     instruments: "Futures, spreads",
     body: [
       "Storage economics anchor the curve. When the market prices a shortage the warehouses do not show, we take the other side and wait for the data.",
-      "The book is sized against delivery capacity, not against the notional the screen will let us trade.",
+      "The position is sized against delivery capacity, not against the notional the screen will let us trade.",
     ],
   },
   {

@@ -143,3 +143,22 @@ What the brief does confirm: A.4's 96px/300 display at ~1.00 leading and
 weight 400). The hairline strategy list is a genuine departure from the
 reference set — four of five use image-card grids — and is worth keeping
 knowingly rather than by accident.
+
+## Director ruling CORRECTED — one "protected" string was not spec copy
+
+The earlier ruling shielded three strings in `strategies.ts` as verbatim
+Appendix A §A.10. copy-chief checked the spec line by line and found that only
+two of them are:
+
+- `oneLiner` "runs across the whole book" — **verbatim A.10, stays.**
+- Tail Overlay body[0] "hold conviction through a drawdown it did not cause" —
+  **verbatim A.10, stays.**
+- Commodity Carry body[1] "The **book** is sized against delivery capacity…" —
+  **NOT spec copy.** A.10's Commodity Carry long form ends at "…wait for the
+  data." The second paragraph was written for this build, so §4.4's terminology
+  ban applies to it normally and the blanket ruling protected it by mistake.
+
+Corrected: "The book is sized" → "The position is sized". This was the last
+customer-facing "book" on the site that Appendix A does not require. The agent
+obeyed the wrong instruction and escalated it rather than silently overriding
+it, which is the right order of operations.
