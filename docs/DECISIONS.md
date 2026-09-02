@@ -40,3 +40,13 @@ The ui-ux-pro-max design-system generator recommended, and Appendix A overrode:
   outranks the spec's placeholder, so the finding is rejected, not deferred.
   The critic could not have known this: it is barred from reading `src/` and the
   correction lives in conversation, not in the brief.
+- **`slate` ships as `#696F76`, not A.3's `#6B7178`.** The spec value measures
+  4.47:1 on `stone` and fails AA for normal text; slate is the caption and
+  secondary-text color and does sit on stone. Darkened to the nearest value that
+  clears 4.5 (measured 4.60 on stone, 5.08 on paper).
+- **`mist` `#C9CCC7` is 1.62:1 on paper and stays.** A.3 scopes it to disabled
+  and placeholder states, which the contrast minimum exempts. It carries no text
+  in the build.
+- **"leverage" kept in the convexity note.** A.10 bans it as a marketing verb
+  ("leverage our platform"). The note uses the financial noun, "leverage you can
+  actually defend", which is correct domain language.
