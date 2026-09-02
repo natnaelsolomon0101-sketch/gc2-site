@@ -67,3 +67,9 @@ The ui-ux-pro-max design-system generator recommended, and Appendix A overrode:
   the critic and an early probe of mine sampled it mid-transition and called it
   a wrong-colored ring. The ring was correct after 150ms; it is now correct on
   the first frame.
+- **The statement band is a `<p>` carrying the `t-h2` token, not an `<h2>`.**
+  A.8 home section 5 says "One `h2` sentence". It renders at h2 size and colour,
+  but a pull-quote heads no section: promoting it to a real `h2` would put an
+  entry in the document outline that leads nowhere, and screen-reader users
+  navigating by heading would land on decorative copy. Visual spec honoured,
+  semantics kept honest.
