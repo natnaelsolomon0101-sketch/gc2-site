@@ -29,32 +29,35 @@ export default async function Note({ params }: { params: Promise<{ slug: string 
   const { default: Body } = await import(`@/content/notes/${slug}.mdx`);
 
   return (
-    <article className="bg-paper">
+    <article>
       <Container>
         <div className="section-y">
-          <div className="measure-prose">
-            <p className="t-small text-slate">
-              {formatDate(note.date)} &nbsp; {note.category}
+          <div className="measure-prose mx-auto">
+            <p className="t-mono text-fog">
+              {note.category}
             </p>
-            <h1
-              className="t-article-title mt-6 text-black"
-            >
+            <h1 className="t-article-title mt-6">
               {note.title}
             </h1>
+            <p className="t-small mt-6 text-fog">{formatDate(note.date)}</p>
           </div>
 
           <div className="mt-12">
             <Prose><Body /></Prose>
           </div>
 
-          <p className="t-caption measure-prose rule-t mt-16 pt-6 text-slate">
+          <p className="t-small measure-prose mx-auto rule-t mt-16 pt-6 text-fog">
             This note is commentary from the desk. It is not investment advice and does
             not describe any position the fund holds.
           </p>
 
-          <nav aria-label="More notes" className="measure-prose rule-t mt-12 flex justify-between gap-6 pt-6">
-            {prev ? <Link href={`/insights/${prev.slug}`} className="t-small link">{prev.title}</Link> : <span />}
-            {next ? <Link href={`/insights/${next.slug}`} className="t-small link">{next.title}</Link> : <span />}
+          <nav aria-label="More notes" className="measure-prose mx-auto rule-t mt-12 flex justify-between gap-6 pt-6">
+            {prev
+              ? <Link href={`/insights/${prev.slug}`} className="t-small link inline-flex min-h-11 items-center">{prev.title}</Link>
+              : <span />}
+            {next
+              ? <Link href={`/insights/${next.slug}`} className="t-small link inline-flex min-h-11 items-center">{next.title}</Link>
+              : <span />}
           </nav>
         </div>
       </Container>

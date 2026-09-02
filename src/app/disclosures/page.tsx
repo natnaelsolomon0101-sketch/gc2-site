@@ -35,21 +35,34 @@ const sections: { h: string; p: string[] }[] = [
 export default function Disclosures() {
   return (
     <>
-      <PageHeader title="Disclosures." />
-      <section className="bg-paper">
+      <PageHeader eyebrow="Legal" title="Disclosures." />
+      <section>
         <Container>
+          {/* Legal copy still has to be readable: `.t-h3` is cloud (17.49:1) and
+              `.t-body` is ash (7.20:1) on obsidian — the `text-black` /
+              `text-ink` the paper build set here were both invisible on the
+              Origin ground. */}
           <div className="measure-prose pb-16 md:pb-24">
             {sections.map((s) => (
               <div key={s.h} className="rule-t py-8">
-                <h2 className="t-h3 text-black">{s.h}</h2>
+                <h2 className="t-h3">{s.h}</h2>
                 {s.p.map((t, i) => (
-                  <p key={i} className="t-body mt-4 text-ink">{t}</p>
+                  <p key={i} className="t-body mt-4">{t}</p>
                 ))}
                 {s.h === "Contact" && (
-                  <p className="t-body mt-4 text-ink">
-                    Questions about this website may be sent to{" "}
-                    <TextLink href={`mailto:${site.emails.investors}`}>{site.emails.investors}</TextLink>.
-                  </p>
+                  <>
+                    {/* Split off the sentence so the address is a standalone
+                        control. Inline in the sentence it was a 21px tap
+                        target; `standalone` gives TextLink `min-h-11`, which an
+                        inline link inside running text cannot take without
+                        breaking the line box. */}
+                    <p className="t-body mt-4">Questions about this website may be sent to:</p>
+                    <p className="t-body mt-1">
+                      <TextLink standalone href={`mailto:${site.emails.investors}`}>
+                        {site.emails.investors}
+                      </TextLink>
+                    </p>
+                  </>
                 )}
               </div>
             ))}
