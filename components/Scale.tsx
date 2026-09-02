@@ -27,11 +27,11 @@ export default function Scale() {
                 {SCALE.asOf && <p className="mt-1 text-[13px] text-pebble">All figures as of {fmtAsOf(SCALE.asOf)}.</p>}
               </div>
             ) : (
-              <dl className="mt-12 grid grid-cols-1 gap-px border border-stone bg-rule sm:grid-cols-3">
+              <dl className="mt-12 grid grid-cols-1 gap-x-12 gap-y-8 sm:grid-cols-3">
                 {SCALE.facts.map((f) => (
-                  <div key={f.k} className="bg-linen-cream px-6 py-7">
-                    <dt className="text-[10px] uppercase tracking-[0.16em] text-pebble">{f.k}</dt>
-                    <dd className="mt-2 text-[16px] leading-snug">{f.v}</dd>
+                  <div key={f.k} className="rule-top pt-5">
+                    <dt className="text-[14px] text-pebble">{f.k}</dt>
+                    <dd className="mt-2 text-[18px] font-medium leading-[1.3]">{f.v}</dd>
                   </div>
                 ))}
               </dl>
