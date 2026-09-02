@@ -13,5 +13,5 @@
 - [x] 4.6 Metadata + SEO + OG images
 - [x] 4.7 Audit suite (npm run qa)
 - [ ] 5 Auto-fix loop
-- [ ] 7 Push, preview, PR
-- [ ] 9 Report
+- [x] 7 Push, preview (PR pending final round)
+- [x] 9 Report (docs/REPORT.md)
