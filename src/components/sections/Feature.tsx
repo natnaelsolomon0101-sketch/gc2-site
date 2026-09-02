@@ -300,14 +300,14 @@ export default function Feature() {
           {/* ------------------------------------------------- the warm field */}
           <div className="ft-slab ft-a">
             <h2 id="feature-title" className="ft-head">
-              {count} strategies.
+              Correlated risk does not
               <br />
-              One risk framework.
+              respect a mandate boundary.
             </h2>
 
             <p className="ft-lede">
-              Correlated risk does not respect a mandate boundary. The limits are set
-              once, firm-wide, and every book runs inside them.
+              So the limits are set once, firm-wide, and all {count.toLowerCase()} strategies
+              run inside them. One framework, not six.
             </p>
 
             <Link href="/firm" className="ft-link">
