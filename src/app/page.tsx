@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Strategies from "@/components/sections/Strategies";
-import HeroTicker from "@/components/sections/HeroTicker";
+import HeroV2 from "@/components/sections/HeroV2";
 import Feature from "@/components/sections/Feature";
 import Approach from "@/components/sections/Approach";
 import Insights from "@/components/sections/Insights";
@@ -25,7 +25,7 @@ const jsonLd = {
 export default function Home() {
   return (
     <>
-      <HeroTicker />
+      <HeroV2 />
 
       <Feature />
 

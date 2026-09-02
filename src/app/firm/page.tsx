@@ -16,7 +16,7 @@ const sections = [
   { h: "How we work", p: [
     "We build our own data and write our own models. An idea earns capital only after adversarial review, where the desk argues the other side in good faith.",
     "Every position has a named owner who defends it in front of the desk. There is no house view that overrides the person carrying the risk.",
-    "We size to survive the tail, not to flatter the mean. A book that cannot hold through a drawdown it did not cause is mis-sized regardless of its expected return.",
+    "We size to survive the tail, not to flatter the mean. A book that cannot hold through a drawdown it did not cause is mis-sized, whatever the case for it.",
   ]},
   { h: "Governance", p: [
     "The Investment Committee sets mandate and limits. It does not pick trades.",

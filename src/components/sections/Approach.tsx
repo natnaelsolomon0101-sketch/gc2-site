@@ -57,7 +57,7 @@ const stages: Stage[] = [
     label: "Sizing",
     heading: "Sized to survive the tail, not to flatter the mean.",
     body:
-      "Size follows what a position must withstand rather than what it is expected to earn. A book that cannot hold through a drawdown it did not cause is mis-sized regardless of its expected return.",
+      "Size follows what a position must withstand rather than what it is expected to earn. A book that cannot hold through a drawdown it did not cause is mis-sized, whatever the case for it.",
     holder: "The named owner, inside Committee limits",
     gateLabel: "Advances when",
     gate: "It fits the mandate and the limits the Investment Committee has set.",
