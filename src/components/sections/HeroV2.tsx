@@ -232,7 +232,11 @@ const CSS = `
    is a swapped webfont — a late metric change against Georgia could clip them
    past the .1em allowance the padding used to buy. */
 .hv2-l{display:block;}
-.hv2-l > span{display:block;}
+/* Each display line is one line by construction, and both clamps below size the
+   type to a measured fraction of the column. nowrap makes that structural: a
+   webfont swap, a metric change or a rounding error can no longer break
+   "Evidence first." across two lines and silently halve the headline. */
+.hv2-l > span{display:block;white-space:nowrap;}
 .hv2-l2{color:#d1c9ff;}
 
 /* two explicit rows, so the reading path runs down-left to down-right and the
@@ -260,28 +264,96 @@ const CSS = `
 /* ---- narrow ----------------------------------------------------------- */
 @media (max-width:767px){
   .hv2{min-height:min(calc(100svh - var(--nav-h, 72px)), 760px);}
-  /* four columns on a phone, so the lit field starts on the column-3 line of
-     that grid instead of the 12-column one, and stops at the 24px page padding
-     rather than bleeding off the edge (unchanged from the grid version). */
-  .hv2-measure{left:calc(24px + 2 * ((100vw - 108px) / 4 + 20px));right:24px;gap:20px;}
-  /* four columns on a phone: hide the rest, move the key lines and the closing
-     line to 1 / 3 / 4 so the grid still reads as one measure. */
-  /* Two steps instead of five — the two brightest, so the wedge still reads as
-     a wedge (the bleed strip is already zero-width below 1200px). And they
-     stop short of the type: on a phone the reading column is the whole width,
-     so the light becomes a lit block in the upper right with a hard bottom
-     edge rather than something the copy has to sit on top of. */
-  .hv2-strip[data-s="0"],.hv2-strip[data-s="1"],.hv2-strip[data-s="4"]{display:none;}
-  .hv2-strip{align-self:start;height:34%;}
+  /* The lit field starts on the column-3 line of the phone's 4-column grid and
+     runs OFF the right edge. It used to stop at the 24px page padding, which
+     made the one luminous element in the frame read as a panel someone placed
+     near the corner rather than as light arriving from off-frame — the same
+     thing the desktop bleed is for. */
+  .hv2-measure{left:calc(24px + 2 * ((100vw - 108px) / 4 + 20px));right:0;gap:20px;}
+  /* Three steps, not two: the three brightest. Two bars cannot show a gradient,
+     so the wedge — the whole idea of the element — did not survive the phone.
+     Three do, and they still stop above the type: on a phone the reading column
+     is the full width, so the light stays a lit block in the upper right with a
+     hard bottom edge instead of something the copy has to sit on top of. */
+  .hv2-strip[data-s="0"],.hv2-strip[data-s="1"]{display:none;}
+  /* 28%, not 34%. The hard bottom edge is only worth having if the type clears
+     it, and 34% did not: measured with the entrance finished, the light landed
+     7px into the headline at 375x667 and 9px into it at 360x640, so "first."
+     sat on the brightest strip on two of the commonest phones. The block is a
+     share of a hero whose height is capped, while the content above the
+     headline is near enough constant, so the shorter the screen the further the
+     type rides up into the light. 28% clears it by 16px at 360x640 and 86px at
+     390x844; the short-screen rule below handles the rest. */
+  .hv2-strip{align-self:start;height:28%;}
   .hv2-row{grid-template-columns:repeat(4,minmax(0,1fr));column-gap:20px;}
-  .hv2-m1{grid-column:1 / span 2;}
-  .hv2-m2,.hv2-m3{display:none;}
-  .hv2-m4{grid-column:3 / span 2;}
-  .hv2-h1{grid-column:1 / -1;font-size:clamp(2.4rem, 12.4vw, 3.9rem);
+  /* The masthead keeps all four facts on a phone. It used to drop two of them,
+     and they were the two that say what the firm IS — a private partnership
+     trading liquid global markets — leaving a first screen that named a city
+     and told the time. They do not fit across: at 360px the measure is 312px
+     and "PRIVATE PARTNERSHIP" plus "LIQUID MARKETS, GLOBAL" need ~371px. So the
+     ledger goes vertical instead, city and clock across the top rule, the two
+     standing facts stacked under it, flush to the same left edge as everything
+     else. Line-height tightens to 1.75 so three rows cost ~58px, not 66. */
+  .hv2-mast{row-gap:0;}
+  .hv2-mono{line-height:1.75;}
+  .hv2-m1{grid-row:1;grid-column:1 / span 2;}
+  .hv2-m4{grid-row:1;grid-column:3 / span 2;}
+  .hv2-m2{display:block;grid-row:2;grid-column:1 / -1;}
+  .hv2-m3{display:block;grid-row:3;grid-column:1 / -1;}
+  /* Same promise as the desktop rule, measured against the phone's grid: here
+     the headline spans all four columns, so it is sized to fill the whole
+     measure (100vw - 48px) rather than eight-twelfths of it. DM Serif Display
+     sets the line at 6.0081x its font-size (measured with the webfont loaded,
+     letter-spacing included), and the target is 98% of the measure rather than
+     100%: at exactly 100% sub-pixel rounding tips the line over and it wraps,
+     which costs the whole headline. So 0.98 * (100vw - 48px) / 6.0081, i.e.
+     16.312vw - 7.83px, with the nowrap above as the hard guard.
+     It was 12.4vw — a guess, and a low one: it left "Evidence first." at 85% of
+     the measure (291px of 342px at 390px), stopping 50px short of the right
+     edge with nothing to explain why. The 4.9rem ceiling is the desktop rule
+     evaluated at 768px, so the two clamps meet across the breakpoint instead
+     of stepping. */
+  .hv2-h1{grid-column:1 / -1;font-size:clamp(2.4rem, calc(16.312vw - 7.83px), 4.9rem);
           margin-block:26px 22px;}
   .hv2-lead{grid-row:1;grid-column:1 / -1;font-size:17px;}
   .hv2-cta{grid-row:2;grid-column:1 / -1;justify-content:flex-start;}
-  .hv2-btn{flex:1 1 100%;}
+  /* Content-width buttons on one row, exactly as on desktop, rather than two
+     identical full-width pills with centred labels. Everything else in this
+     hero is flush left and set to its own measure; stacked full-bleed pills
+     were the one element that looked like a different design system. 16px of
+     side padding and a 10px gap are what make both fit inside a 312px measure
+     at 360px: 134 + 159 + 10 = 303. At 16px and the desktop 12px gap it came to
+     313 and wrapped on a 1px miss. Below 360px they wrap to their own widths and
+     stay left-aligned. Height stays 48px, so the touch targets are unchanged. */
+  .hv2-cta{gap:10px;}
+  .hv2-btn{flex:0 1 auto;padding:12px 15px;}
+}
+/* Short phones (iPhone SE 1st gen and the 320x568 class). The hero is allowed
+   to be exactly one screen and no more: the actions are the last thing in it,
+   and an action you have to scroll to find is not an action. At 320x568 the
+   full layout runs 671px against a 568px viewport, so here the standing facts
+   fold back into the city line, the display margins halve, and the two spacers
+   give up the minimums they hold on taller screens. Nothing is removed that
+   carries meaning except the two mono facts, which are the only content on the
+   screen that also exists one tap away on /firm.
+   Measured: 671px -> 556px, so the actions land above the fold on the smallest
+   phone still in use. (They were below it before this hero was touched, too -
+   at ~630px - so this is a fix, not a regression being papered over.) */
+@media (max-width:767px) and (max-height:640px){
+  .hv2-m2,.hv2-m3{display:none;}
+  .hv2-h1{margin-block:14px 12px;}
+  .hv2-gap{min-height:12px;}
+  .hv2-gap-b{min-height:8px;}
+  .hv2-foot{padding-top:16px;row-gap:18px;}
+  .hv2-lead{font-size:16px;}
+}
+/* The light gets its own, tighter height threshold (600px rather than 640px).
+   Squeezing the content upward is what pushes the headline into the block, so
+   the two cannot share a breakpoint: at 360x640 the tightened layout still
+   leaves the type 16px clear at 28%, but at 320x568 it does not, and only that
+   class of screen needs the light cut this far back. */
+@media (max-width:767px) and (max-height:600px){
+  .hv2-strip{height:15%;}
 }
 @media (min-width:768px) and (max-width:1023px){
   /* the two middle masthead facts wrap to two lines and collide once the
