@@ -31,7 +31,8 @@ const PROHIBITED_506C = [
   "illustrative figures",
 ];
 
-const ROUTES = ["/", "/firm", "/strategies", "/insights", "/diligence", "/governance", "/contact", "/disclosures"];
+const ROUTES = ["/", "/firm", "/strategies", "/insights", "/diligence", "/governance",
+                "/partnership", "/questions", "/access", "/contact", "/disclosures"];
 
 async function main() {
   const base = process.env.REGIME_BASE ?? "http://localhost:3000";
@@ -51,7 +52,20 @@ async function main() {
     const res = await page.goto(base + route, { waitUntil: "networkidle" });
     if (!res || res.status() !== 200) { console.log(`  skip ${route} (${res?.status()})`); continue; }
     // Rendered text, not markup: a term inside a class name is not solicitation.
-    const text = (await page.evaluate(() => document.body.innerText)).toLowerCase();
+    //
+    // textContent, not innerText. innerText returns what is VISIBLE, and
+    // Chromium treats the contents of a closed <details> as invisible. On an
+    // accordion page that is ~90% of the copy, so innerText was scanning the
+    // summaries and nothing else — a page could solicit inside every closed
+    // answer and pass. textContent still excludes attributes and class names,
+    // which is the property this scan actually needed; script and style are
+    // stripped off a clone because textContent would otherwise return the
+    // source of both.
+    const text = (await page.evaluate(() => {
+      const body = document.body.cloneNode(true) as HTMLElement;
+      body.querySelectorAll("script, style, noscript, template").forEach((n) => n.remove());
+      return body.textContent ?? "";
+    })).toLowerCase();
     for (const term of list) {
       if (text.includes(term)) hits.push(`${route}  "${term}"`);
     }
