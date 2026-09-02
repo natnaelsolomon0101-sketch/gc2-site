@@ -8,8 +8,11 @@ export const nav = [
 // Allocator-facing pages. Kept out of the top bar on purpose: they are the
 // second question an allocator asks, not the first thing a visitor needs.
 export const allocatorNav = [
+  { label: "Partnership", href: "/partnership" },
   { label: "Diligence", href: "/diligence" },
   { label: "Governance", href: "/governance" },
+  { label: "Questions", href: "/questions" },
+  { label: "Access", href: "/access" },
 ] as const;
 
 export const legalNav = [{ label: "Disclosures", href: "/disclosures" }] as const;

@@ -3,7 +3,7 @@ import { site } from "@/config/site";
 import { nav, allocatorNav, legalNav } from "@/config/nav";
 
 const FOOTER_GROUPS = [
-  { label: "Firm", items: nav },
+  { label: "Site", items: nav },
   { label: "For allocators", items: allocatorNav },
   { label: "Legal", items: legalNav },
 ] as const;
