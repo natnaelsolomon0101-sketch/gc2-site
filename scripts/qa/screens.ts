@@ -83,6 +83,22 @@ export async function runScreens(base: string, outDir: string, routes: string[])
     });
     await page.waitForTimeout(300);
     await page.screenshot({ path: path.join(outDir, "screens", `${slug}-focus-black.png`) });
+
+    // An in-page control too: the whole strategy row is focusable (A.8.4) and
+    // its ring needs to be judgeable, not just the nav and the black band.
+    if (route === "/") {
+      const focused = await page.evaluate(() => {
+        const row = document.querySelector<HTMLElement>('a[href*="/strategies#"]');
+        if (!row) return false;
+        row.scrollIntoView({ block: "center" });
+        row.focus();
+        return true;
+      });
+      if (focused) {
+        await page.waitForTimeout(300);
+        await page.screenshot({ path: path.join(outDir, "screens", "home-focus-row.png") });
+      }
+    }
     await ctx.close();
   }
 
