@@ -31,7 +31,8 @@ const PROHIBITED_506C = [
   "illustrative figures",
 ];
 
-const ROUTES = ["/", "/firm", "/strategies", "/insights", "/contact", "/disclosures"];
+const ROUTES = ["/", "/firm", "/strategies", "/insights", "/contact", "/disclosures",
+  "/partnership", "/questions", "/access"];
 
 async function main() {
   const base = process.env.REGIME_BASE ?? "http://localhost:3000";
