@@ -3,7 +3,7 @@ import { siteUrl } from "@/config/site";
 import { notes } from "@/content/notes";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const routes = ["", "/firm", "/strategies", "/insights", "/contact", "/disclosures"];
+  const routes = ["", "/firm", "/strategies", "/insights", "/diligence", "/governance", "/contact", "/disclosures"];
   const now = new Date();
   return [
     ...routes.map((r) => ({
