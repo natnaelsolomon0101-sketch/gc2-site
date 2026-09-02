@@ -68,13 +68,13 @@ type Glow = {
    instead of averaging out to grey. */
 const GLOWS: Glow[] = [
   // -- far: the two skies, ~100s cycles -----------------------------------
-  { k: "f1", c: C.deep,   a: 0.80, x: 36, y: -2, w: 142, h: 74, r: -7, n: "atmA", d: 118, o: 0  }, // upper sky wash
-  { k: "f2", c: C.cyan,   a: 0.50, x: 62, y: 90, w: 146, h: 50, r: 4,  n: "atmB", d: 104, o: 31 }, // lower horizon wash
+  { k: "f1", c: C.deep,   a: 0.62, x: 36, y: -2, w: 142, h: 74, r: -7, n: "atmA", d: 118, o: 0  }, // upper sky wash, pulled back to let warmth through
+  { k: "f2", c: C.orchid, a: 0.46, x: 62, y: 90, w: 146, h: 50, r: 4,  n: "atmB", d: 104, o: 31 }, // lower horizon wash — orchid, not cyan: cyan read cold and clinical
 
   // -- mid: the shapes you actually read, 45-90s --------------------------
   { k: "m1", c: C.iris,   a: 0.64, x: 79, y: 2,  w: 80,  h: 46, r: -16, n: "atmD", d: 74, o: 8  },
-  { k: "m2", c: C.orchid, a: 0.38, x: 48, y: -4, w: 64,  h: 34, r: 8,   n: "atmF", d: 58, o: 21 }, // mixes to magenta over m1
-  { k: "m3", c: C.peri,   a: 0.64, x: 46, y: 83, w: 150, h: 19, r: -3,  n: "atmB", d: 88, o: 55 }, // the horizon ribbon
+  { k: "m2", c: C.orchid, a: 0.54, x: 48, y: -4, w: 64,  h: 34, r: 8,   n: "atmF", d: 58, o: 21 }, // mixes to magenta over m1
+  { k: "m3", c: C.pale,   a: 0.58, x: 46, y: 83, w: 150, h: 19, r: -3,  n: "atmB", d: 88, o: 55 }, // the horizon ribbon
   { k: "m4", c: C.deep,   a: 0.54, x: 4,  y: 76, w: 60,  h: 46, r: 14,  n: "atmE", d: 66, o: 40 }, // lower-left counterweight
 
   // -- the light that wraps the type: two edge sources at headline height,

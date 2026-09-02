@@ -22,7 +22,7 @@ const monoFace = Roboto_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: `${site.name} — Private investment partnership, Austin`,
+    default: `${site.name} — Private investment partnership, Miami`,
     template: `%s — ${site.name}`,
   },
   description:

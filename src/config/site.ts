@@ -2,7 +2,7 @@ export const site = {
   name: "Girlscantrade2",
   mark: "GC2",
   domain: "gc2.fund",
-  city: "Austin, Texas",
+  city: "Miami, Florida",
   founded: 2019,
   structure: "Private partnership",
   mandate: "Liquid markets, global",

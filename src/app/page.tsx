@@ -10,7 +10,7 @@ import { site, siteUrl } from "@/config/site";
 import { notes, formatDate } from "@/content/notes";
 
 export const metadata: Metadata = {
-  title: `${site.name} — Private investment partnership, Austin`,
+  title: `${site.name} — Private investment partnership, Miami`,
   description:
     "A private investment partnership running concentrated, systematic strategies across liquid global markets.",
 };
@@ -19,7 +19,7 @@ const jsonLd = {
   "@context": "https://schema.org", "@type": "Organization",
   name: site.name, alternateName: site.mark, url: siteUrl,
   email: site.emails.investors, foundingDate: String(site.founded),
-  address: { "@type": "PostalAddress", addressLocality: "Austin", addressRegion: "TX", addressCountry: "US" },
+  address: { "@type": "PostalAddress", addressLocality: "Miami", addressRegion: "FL", addressCountry: "US" },
 };
 
 export default function Home() {
