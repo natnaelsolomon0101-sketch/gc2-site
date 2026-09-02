@@ -1,86 +1,94 @@
 # GC2 — Design system
 
+The Origin system. Dark ground, serif display, chromatic tiles used only inside
+the pinned strategies panel. Every contrast number below was computed from the
+shipped token values, not copied from a spec.
+
 ## Principles
-1. Canvas is paper. A dark band is one deliberate inversion per page, never the default.
-2. 95% achromatic. One accent, on links and focus only. Never a fill, never a surface.
-3. Authority comes from restraint: very large, very light display type, tight leading.
-4. Depth is surface steps and 1px hairlines. There are no shadows in this codebase.
-5. Whitespace is the hierarchy. When in doubt, add space, not chrome.
+
+1. The ground is near-black and stays that way. Light surfaces are cards, never pages.
+2. Color is confined to the strategy tiles. Everything else is achromatic.
+3. Authority comes from scale: very large, light-weight serif display against small mono labels.
+4. Depth is a surface step (obsidian to graphite) plus radius. No shadows.
+5. Motion is slow and additive. It never gates content becoming visible.
 
 ## Color
 
 | Token | Hex | Role |
 |---|---|---|
-| `paper` | `#FFFFFF` | Page canvas |
-| `stone` | `#F3F4F1` | Alternate band, row hover, text inside the inverted band |
-| `hairline` | `#E3E5E1` | All rules, borders, dividers on paper |
-| `mist` | `#C9CCC7` | Non-text only. See note below. |
-| `slate` | `#696F76` | Secondary text, captions, labels |
-| `ink` | `#1F2326` | Body text |
-| `black` | `#000000` | Display, wordmark, the one filled button, the inverted band |
-| `ledger` | `#0F4C3A` | Text links, focus ring, active nav underline. Never a fill. |
-| `ledger-tint` | `#E8F0EC` | Selected/active row background only |
-| `muted-on-black` | `#9AA0A6` | Secondary text inside the inverted band |
-| `hairline-on-black` | `rgba(255,255,255,.14)` | Rules inside the inverted band |
+| `obsidian` | `#0f1011` | Page ground |
+| `abyss` | `#090a0b` | Deeper band, section inversion |
+| `graphite` | `#2e2e2e` | Card surface |
+| `steel` | `#3f4041` | Hairlines, control borders |
+| `pure` | `#ffffff` | Display type, wordmark, primary button fill |
+| `cloud` | `#f5f5f7` | Card headings |
+| `silver` | `#cacaca` | Light tile ground |
+| `ash` | `#9f9fa0` | Body text |
+| `fog` | `#7c7d7d` | De-emphasized text: dates, legal, inactive rows |
+| `void` | `#000000` | Type on chromatic tiles |
 
-Measured contrast (sRGB, WCAG 2.1):
-`slate`/paper 5.08 · `slate`/stone 4.60 · `ink`/paper 15.83 · `ledger`/paper 9.93 ·
-`stone`/black 19.02 · `muted-on-black`/black 7.95. All ≥ 4.5.
+Measured on `obsidian` (WCAG 2.1, sRGB):
 
-`slate` is `#696F76`, not the briefed `#6B7178`: that value measured 4.47:1 on `stone`
-and failed AA wherever secondary text sits on an alternate band. `#696F76` is the
-smallest darkening that clears 4.5 on both paper and stone.
+`pure` 19.05 · `cloud` 17.49 · `silver` 11.62 · `ash` 7.20 · `fog` 4.61.
+On `graphite`: `cloud` 12.47 · `ash` 5.14. All at or above 4.5.
 
-`mist` measures 1.62:1 on paper and is never applied to text. Its briefed roles were
-disabled text and placeholders; this site has no form, so it has no text role at all.
+`fog` is `#7c7d7d`, not the original `#6a6b6b`. That value measured 3.56:1 and
+failed AA on four 14px usages, the footer legal disclaimer among them.
 
-No gradients. No tinted near-blacks — display and the inverted band are true `#000000`.
-No second accent.
+## Chromatic tiles
 
-## Typography
-Display **Newsreader**, weight 300 (400 for h3, wordmark, statements). Never above 400, never italic.
-Text **Instrument Sans**, weight 400 (500 for nav, buttons, labels). Never 600+.
-No monospace. `font-variant-numeric: tabular-nums` globally.
+Used only by `PinnedStrategies`. Foreground is per-tile, not uniform: white
+passes on exactly one of the six.
 
-| Token | Family / weight | Desktop | ≤768px | Leading | Tracking |
-|---|---|---|---|---|---|
-| `display` | Newsreader 300 | 96 | 52 | 1.00 | −0.01em |
-| `h1` | Newsreader 300 | 72 | 44 | 1.02 | −0.01em |
-| `h2` | Newsreader 300 | 48 | 34 | 1.08 | −0.005em |
-| `h3` | Newsreader 400 | 28 | 24 | 1.20 | 0 |
-| `lead` | Instrument Sans 400 | 22 | 19 | 1.45 | 0 |
-| `body` | Instrument Sans 400 | 17 | 17 | 1.60 | 0 |
-| `small` | Instrument Sans 400/500 | 15 | 15 | 1.50 | 0 |
-| `caption` | Instrument Sans 400 | 13 | 13 | 1.50 | 0 |
+| Tile | Background | Foreground | Ratio |
+|---|---|---|---|
+| iris gleam | `#847dff` | `#000000` | 6.36 |
+| cyan signal | `#00b3dd` | `#000000` | 8.49 |
+| pale iris | `#d1c9ff` | `#000000` | 13.51 |
+| deep iris | `#4b49aa` | `#ffffff` | 7.41 |
+| orchid bloom | `#dd90d8` | `#000000` | 9.06 |
+| periwinkle | `#90b8f0` | `#000000` | 10.30 |
 
-Body measure 34em. Lead measure 30em. Headlines max 3 lines at desktop.
+White on `pale iris` would be 1.55:1. Do not make the foreground uniform.
 
-## Layout
-Container 1240px, gutters 24 / 48 (≥1024). 12 columns, 24px gap.
-Section padding 120 desktop / 72 mobile, never below 64. Nav 72px, sticky.
-Base unit 4. Scale: 4 8 12 16 24 32 48 64 96 120 160.
-Everything left-aligned except the mobile nav overlay.
+## Type
 
-## Shape
-Buttons and inputs 2px. Cards and images 4px. No pills. Borders 1px `hairline`,
-spanning the container, not the viewport.
+Display is DM Serif Display, UI is Inter, data and labels are mono.
 
-## Elevation
-None. No `shadow-*` exists in `src/`. The sticky nav gains a 1px hairline bottom
-border after 8px of scroll. That is the only elevation cue.
+| Class | Size | Role |
+|---|---|---|
+| `t-display` | 52 / 96px | Page hero |
+| `t-display-sm` | 40 / 80px | Section heading |
+| `t-heading-lg` | 32 / 38px | Strategy tile heading |
+| `t-heading-sm` | 26px | Card title |
+| `t-wordmark` | 24px | GC2 mark, Nav and Footer |
+| `t-sub` | 18px | Hero subhead |
+| `t-body` | 16px | Body |
+| `t-small` | 14px | Captions, dates, legal |
+| `t-mono` | 12px | Eyebrow labels |
+| `t-mono-xs` | 11px | Card eyebrows, definition terms |
+
+Second numbers are at `min-width: 768px`. There are no inline `font-size`
+overrides in the codebase; if a size is missing from this table, add a tier
+rather than patching at the call site.
 
 ## Motion
-150ms hover/focus, 500ms reveals, `cubic-bezier(.2,.8,.2,1)`.
-One orchestrated moment: the hero reveal on home load, staggered 70ms, once.
-Nothing else animates on scroll. The surface drifts on a 90s loop.
-`prefers-reduced-motion: reduce` renders the hero final and freezes the surface.
-CSS only.
 
-## The surface
-~40 isolines from deterministic 2D simplex noise (seed committed in
-`scripts/generate-surface.ts`), marching squares over a 240×160 grid, emitted once to
-`public/surface.svg`. 1px `hairline` strokes, no fill. Masked so it dissolves left and
-down. Hero right half; reused at 40% opacity top-right on `/firm`. Nowhere else.
+`fade-in` splits opacity from transform on purpose. Opacity resolves in 620ms on
+an ease-out; the 14px rise runs 1600ms on the slow atmospheric curve. They were
+one 2.5s ease-in-out, which left the h1 (the LCP element) near zero opacity for
+roughly two seconds while first paint had already landed at 140ms.
 
-## Iconography
-None. The only glyph is a two-line hamburger on mobile. No arrows on links or buttons.
+Every animation is behind `prefers-reduced-motion`. No `transition: all`, and no
+animation of layout-affecting properties.
+
+## Targets
+
+Interactive elements clear 44x44 at 390px. The `sr-only` skip link measures 1x1
+at rest by design and expands to 146x48 on focus.
+
+## Content rules
+
+`site.ts` is the only place the fund name appears. `site.address` and
+`site.phone` are `null` and render nothing rather than a placeholder. The panel
+figures carry an "Illustrative" marker. Do not ship an invented number.
