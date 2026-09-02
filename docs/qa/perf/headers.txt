@@ -1,0 +1,283 @@
+$ curl -I http://localhost:50854/
+HTTP/1.1 200 OK
+Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; upgrade-insecure-requests
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+X-Frame-Options: DENY
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding
+x-nextjs-cache: HIT
+x-nextjs-prerender: 1
+x-nextjs-prerender: 1
+x-nextjs-stale-time: 300
+Cache-Control: s-maxage=31536000
+ETag: "u36k0glh2xu8o"
+Content-Type: text/html; charset=utf-8
+Content-Length: 39214
+Date: Wed, 02 Sep 2026 17:06:22 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+
+$ curl -I http://localhost:50854/firm
+HTTP/1.1 200 OK
+Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; upgrade-insecure-requests
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+X-Frame-Options: DENY
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding
+x-nextjs-cache: HIT
+x-nextjs-prerender: 1
+x-nextjs-prerender: 1
+x-nextjs-stale-time: 300
+Cache-Control: s-maxage=31536000
+ETag: "s3bzeep5y8jck"
+Content-Type: text/html; charset=utf-8
+Content-Length: 25098
+Date: Wed, 02 Sep 2026 17:06:22 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+
+$ curl -I http://localhost:50854/strategies
+HTTP/1.1 200 OK
+Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; upgrade-insecure-requests
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+X-Frame-Options: DENY
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding
+x-nextjs-cache: HIT
+x-nextjs-prerender: 1
+x-nextjs-prerender: 1
+x-nextjs-stale-time: 300
+Cache-Control: s-maxage=31536000
+ETag: "5yw4ezdo2fpfs"
+Content-Type: text/html; charset=utf-8
+Content-Length: 32990
+Date: Wed, 02 Sep 2026 17:06:22 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+
+$ curl -I http://localhost:50854/insights
+HTTP/1.1 200 OK
+Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; upgrade-insecure-requests
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+X-Frame-Options: DENY
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding
+x-nextjs-cache: HIT
+x-nextjs-prerender: 1
+x-nextjs-prerender: 1
+x-nextjs-stale-time: 300
+Cache-Control: s-maxage=31536000
+ETag: "7gwzamcv7kgjq"
+Content-Type: text/html; charset=utf-8
+Content-Length: 21468
+Date: Wed, 02 Sep 2026 17:06:22 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+
+$ curl -I http://localhost:50854/insights/trade-the-regime-not-the-forecast
+HTTP/1.1 200 OK
+Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; upgrade-insecure-requests
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+X-Frame-Options: DENY
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding
+x-nextjs-cache: HIT
+x-nextjs-prerender: 1
+x-nextjs-prerender: 1
+x-nextjs-stale-time: 300
+Cache-Control: s-maxage=31536000
+ETag: "j07jxoubiica"
+Content-Type: text/html; charset=utf-8
+Content-Length: 23786
+Date: Wed, 02 Sep 2026 17:06:22 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+
+$ curl -I http://localhost:50854/contact
+HTTP/1.1 200 OK
+Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; upgrade-insecure-requests
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+X-Frame-Options: DENY
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding
+x-nextjs-cache: HIT
+x-nextjs-prerender: 1
+x-nextjs-prerender: 1
+x-nextjs-stale-time: 300
+Cache-Control: s-maxage=31536000
+ETag: "ytu35n335aecn"
+Content-Type: text/html; charset=utf-8
+Content-Length: 18621
+Date: Wed, 02 Sep 2026 17:06:22 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+
+$ curl -I http://localhost:50854/disclosures
+HTTP/1.1 200 OK
+Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; upgrade-insecure-requests
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+X-Frame-Options: DENY
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding
+x-nextjs-cache: HIT
+x-nextjs-prerender: 1
+x-nextjs-prerender: 1
+x-nextjs-stale-time: 300
+Cache-Control: s-maxage=31536000
+ETag: "a9vz2m39tph8r"
+Content-Type: text/html; charset=utf-8
+Content-Length: 22369
+Date: Wed, 02 Sep 2026 17:06:22 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+
+$ curl -I http://localhost:50854/surface.svg
+HTTP/1.1 200 OK
+Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; upgrade-insecure-requests
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+X-Frame-Options: DENY
+Cache-Control: public, max-age=31536000, immutable
+Accept-Ranges: bytes
+Last-Modified: Wed, 02 Sep 2026 16:38:56 GMT
+ETag: W/"6bc1-1a062fce5be"
+Content-Type: image/svg+xml
+Content-Length: 27585
+Vary: Accept-Encoding
+Date: Wed, 02 Sep 2026 17:06:22 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+
+$ curl -I http://localhost:50854/favicon.svg
+HTTP/1.1 200 OK
+Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; upgrade-insecure-requests
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+X-Frame-Options: DENY
+Cache-Control: public, max-age=86400, must-revalidate
+Accept-Ranges: bytes
+Last-Modified: Wed, 02 Sep 2026 16:48:05 GMT
+ETag: W/"752-1a06305487e"
+Content-Type: image/svg+xml
+Content-Length: 1874
+Vary: Accept-Encoding
+Date: Wed, 02 Sep 2026 17:06:22 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+
+$ curl -I http://localhost:50854/icon.png
+HTTP/1.1 200 OK
+Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; upgrade-insecure-requests
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+X-Frame-Options: DENY
+Cache-Control: public, max-age=86400, must-revalidate
+Accept-Ranges: bytes
+Last-Modified: Wed, 02 Sep 2026 16:48:05 GMT
+ETag: W/"2b5-1a063054948"
+Content-Type: image/png
+Content-Length: 693
+Date: Wed, 02 Sep 2026 17:06:22 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+
+$ curl -I http://localhost:50854/apple-touch-icon.png
+HTTP/1.1 200 OK
+Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; upgrade-insecure-requests
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+X-Frame-Options: DENY
+Cache-Control: public, max-age=86400, must-revalidate
+Accept-Ranges: bytes
+Last-Modified: Wed, 02 Sep 2026 16:48:06 GMT
+ETag: W/"1083-1a06305497a"
+Content-Type: image/png
+Content-Length: 4227
+Date: Wed, 02 Sep 2026 17:06:22 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+
+$ curl -I http://localhost:50854/insights/feed.xml
+HTTP/1.1 200 OK
+Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; upgrade-insecure-requests
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+X-Frame-Options: DENY
+vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+x-nextjs-cache: HIT
+cache-control: public, max-age=0, must-revalidate
+content-type: application/rss+xml; charset=utf-8
+Date: Wed, 02 Sep 2026 17:06:22 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+
+$ curl -I http://localhost:50854/robots.txt
+HTTP/1.1 200 OK
+Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; upgrade-insecure-requests
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+X-Frame-Options: DENY
+vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+x-nextjs-cache: HIT
+cache-control: public, max-age=0, must-revalidate
+content-type: text/plain
+Date: Wed, 02 Sep 2026 17:06:22 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+
+$ curl -I http://localhost:50854/sitemap.xml
+HTTP/1.1 200 OK
+Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; upgrade-insecure-requests
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+X-Frame-Options: DENY
+vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+x-nextjs-cache: HIT
+cache-control: public, max-age=0, must-revalidate
+content-type: application/xml
+Date: Wed, 02 Sep 2026 17:06:22 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+

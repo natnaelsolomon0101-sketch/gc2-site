@@ -1,0 +1,72 @@
+{
+  "/": {
+    "performance": 96,
+    "accessibility": 100,
+    "best-practices": 100,
+    "seo": 100,
+    "agentic-browsing": 100,
+    "lcpMs": 2855,
+    "cls": 0,
+    "tbtMs": 17
+  },
+  "/firm": {
+    "performance": 96,
+    "accessibility": 100,
+    "best-practices": 100,
+    "seo": 100,
+    "agentic-browsing": 100,
+    "lcpMs": 2855,
+    "cls": 0,
+    "tbtMs": 10
+  },
+  "/strategies": {
+    "performance": 96,
+    "accessibility": 100,
+    "best-practices": 100,
+    "seo": 100,
+    "agentic-browsing": 100,
+    "lcpMs": 2855,
+    "cls": 0,
+    "tbtMs": 8
+  },
+  "/insights": {
+    "performance": 96,
+    "accessibility": 100,
+    "best-practices": 100,
+    "seo": 100,
+    "agentic-browsing": 100,
+    "lcpMs": 2855,
+    "cls": 0,
+    "tbtMs": 9
+  },
+  "/insights/trade-the-regime-not-the-forecast": {
+    "performance": 96,
+    "accessibility": 100,
+    "best-practices": 100,
+    "seo": 100,
+    "agentic-browsing": 100,
+    "lcpMs": 2856,
+    "cls": 0,
+    "tbtMs": 12
+  },
+  "/contact": {
+    "performance": 96,
+    "accessibility": 100,
+    "best-practices": 100,
+    "seo": 100,
+    "agentic-browsing": 100,
+    "lcpMs": 2856,
+    "cls": 0,
+    "tbtMs": 9
+  },
+  "/disclosures": {
+    "performance": 98,
+    "accessibility": 100,
+    "best-practices": 100,
+    "seo": 100,
+    "agentic-browsing": 100,
+    "lcpMs": 2405,
+    "cls": 0,
+    "tbtMs": 5
+  }
+}

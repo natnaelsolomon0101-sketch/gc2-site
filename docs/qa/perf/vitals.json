@@ -1,0 +1,44 @@
+{
+  "/": {
+    "lcpMs": 76,
+    "lcpElement": "IMG",
+    "lcpSize": 240864,
+    "cls": 0
+  },
+  "/firm": {
+    "lcpMs": 28,
+    "lcpElement": "IMG",
+    "lcpSize": 81432,
+    "cls": 0
+  },
+  "/strategies": {
+    "lcpMs": 24,
+    "lcpElement": "P",
+    "lcpSize": 44954,
+    "cls": 0
+  },
+  "/insights": {
+    "lcpMs": 24,
+    "lcpElement": "SPAN",
+    "lcpSize": 24975,
+    "cls": 0
+  },
+  "/insights/trade-the-regime-not-the-forecast": {
+    "lcpMs": 32,
+    "lcpElement": "P",
+    "lcpSize": 74556,
+    "cls": 0
+  },
+  "/contact": {
+    "lcpMs": 20,
+    "lcpElement": "P",
+    "lcpSize": 39767,
+    "cls": 0
+  },
+  "/disclosures": {
+    "lcpMs": 20,
+    "lcpElement": "P",
+    "lcpSize": 53040,
+    "cls": 0
+  }
+}
