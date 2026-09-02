@@ -53,12 +53,20 @@
     font-size: 17px;
     line-height: 1.6;
     font-variant-numeric: tabular-nums;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    /* A.4/4.1: kerning and ligatures on everywhere. Grayscale antialiasing is
+       NOT global — it thins Newsreader on paper. It is scoped to .on-black
+       below, where the light-on-dark stroke needs thinning instead. */
+    font-kerning: normal;
+    text-rendering: optimizeLegibility;
   }
   html { color-scheme: light; }
-  ::selection { background: var(--color-ledger); color: var(--color-paper); }
+  ::selection { background: var(--color-ledger-tint); color: var(--color-black); }
   h1,h2,h3,h4 { font-family: var(--font-display); font-weight: 300; }
+
+  /* 4.1 wrap discipline. `balance` is a hint, not a promise — wraps were
+     checked by eye at 1280 and 390. */
+  h1,h2,h3,h4 { text-wrap: balance; }
+  p, li, dd, dt, figcaption { text-wrap: pretty; }
 }
 
 @layer components {
@@ -75,7 +83,21 @@
   .section-y { padding-block: 72px; }
   @media (min-width: 768px) { .section-y { padding-block: 120px; } }
 
+  /* Grayscale smoothing lives only inside the inverted band (4.1). On paper it
+     thins Newsreader 300; on black it keeps the light-on-dark stroke from
+     blooming. */
+  .on-black {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   /* ---- type scale ---- */
+  /* Display and headline roles carry `balance` on the class as well as the tag,
+     because the statement band's headline is a <p>, not an <hN>. Components
+     layer beats base, so this wins over the paragraph `pretty` above. */
+  .t-display, .t-h1, .t-h2, .t-h3, .t-article-title, .t-nav-mobile,
+  .t-wordmark { text-wrap: balance; }
+
   .t-display { font-family: var(--font-display); font-weight: 300; font-size: 52px;
                line-height: 1.00; letter-spacing: -0.01em; font-optical-sizing: auto; }
   .t-h1      { font-family: var(--font-display); font-weight: 300; font-size: 44px;
@@ -104,6 +126,30 @@
   /* cols 1-9 of the 1240 container (A.8 home 5). 22em ran to ~1011px
      at h2 size and read as a wide paragraph, not a held statement. */
   .measure-statement { max-width: 852px; }
+
+  /* ---- optical margin alignment (4.1) ----
+     Newsreader 300 left side bearings, measured two ways (canvas TextMetrics
+     actualBoundingBoxLeft and an 8x-supersampled fillText scan), identical to
+     4 decimal places and scale-invariant:
+        E H I R (stem + serif) ....  0.03125em
+        N ........................   0.0260em
+        c ........................   0.0391em
+        S ........................   0.0403em
+        A (diagonal apex) ........  -0.0091em
+     The hero display begins "Evidence", the statement band begins "Risk" —
+     both 0.03125em. The offset is -0.03em: a hair under the full bearing so a
+     future first glyph that is slightly tighter cannot overhang.
+     This is deliberately NOT applied to .t-h1/.t-h2/.t-h3 generally. The
+     bearing is a property of the glyph, not the size: "A research house that
+     trades." has a NEGATIVE bearing, and a blanket -0.03em would push it
+     3.9px past the rule. Only the two roles whose first glyph is fixed by
+     A.8's copy are corrected. */
+  .t-display        { margin-left: -0.03em; }
+  .measure-statement{ margin-left: -0.03em; }
+
+  /* 4.1: hanging punctuation on the long-form column and the statement band.
+     Honoured by Safari today; inert but harmless elsewhere. */
+  .prose-gc2, .measure-statement { hanging-punctuation: first last; }
   .measure-legal     { max-width: 34em; }
   .measure-body { max-width: 34em; }
   .measure-lead { max-width: 30em; }
@@ -112,12 +158,27 @@
   /* Fixed so rules under the article column all draw the same width
      regardless of the font-size of the element carrying them. */
   .measure-article{ max-width: 612px; }
+  /* The closing caption carries one of those rules, but at 13px a 612px column
+     sets 101 characters — over 4.1's 80-character ceiling. Narrowing the box
+     would pull the hairline off the prose column it has to align with, so the
+     measure is cut with an inset instead: the border still spans 612px, the
+     text wraps at 452px (~74 characters). Only above the breakpoint; at 390 the
+     column is 342px and already sets ~56. */
+  @media (min-width: 769px) {
+    .t-caption.measure-article { padding-right: var(--spacing-40); }
+  }
 
   /* one-off type roles, tokenized so no component carries a raw size */
   .t-wordmark      { font-family: var(--font-display); font-weight: 400; font-size: 22px; line-height: 1; }
   .t-nav-mobile    { font-family: var(--font-display); font-weight: 300; font-size: 40px; line-height: 1; }
-  .t-article-title { font-family: var(--font-display); font-weight: 300; font-size: 56px;
+  /* A.8 sets 56px and gives no mobile size. At 390 that runs every note title
+     to three lines and strands the last word ("convexity", "problem") —
+     4.1's widow pass forbids it. 44px is the A.4 mobile h1 size, so this
+     introduces no new value into the scale, and it takes all three titles to
+     two clean lines. */
+  .t-article-title { font-family: var(--font-display); font-weight: 300; font-size: 44px;
                      line-height: 1.05; letter-spacing: -0.01em; }
+  @media (min-width: 769px) { .t-article-title { font-size: 56px; } }
   .t-prose         { font-size: 18px; line-height: 1.7; }
 
   /* frames */
@@ -140,15 +201,23 @@
   /* Standalone links: their own control, not a word inside a sentence. */
   .link-block { display: inline-flex; align-items: center; min-height: 44px; }
 
+  /* A real underline, not a border: a border cannot skip a descender, and it
+     sits on the box edge rather than under the baseline. 4.1 fixes the metrics;
+     A.6 fixes the hover (underline ink -> ledger, 150ms), so the transition is
+     on text-decoration-color and the text colour never moves. */
   .link {
     color: var(--color-ledger);
-    border-bottom: 1px solid currentColor;
-    transition: color var(--dur-hover) var(--ease-gc2),
-                border-color var(--dur-hover) var(--ease-gc2);
+    text-decoration: underline;
+    text-decoration-color: var(--color-ink);
+    text-underline-offset: 0.18em;
+    text-decoration-thickness: 1px;
+    text-decoration-skip-ink: auto;
+    transition: text-decoration-color var(--dur-hover) var(--ease-gc2);
   }
-  .link:hover { color: var(--color-black); }
-  .link-on-black { color: var(--color-stone); }
-  .link-on-black:hover { color: var(--color-paper); }
+  .link:hover { text-decoration-color: var(--color-ledger); }
+  /* Inside the black band the same two-step runs on the inverted pair. */
+  .link-on-black { color: var(--color-stone); text-decoration-color: var(--color-muted-on-black); }
+  .link-on-black:hover { text-decoration-color: var(--color-stone); }
 
   /* ---- hairline list ---- */
   .rule-t { border-top: 1px solid var(--color-hairline); }
