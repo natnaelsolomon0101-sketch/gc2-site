@@ -152,3 +152,96 @@
   *,*::before,*::after { animation-duration:.001ms !important; animation-iteration-count:1 !important;
                          transition-duration:.001ms !important; scroll-behavior:auto !important; }
 }
+
+/* ===========================================================================
+   PRINT — the site is dark, paper is not.
+
+   Allocators print /diligence, /governance, /questions and /tearsheet. Before
+   this block the site had no global print styles at all, and it failed in both
+   printer modes at once. With background graphics ON, `body` printed a near
+   black ground (#0f1011) across the full page. With them OFF — the default —
+   171 elements printed white ink on white paper: every .t-h1, .t-h2, the GC2
+   wordmark, every text-pure and text-cloud. Each heading on the site vanished.
+
+   /questions was the worst case and the most likely page to be printed: its
+   own print rules flipped the INK to black and left the ground dark, so all 25
+   questions and 51 answer paragraphs printed black on #0f1011 — 1.10:1. A page
+   built to be read before a first conversation printed as a solid black
+   rectangle. This inverts ground and ink together rather than one of them.
+   ======================================================================== */
+@media print {
+  :root { color-scheme: light; }
+
+  html, body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* Every painted ground goes to paper white. Backgrounds are set with tokens
+     and with white/N alpha utilities all over the site, so this is deliberately
+     broad: on paper there is no ground, only ink. */
+  *, *::before, *::after {
+    background-image: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  main, section, article, header, footer, div, aside, li, ul, ol, dl, table,
+  thead, tbody, tr, td, th, details, summary, nav {
+    background-color: transparent !important;
+  }
+
+  /* Ink. The dark palette's light values are all invisible on white, so every
+     one of them is remapped rather than left to chance. */
+  h1, h2, h3, h4, h5, h6,
+  .t-display, .t-display-sm, .t-heading-lg, .t-heading-sm,
+  .t-h1, .t-h2, .t-h3, .t-article-title, .t-wordmark,
+  .text-pure, .text-cloud, .text-silver,
+  blockquote, summary {
+    color: #000000 !important;
+  }
+  p, li, dd, dt, td, th, span, a,
+  .t-body, .t-small, .t-sub, .t-lead, .t-prose, .t-caption,
+  .text-ash, .text-fog {
+    color: #1a1a1a !important;
+  }
+  .t-mono, .t-mono-xs { color: #444444 !important; }
+
+  /* Hairlines were white at 10-12% alpha. On paper that is nothing. */
+  [class*="border-white"], .rule-t, .rule-b,
+  table, thead, tbody, tr, td, th {
+    border-color: #cccccc !important;
+  }
+
+  /* A cross-reference has to stay distinguishable from body copy once colour
+     is gone. Only in-content links: the nav and footer are hidden below. */
+  main a[href^="/"], main a[href^="mailto:"], main a[href^="http"] {
+    text-decoration: underline !important;
+    text-underline-offset: 2px;
+    border-bottom: 0 !important;
+  }
+
+  /* Chrome that means nothing on paper. */
+  header nav, footer nav, .hv2-bg, .hv2-grain, [aria-hidden="true"] svg {
+    display: none !important;
+  }
+
+  /* Nothing may be withheld from the page. Closed accordions open, scroll
+     driven and reveal animations resolve to their finished state, and anything
+     pinned is released — on paper there is no scroll to drive them. */
+  details { display: block !important; }
+  details > *:not(summary) { display: revert !important; }
+  details:not([open]) > *:not(summary) { display: revert !important; }
+  [style*="opacity"], .fade-in {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+  [class*="sticky"], [class*="fixed"] {
+    position: static !important;
+  }
+
+  /* Keep a band and its heading together, and never break a table row. */
+  h1, h2, h3 { break-after: avoid-page; }
+  tr, li, dt, dd { break-inside: avoid; }
+}

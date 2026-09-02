@@ -21,7 +21,7 @@
 
    - A 12-column hairline grid locked to the site's 1200px measure. It is the
      skeleton, and every other element lands on one of its lines.
-   - A masthead of real facts (city, structure, mandate, live Austin time),
+   - A masthead of real facts (city, structure, mandate, live local time),
      mono, ruled above and below. No invented numbers anywhere — everything
      shown is from config or is the actual clock.
    - The display type left-aligned on the column-1 line, sized so that
@@ -275,17 +275,40 @@ const CSS = `
 @keyframes hv2Drift{from{transform:translate3d(0,-7%,0)}to{transform:translate3d(0,7%,0)}}
 `;
 
-/** Austin is the firm's stated city; this is the real current time there, not
- *  a decorative counter. Rendered as a placeholder on the server and filled on
- *  mount so the markup is deterministic. */
-function useAustinTime() {
+/** The real current time in the firm's stated city, not a decorative counter.
+ *  Rendered as a placeholder on the server and filled on mount so the markup
+ *  is deterministic.
+ *
+ *  The zone and its label are derived from site.city rather than written in.
+ *  When the city moved from Austin to Miami this clock kept running on
+ *  America/Chicago and kept printing "CT" — a masthead reading MIAMI, FLORIDA
+ *  beside a Central-time clock, wrong by an hour, sitting under a headline
+ *  that says "Evidence first." A hardcoded zone is a fact that cannot follow
+ *  the fact it describes. */
+const ZONES: Record<string, { tz: string; label: string }> = {
+  "Miami, Florida": { tz: "America/New_York", label: "ET" },
+  "Austin, Texas": { tz: "America/Chicago", label: "CT" },
+};
+
+function zoneFor(city: string) {
+  const z = ZONES[city];
+  if (!z) {
+    throw new Error(
+      `HeroV2: no time zone mapped for site.city "${city}". Add it to ZONES ` +
+        `rather than letting the masthead show another city's clock.`
+    );
+  }
+  return z;
+}
+
+function useCityTime() {
   const [t, setT] = useState<string | null>(null);
   useEffect(() => {
     const still =
       typeof window.matchMedia === "function" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const fmt = new Intl.DateTimeFormat("en-US", {
-      timeZone: "America/Chicago",
+      timeZone: zoneFor(site.city).tz,
       hour12: false,
       hour: "2-digit",
       minute: "2-digit",
@@ -301,7 +324,7 @@ function useAustinTime() {
 }
 
 export default function HeroV2() {
-  const time = useAustinTime();
+  const time = useCityTime();
 
   return (
     <section className="hv2">
@@ -330,7 +353,7 @@ export default function HeroV2() {
           <span className="hv2-mono hv2-m2">{site.structure}</span>
           <span className="hv2-mono hv2-m3 hv2-mono-lit">{site.mandate}</span>
           <span className="hv2-mono hv2-m4 hv2-mono-lit">
-            <span className="hv2-clock">{time ?? "--:--:--"}</span> CT
+            <span className="hv2-clock">{time ?? "--:--:--"}</span> {zoneFor(site.city).label}
           </span>
         </div>
 
