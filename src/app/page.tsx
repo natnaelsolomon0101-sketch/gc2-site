@@ -5,6 +5,7 @@ import HeroV2 from "@/components/sections/HeroV2";
 import Feature from "@/components/sections/Feature";
 import Approach from "@/components/sections/Approach";
 import Insights from "@/components/sections/Insights";
+import ForAllocators from "@/components/sections/ForAllocators";
 import ContactBand from "@/components/sections/ContactBand";
 import { site, siteUrl } from "@/config/site";
 import { notes, formatDate } from "@/content/notes";
@@ -45,6 +46,8 @@ export default function Home() {
       <Approach />
 
       <Insights />
+
+      <ForAllocators />
 
       <ContactBand />
     </>
