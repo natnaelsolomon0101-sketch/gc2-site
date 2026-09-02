@@ -28,10 +28,18 @@
      "Evidence first." measures almost exactly eight columns. The layout is
      built around the type, not the other way round.
    - ONE luminous element, and it is made of the grid rather than laid over it:
-     the last four columns of the measure plus the bleed out to the viewport
-     edge are lit individually, each step brighter and more open than the one
-     to its left, with the 24px gutters left black between them. Inside each
-     strip the light is immediately cut into a louvre of 1px hard-stop rules.
+     the field from the column-9 line out to the viewport edge is divided into
+     five equal strips, each step brighter and more open than the one to its
+     left, with the 24px gutters left black between them. The left edge is
+     locked to the grid — it starts exactly where the reading column ends — and
+     the five steps then divide whatever width the viewport gives them, so the
+     wedge reads as the same measured wedge at 1280 and at 2560. (It used to be
+     four fixed 74px grid columns plus a bleed strip sized by the leftover
+     margin; that made the last step 40px at 1280 and 680px at 2560, so at
+     desktop widths the "wedge" was four slivers beside one flat slab — the
+     stock-gradient failure this composition exists to avoid.)
+     Inside each strip the light is immediately cut into a louvre of 1px
+     hard-stop rules.
      Hard stops, never blur: the light is dithered into structure, so it cannot
      go hazy. The masthead bar and the full-bleed rules cut across it.
    - Fine static grain over everything, which is what makes a flat dark field
@@ -71,18 +79,18 @@ const GRAIN =
   "</filter><rect width='140' height='140' filter='url(#g)'/></svg>";
 const GRAIN_URL = `url("data:image/svg+xml,${encodeURIComponent(GRAIN)}")`;
 
-/** The step wedge, dimmest column first. Index 0-3 are grid columns 9-12 (set
- *  in CSS so the breakpoints can re-place them); the last entry is the strip
- *  that bleeds past the measure to the viewport edge. `o` is the strip's share
- *  of the light; `pitch` is its louvre period in px — one 1px rule every
- *  `pitch`, so a tighter pitch swallows more light. Value and line density
- *  step together, which is what makes it read as a measured wedge. */
+/** The step wedge, dimmest strip first. The five strips divide the field from
+ *  the column-9 line to the viewport edge equally (widths are set in CSS so the
+ *  breakpoints can drop steps on narrow screens). `o` is the strip's share of
+ *  the light; `pitch` is its louvre period in px — one 1px rule every `pitch`,
+ *  so a tighter pitch swallows more light. Value and line density step
+ *  together, which is what makes it read as a measured wedge. */
 const WEDGE: { o: number; pitch: number }[] = [
   { o: 0.26, pitch: 4 },
   { o: 0.44, pitch: 5 },
   { o: 0.66, pitch: 7 },
   { o: 0.86, pitch: 9 },
-  { o: 1, pitch: 12 }, // the bleed strip, outside the measure
+  { o: 1, pitch: 12 }, // the brightest step, running out to the viewport edge
 ];
 
 const louvre = (pitch: number) =>
@@ -95,6 +103,12 @@ const CSS = `
   /* distance from the wrap's content box to the viewport edge, so grid items
      can bleed out of the measure without leaving the grid */
   --hv2-bleed: calc((100vw - min(100vw, 1200px)) / 2 + 24px);
+  /* the site measure, one of its 12 columns, and the column-9 line in page
+     coordinates. The wedge is anchored to that line: it starts exactly where
+     the reading column stops, at every width, without being made of columns. */
+  --hv2-meas: min(100vw, 1200px);
+  --hv2-col: calc((var(--hv2-meas) - 48px - 264px) / 12);
+  --hv2-c9: calc((100vw - var(--hv2-meas)) / 2 + 24px + 8 * (var(--hv2-col) + 24px));
   position:relative; isolation:isolate; overflow:hidden;
   min-height:min(calc(100svh - var(--nav-h, 72px)), 880px);
   display:flex; flex-direction:column;
@@ -108,11 +122,11 @@ const CSS = `
     radial-gradient(120% 78% at 84% 4%, rgba(75,73,170,.22) 0%, rgba(75,73,170,.06) 46%, rgba(9,10,11,0) 72%),
     linear-gradient(180deg, #0f1011 0%, #090a0b 100%);}
 
-/* the measure. identical box maths to .wrap so every line in here lands on
-   the same column the foreground content is set on. */
-.hv2-measure{position:absolute;inset:0;max-width:1200px;margin-inline:auto;
-  padding-inline:24px;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));
-  column-gap:24px;}
+/* the lit field: from the column-9 line of the measure out to the viewport
+   edge. Its left edge lands on the same line the foreground content stops on;
+   the strips inside then share that width equally. */
+.hv2-measure{position:absolute;top:0;bottom:0;left:var(--hv2-c9);right:0;
+  display:flex;gap:24px;}
 /* The 12 column hairlines, the two full-bleed rules and the index line
    that used to be drawn here are all gone. They read as graph paper laid
    over the picture rather than as structure, and the two rules put a hard
@@ -129,14 +143,7 @@ const CSS = `
    same columns as everything else, it steps in measured increments like a
    photographic step wedge, and every boundary in it is a hard edge the grid
    already explains. The source reads as off-frame right. */
-.hv2-strip{grid-row:1;position:relative;overflow:hidden;transform-origin:50% 0;}
-.hv2-strip[data-s="0"]{grid-column:9;}
-.hv2-strip[data-s="1"]{grid-column:10;}
-.hv2-strip[data-s="2"]{grid-column:11;}
-.hv2-strip[data-s="3"]{grid-column:12;}
-/* the strip that runs from the measure's right edge out to the viewport */
-.hv2-strip-bleed{position:absolute;top:0;bottom:0;left:100%;
-  width:calc(var(--hv2-bleed) - 24px);}
+.hv2-strip{position:relative;overflow:hidden;transform-origin:50% 0;flex:1 1 0;}
 /* Deliberately EVEN light. The value modelling is done by the wedge and the
    louvre, not by the gradient — a gradient left to do its own falloff is how
    the last three attempts turned to haze. Warm end of the palette: pale-iris,
@@ -183,15 +190,33 @@ const CSS = `
 .hv2-clock{font-variant-numeric:tabular-nums;}
 
 
-/* the free space is split above and below the display line so the headline
-   lands just below optical centre rather than being flush to either rule */
+/* The free space is split ABOVE and BELOW the message, never inside it. Both
+   spacers sit outside the headline/lead/actions group, so that group reads as
+   one block sitting just below optical centre, and the leftover height becomes
+   air around it instead of a gap through it.
+   The spacers used to straddle the headline (1 above, .72 below), which put
+   ~136px of nothing between the headline and the sentence that completes it.
+   That is what made the hero read as three floating bands: 36% of an 880px
+   hero was gap, and most of it fell between two elements that belong together. */
 .hv2-gap{flex:1 1 0;min-height:40px;}
-.hv2-gap-b{flex:.72 1 0;min-height:24px;}
+.hv2-gap-b{flex:.55 1 0;min-height:24px;}
 
 /* display type — the layout is built to it: at every width "Evidence first."
-   is set to run to the column-8 line. */
+   is set to run to the column-8 line.
+   The size term is derived from that promise rather than guessed. Eight columns
+   plus their seven gutters measure (2/3)(100vw - 312px) + 168px, and DM Serif
+   Display sets "Evidence first." at 6.006x its font-size, so the size that
+   lands the line exactly is 11.1vw - 6.66px. Above a 1200px viewport the
+   measure stops growing, so the size has to stop too: the 7.9rem ceiling is
+   that same formula evaluated at 1200px, and it holds the line at 759px
+   against a 760px target from there up.
+   It was 8.7vw, a viewport term with no relationship to the measure. Since
+   the measure freezes at 1200px and the clamp did not bite until 1453px, every
+   width in between sized the type off the viewport while the grid it was
+   supposed to hit sized off the measure: 669px against 760px at 1280px, a 12%
+   miss on the file's own central claim, across the most common laptop band. */
 .hv2-h1{grid-column:1 / span 9;font-family:var(--font-display);font-weight:400;
-  color:#fff;font-size:clamp(2.5rem, 8.7vw, 7.9rem);line-height:.88;
+  color:#fff;font-size:clamp(2.5rem, calc(11.1vw - 6.66px), 7.9rem);line-height:.88;
   letter-spacing:-.026em;margin-block:34px 30px;}
 .hv2-l{display:block;overflow:hidden;padding-bottom:.1em;margin-bottom:-.1em;}
 .hv2-l > span{display:block;}
@@ -203,10 +228,14 @@ const CSS = `
 .hv2-foot{padding-top:24px;align-items:start;row-gap:26px;}
 .hv2-lead{grid-row:1;grid-column:1 / span 6;font-size:18px;line-height:1.55;
   font-weight:300;color:#9f9fa0;max-width:30em;}
-/* the actions stop exactly on the column-9 line, where the light begins:
-   everything you read sits left of the aperture, nothing floats over it */
-.hv2-cta{grid-row:2;grid-column:5 / span 4;display:flex;flex-wrap:wrap;gap:12px;
-  justify-content:flex-end;}
+/* the actions sit on the column-1 line, under the sentence they close, so the
+   masthead, the headline, the lead and the buttons all share one left edge and
+   the reading path runs straight down it.
+   They used to be right-aligned into columns 5-8, which aligned them to the
+   column-9 line — a background feature, not anything in the foreground — so
+   the eye ran left, left, left, then jumped right across an empty corner. */
+.hv2-cta{grid-row:2;grid-column:1 / span 6;display:flex;flex-wrap:wrap;gap:12px;
+  justify-content:flex-start;}
 .hv2-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;
   min-height:48px;padding:12px 22px;border-radius:8px;font-size:16px;
   background:#fff;color:#000;border:1px solid #fff;
@@ -218,7 +247,10 @@ const CSS = `
 /* ---- narrow ----------------------------------------------------------- */
 @media (max-width:767px){
   .hv2{min-height:min(calc(100svh - var(--nav-h, 72px)), 760px);}
-  .hv2-measure{grid-template-columns:repeat(4,minmax(0,1fr));column-gap:20px;}
+  /* four columns on a phone, so the lit field starts on the column-3 line of
+     that grid instead of the 12-column one, and stops at the 24px page padding
+     rather than bleeding off the edge (unchanged from the grid version). */
+  .hv2-measure{left:calc(24px + 2 * ((100vw - 108px) / 4 + 20px));right:24px;gap:20px;}
   /* four columns on a phone: hide the rest, move the key lines and the closing
      line to 1 / 3 / 4 so the grid still reads as one measure. */
   /* Two steps instead of five — the two brightest, so the wedge still reads as
@@ -226,9 +258,7 @@ const CSS = `
      stop short of the type: on a phone the reading column is the whole width,
      so the light becomes a lit block in the upper right with a hard bottom
      edge rather than something the copy has to sit on top of. */
-  .hv2-strip[data-s="0"],.hv2-strip[data-s="1"]{display:none;}
-  .hv2-strip[data-s="2"]{grid-column:3;}
-  .hv2-strip[data-s="3"]{grid-column:4;}
+  .hv2-strip[data-s="0"],.hv2-strip[data-s="1"],.hv2-strip[data-s="4"]{display:none;}
   .hv2-strip{align-self:start;height:34%;}
   .hv2-row{grid-template-columns:repeat(4,minmax(0,1fr));column-gap:20px;}
   .hv2-m1{grid-column:1 / span 2;}
@@ -334,11 +364,7 @@ export default function HeroV2() {
         <div className="hv2-ground" />
         <div className="hv2-measure">
           {WEDGE.map((s, i) => (
-            <div
-              key={i}
-              data-s={i}
-              className={i === WEDGE.length - 1 ? "hv2-strip hv2-strip-bleed" : "hv2-strip"}
-            >
+            <div key={i} data-s={i} className="hv2-strip">
               <div className="hv2-strip-light" style={{ opacity: s.o }} />
               <div className="hv2-strip-louvre" style={{ background: louvre(s.pitch) }} />
             </div>
@@ -370,8 +396,6 @@ export default function HeroV2() {
           </h1>
         </div>
 
-        <div className="hv2-gap-b" />
-
         <div className="hv2-row hv2-foot">
           <p className="hv2-lead">
             {site.name} runs concentrated, systematic strategies across liquid global
@@ -386,6 +410,8 @@ export default function HeroV2() {
             </Link>
           </div>
         </div>
+
+        <div className="hv2-gap-b" />
       </div>
     </section>
   );
