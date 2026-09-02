@@ -95,9 +95,6 @@ const CSS = `
   /* distance from the wrap's content box to the viewport edge, so grid items
      can bleed out of the measure without leaving the grid */
   --hv2-bleed: calc((100vw - min(100vw, 1200px)) / 2 + 24px);
-  --hv2-line: rgba(255,255,255,.07);
-  --hv2-line-key: rgba(209,201,255,.20);
-  --hv2-rule: rgba(255,255,255,.13);
   position:relative; isolation:isolate; overflow:hidden;
   min-height:min(calc(100svh - var(--nav-h, 72px)), 880px);
   display:flex; flex-direction:column;
@@ -116,13 +113,14 @@ const CSS = `
 .hv2-measure{position:absolute;inset:0;max-width:1200px;margin-inline:auto;
   padding-inline:24px;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));
   column-gap:24px;}
-/* one item per column, each drawing the hairline that sits on its own left
-   edge; the last also closes the measure on the right. Key lines are the ones
-   the composition is actually pinned to: column 1 (the type's left edge) and
-   column 9 (the aperture's edge). */
-.hv2-col{grid-row:1;border-left:1px solid var(--hv2-line);}
-.hv2-col[data-c="1"],.hv2-col[data-c="9"]{border-left-color:var(--hv2-line-key);}
-.hv2-col[data-c="12"]{border-right:1px solid var(--hv2-line);}
+/* The 12 column hairlines, the two full-bleed rules and the index line
+   that used to be drawn here are all gone. They read as graph paper laid
+   over the picture rather than as structure, and the two rules put a hard
+   horizontal straight through the one thing in the frame that is supposed
+   to read as light. The wedge already states the grid: its four lit
+   columns and their black gutters ARE the measure, on the same tracks the
+   type is set on. The grid still governs every edge; it is just no longer
+   traced. */
 
 /* ---- the light: a step wedge built ON the grid ------------------------
    Not a panel laid over the layout. The last four columns of the measure are
@@ -157,16 +155,6 @@ const CSS = `
    so value and line density step together. It can look like many things, but
    it can never look soft. */
 .hv2-strip-louvre{position:absolute;inset:0;}
-/* the index: one hairline stepping down the lit field in 18 discrete jumps,
-   crossing strips and black gutters alike */
-.hv2-idxwrap{grid-row:1;grid-column:9 / -1;position:relative;
-  margin-right:calc(-1 * var(--hv2-bleed));overflow:hidden;}
-/* rest pose sits the index inside the frame, so the reduced-motion state is a
-   composed still rather than the line parked off the top */
-.hv2-idx{position:absolute;inset:0;transform:translate3d(0,38%,0);}
-.hv2-idx > i{position:absolute;left:0;right:0;top:0;height:1px;display:block;
-  background:linear-gradient(90deg, rgba(209,201,255,0) 0%,
-    rgba(209,201,255,.34) 26%, rgba(209,201,255,.62) 100%);}
 
 .hv2-grain{position:absolute;inset:0;background-image:${GRAIN_URL};
   background-size:140px 140px;opacity:.30;}
@@ -194,8 +182,6 @@ const CSS = `
 .hv2-mono-lit{color:#cacaca;}          /* anything sitting over the aperture */
 .hv2-clock{font-variant-numeric:tabular-nums;}
 
-.hv2-rule{height:1px;background:var(--hv2-rule);transform-origin:0 50%;
-  margin-inline:calc(-1 * var(--hv2-bleed));}
 
 /* the free space is split above and below the display line so the headline
    lands just below optical centre rather than being flush to either rule */
@@ -235,11 +221,6 @@ const CSS = `
   .hv2-measure{grid-template-columns:repeat(4,minmax(0,1fr));column-gap:20px;}
   /* four columns on a phone: hide the rest, move the key lines and the closing
      line to 1 / 3 / 4 so the grid still reads as one measure. */
-  .hv2-col[data-c="5"],.hv2-col[data-c="6"],.hv2-col[data-c="7"],.hv2-col[data-c="8"],
-  .hv2-col[data-c="9"],.hv2-col[data-c="10"],.hv2-col[data-c="11"],
-  .hv2-col[data-c="12"]{display:none;}
-  .hv2-col[data-c="3"]{border-left-color:var(--hv2-line-key);}
-  .hv2-col[data-c="4"]{border-right:1px solid var(--hv2-line);}
   /* Two steps instead of five — the two brightest, so the wedge still reads as
      a wedge (the bleed strip is already zero-width below 1200px). And they
      stop short of the type: on a phone the reading column is the whole width,
@@ -248,8 +229,7 @@ const CSS = `
   .hv2-strip[data-s="0"],.hv2-strip[data-s="1"]{display:none;}
   .hv2-strip[data-s="2"]{grid-column:3;}
   .hv2-strip[data-s="3"]{grid-column:4;}
-  .hv2-strip,.hv2-idxwrap{align-self:start;height:34%;}
-  .hv2-idxwrap{grid-column:3 / -1;}
+  .hv2-strip{align-self:start;height:34%;}
   .hv2-row{grid-template-columns:repeat(4,minmax(0,1fr));column-gap:20px;}
   .hv2-m1{grid-column:1 / span 2;}
   .hv2-m2,.hv2-m3{display:none;}
@@ -275,8 +255,6 @@ const CSS = `
 @media (prefers-reduced-motion: no-preference){
   .hv2-l > span{animation:hv2Rise 1000ms cubic-bezier(.16,1,.3,1) both;}
   .hv2-l2 > span{animation-delay:110ms;}
-  .hv2-rule{animation:hv2Draw 1100ms cubic-bezier(.22,.61,.36,1) both;}
-  .hv2-rule-b{animation-delay:180ms;}
   .hv2-mast > *,.hv2-foot > *{animation:hv2In 700ms cubic-bezier(.22,.61,.36,1) both;}
   .hv2-m2{animation-delay:60ms;} .hv2-m3{animation-delay:120ms;} .hv2-m4{animation-delay:180ms;}
   .hv2-foot > *{animation-delay:340ms;}
@@ -290,14 +268,11 @@ const CSS = `
      fixed louvre. One composited transform per strip, all in lockstep, so it
      reads as a single source moving rather than five things drifting. */
   .hv2-strip-light{animation:hv2Drift 22s cubic-bezier(.45,.05,.55,.95) infinite alternate both;}
-  .hv2-idx{animation:hv2Index 8s steps(20,end) infinite both;}
 }
 @keyframes hv2Rise{from{transform:translate3d(0,102%,0)}to{transform:none}}
-@keyframes hv2Draw{from{transform:scaleX(0)}to{transform:none}}
 @keyframes hv2In{from{opacity:0;transform:translate3d(0,8px,0)}to{opacity:1;transform:none}}
 @keyframes hv2Wipe{from{transform:scaleY(0)}to{transform:none}}
 @keyframes hv2Drift{from{transform:translate3d(0,-7%,0)}to{transform:translate3d(0,7%,0)}}
-@keyframes hv2Index{from{transform:translate3d(0,0,0)}to{transform:translate3d(0,100%,0)}}
 `;
 
 /** Austin is the firm's stated city; this is the real current time there, not
@@ -345,14 +320,6 @@ export default function HeroV2() {
               <div className="hv2-strip-louvre" style={{ background: louvre(s.pitch) }} />
             </div>
           ))}
-          <div className="hv2-idxwrap">
-            <div className="hv2-idx">
-              <i />
-            </div>
-          </div>
-          {Array.from({ length: 12 }, (_, i) => (
-            <div key={i} className="hv2-col" data-c={i + 1} style={{ gridColumn: i + 1 }} />
-          ))}
         </div>
         <div className="hv2-grain" />
       </div>
@@ -366,7 +333,6 @@ export default function HeroV2() {
             <span className="hv2-clock">{time ?? "--:--:--"}</span> CT
           </span>
         </div>
-        <div className="hv2-rule" />
 
         <div className="hv2-gap" />
 
@@ -383,7 +349,6 @@ export default function HeroV2() {
 
         <div className="hv2-gap-b" />
 
-        <div className="hv2-rule hv2-rule-b" />
         <div className="hv2-row hv2-foot">
           <p className="hv2-lead">
             {site.name} runs concentrated, systematic strategies across liquid global
