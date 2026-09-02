@@ -1,0 +1,14 @@
+/*
+ * A Tile is a light island on a near-black page. The global focus ring is
+ * `pure` (#ffffff), which is 1.55:1 on pale-iris and invisible on every other
+ * light tone. Inside a Tile the ring is drawn in the tile's own foreground —
+ * black on the five light tones, white on deep-iris — so it inherits the
+ * pairing the component already guarantees. currentColor is that foreground,
+ * because Tile sets `color` on the root and children inherit it.
+ */
+.tile:focus-visible,
+.tile :global(:focus-visible) {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+  border-radius: 8px;
+}
