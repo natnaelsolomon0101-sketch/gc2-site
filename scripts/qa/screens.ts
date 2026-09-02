@@ -40,6 +40,9 @@ export async function runScreens(base: string, outDir: string, routes: string[])
           const h = Math.min(MAX_TALL, full - y);
           await page.screenshot({
             path: path.join(outDir, "screens", `${slug}-${width}${i === 0 ? "" : `-part${i + 1}`}.png`),
+            // clip is page-relative only when fullPage is set; without it the
+            // clip is viewport-relative and anything below the fold throws.
+            fullPage: true,
             clip: { x: 0, y, width, height: h },
           });
         }
@@ -70,8 +73,14 @@ export async function runScreens(base: string, outDir: string, routes: string[])
     await page.keyboard.press("Tab");
     await page.keyboard.press("Tab");
     await page.screenshot({ path: path.join(outDir, "screens", `${slug}-focus-nav.png`) });
-    // Walk into the black band at the foot of the page.
-    for (let i = 0; i < 40; i++) await page.keyboard.press("Tab");
+    // Focus a link inside the black band directly. A fixed tab count landed
+    // mid-page and produced a capture that could not evidence the stone ring.
+    await page.evaluate(() => {
+      const onBlack = [...document.querySelectorAll("footer a, footer button")];
+      const target = onBlack[onBlack.length - 1] as HTMLElement | undefined;
+      if (target) { target.scrollIntoView({ block: "center" }); target.focus(); }
+    });
+    await page.waitForTimeout(300);
     await page.screenshot({ path: path.join(outDir, "screens", `${slug}-focus-black.png`) });
     await ctx.close();
   }
