@@ -81,3 +81,8 @@
 .gc2-drift-2{ animation: gc2Drift2 46s ease-in-out infinite; }
 
 @keyframes gc2Ticker { from { transform: translate3d(0,0,0); } to { transform: translate3d(-50%,0,0); } }
+
+@keyframes gc2Expand   { from { height: 0 } to { height: var(--radix-accordion-content-height) } }
+@keyframes gc2Collapse { from { height: var(--radix-accordion-content-height) } to { height: 0 } }
+.animate-gc2-expand   { animation: gc2Expand   .42s cubic-bezier(.22,.61,.36,1); }
+.animate-gc2-collapse { animation: gc2Collapse .34s cubic-bezier(.22,.61,.36,1); }

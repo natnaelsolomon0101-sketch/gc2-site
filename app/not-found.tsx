@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { FUND } from "@/content/site";
+import { buttonVariants } from "@/components/ui/button";
 
 export const metadata: Metadata = { title: "Page not found", robots: { index: false, follow: false } };
 
@@ -10,7 +11,7 @@ export default function NotFound() {
         <p className="eyebrow">404</p>
         <h1 className="display h-sec mt-6 max-w-[16ch]">This page is not in the book.</h1>
         <p className="body-copy mt-6">The address you followed no longer resolves.</p>
-        <a href="/" className="mt-10 inline-flex min-h-11 items-center border border-ink px-7 py-3 text-[14px] transition-colors hover:bg-ink hover:text-white">
+        <a href="/" className={buttonVariants({ variant: "outline", size: "md" }) + " mt-10"}>
           Back to {FUND.mark}
         </a>
       </div>

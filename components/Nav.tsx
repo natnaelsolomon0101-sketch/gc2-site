@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { FUND, NAV, NAV_CTA } from "@/content/site";
 import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
@@ -44,7 +45,7 @@ export default function Nav() {
           </nav>
 
           <a href={NAV_CTA.href}
-             className="hidden rounded-none border border-ink px-5 py-2.5 text-[13px] tracking-wide transition-colors hover:bg-ink hover:text-white md:inline-flex">
+             className={cn(buttonVariants({ variant: "outline", size: "sm" }), "hidden md:inline-flex")}>
             {NAV_CTA.label}
           </a>
 
@@ -72,7 +73,7 @@ export default function Nav() {
              className="display h-sub py-3">{n.label}</a>
         ))}
         <a href={NAV_CTA.href} onClick={() => setOpen(false)}
-           className="mt-6 inline-flex w-fit border border-ink px-6 py-3 text-[14px]">
+           className={cn(buttonVariants({ variant: "outline", size: "md" }), "mt-6 w-fit")}>
           {NAV_CTA.label}
         </a>
       </div>

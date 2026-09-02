@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { NEWSLETTER } from "@/content/site";
 import Emphasis from "./Emphasis";
+import { Button } from "@/components/ui/button";
 
 export default function Newsletter() {
   const [email, setEmail] = useState("");
@@ -26,9 +27,9 @@ export default function Newsletter() {
                 placeholder={NEWSLETTER.placeholder}
                 className="h-12 flex-1 border-b border-ink bg-transparent px-1 text-[16px] outline-none placeholder:text-ink-45 focus-visible:border-accent"
               />
-              <button type="submit" className="h-12 shrink-0 border border-ink px-8 text-[14px] transition-colors hover:bg-ink hover:text-white">
+              <Button type="submit" variant="outline" size="md" className="shrink-0 px-8">
                 {NEWSLETTER.cta}
-              </button>
+              </Button>
             </div>
             <p aria-live="polite" className="mt-4 text-[13px] text-ink-45">
               {sent ? "Thank you. We will be in touch." : NEWSLETTER.note}
