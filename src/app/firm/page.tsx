@@ -34,7 +34,6 @@ export default function Firm() {
       <PageHeader
         title="A research house that trades."
         standfirst="We are a small partnership. The work is research; trading is how the research is expressed."
-        withSurface
       />
       {sections.map((s) => (
         <section key={s.h} className="bg-paper">

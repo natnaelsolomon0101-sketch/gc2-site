@@ -2,74 +2,60 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import Wordmark from "./Wordmark";
-import MobileNav from "./MobileNav";
+import { site } from "@/config/site";
 import { nav } from "@/config/nav";
 
 export default function Nav() {
-  const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
   useEffect(() => { setOpen(false); }, [pathname]);
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    const k = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", k);
+    return () => { document.body.style.overflow = ""; window.removeEventListener("keydown", k); };
+  }, [open]);
 
   return (
     <>
-      <header
-        className={`nav-frame sticky top-0 z-50 bg-paper ${scrolled ? "border-b border-hairline" : "border-b border-transparent"}`}
-      >
-        <div className="container-gc2 flex h-full items-center justify-between">
-          <Wordmark />
+      <header className="sticky top-0 z-50" style={{ backdropFilter: "blur(24px)" }}>
+        <div className="wrap flex items-center justify-between" style={{ height: "var(--nav-h)" }}>
+          <Link href="/" aria-label={`${site.mark} home`}
+                className="t-heading-lg text-pure" style={{ fontSize: 24, lineHeight: 1 }}>
+            {site.mark}
+          </Link>
 
-          <nav aria-label="Primary" className="hidden items-center gap-8 md:flex">
-            {nav.map((n) => {
-              const active = pathname === n.href || pathname.startsWith(`${n.href}/`);
-              return (
-                <Link key={n.href} href={n.href}
-                  aria-current={active ? "page" : undefined}
-                  className={`t-small font-medium ${active ? "text-black" : "text-ink"}`}
-                  style={active ? { borderBottom: "1px solid var(--color-ledger)", paddingBottom: "6px" } : undefined}
-                >
-                  {n.label}
-                </Link>
-              );
-            })}
+          <nav aria-label="Primary" className="hidden items-center gap-3 md:flex">
+            {nav.map((n) => (
+              <Link key={n.href} href={n.href} className="nav-glass"
+                    aria-current={pathname === n.href ? "page" : undefined}>
+                {n.label}
+              </Link>
+            ))}
             <Link href="/contact" className="btn">Investor inquiries</Link>
           </nav>
 
-          <button
-            type="button"
-            onClick={() => setOpen((v) => !v)}
-            aria-label={open ? "Close menu" : "Open menu"}
-            aria-expanded={open}
-            aria-controls="mobile-nav"
-            className="-mr-2 flex h-11 w-11 items-center justify-center md:hidden"
-          >
+          <button type="button" onClick={() => setOpen(v => !v)} aria-expanded={open}
+                  aria-controls="m-nav" aria-label={open ? "Close menu" : "Open menu"}
+                  className="-mr-2 flex h-11 w-11 items-center justify-center md:hidden">
             <svg width="22" height="14" viewBox="0 0 22 14" fill="none" aria-hidden>
-              {open ? (
-                <>
-                  <path d="M2 2l18 10" stroke="currentColor" strokeWidth="1.5" />
-                  <path d="M2 12L20 2" stroke="currentColor" strokeWidth="1.5" />
-                </>
-              ) : (
-                <>
-                  <path d="M0 3h22" stroke="currentColor" strokeWidth="1.5" />
-                  <path d="M0 11h22" stroke="currentColor" strokeWidth="1.5" />
-                </>
-              )}
+              {open
+                ? <><path d="M2 2l18 10" stroke="#fff" strokeWidth="1.5"/><path d="M2 12L20 2" stroke="#fff" strokeWidth="1.5"/></>
+                : <><path d="M0 3h22" stroke="#fff" strokeWidth="1.5"/><path d="M0 11h22" stroke="#fff" strokeWidth="1.5"/></>}
             </svg>
           </button>
         </div>
       </header>
 
-      <MobileNav open={open} onClose={() => setOpen(false)} />
+      <div id="m-nav" hidden={!open}
+           className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-7 bg-obsidian md:hidden">
+        {nav.map((n) => (
+          <Link key={n.href} href={n.href} onClick={() => setOpen(false)} className="t-display-sm">
+            {n.label}
+          </Link>
+        ))}
+        <Link href="/contact" onClick={() => setOpen(false)} className="btn mt-4">Investor inquiries</Link>
+      </div>
     </>
   );
 }
