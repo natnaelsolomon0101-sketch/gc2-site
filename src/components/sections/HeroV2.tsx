@@ -45,15 +45,23 @@
    - Fine static grain over everything, which is what makes a flat dark field
      read filmic instead of empty.
 
-   MOTION (exact, not floaty)
-   --------------------------
-   One-shot on load: the two display lines rise under a hard mask, the rules
-   draw left to right, and the wedge wipes down one step at a time. Steady
-   state is two composited transforms — the light sliding behind the fixed
-   louvre (22s, ±7%), and a 1px index hairline stepping down the lit field in
-   20 discrete jumps (8s, steps(), one step every 400ms) — plus one text node
-   updated once a second for the clock. No rAF, no canvas, no layout, and no
-   paint after the first frame.
+   MOTION (exact, not floaty — and never in front of the content)
+   --------------------------------------------------------------
+   One-shot on load: content settles, light wipes. Content — the masthead, the
+   two display lines, the lead, the actions — uses the site's own entrance from
+   globals.css, originFadeIn 620ms on an ease-out beside originRise 1600ms on
+   the slow atmospheric curve. Opacity and transform are split so the words are
+   painted in the first frame and only settle afterwards; nothing in this hero
+   waits on an animation to become readable. The wedge is the exception, and
+   only because it is light rather than content: it still wipes down one step at
+   a time, left to right.
+
+   Steady state is one composited transform — the light sliding behind the fixed
+   louvre (22s, ±7%) — plus one text node updated once a second for the clock.
+   No rAF, no canvas, no layout, and no paint after the first frame.
+   (There is no index hairline. One used to step down the lit field and this
+   paragraph outlived it by several commits; the note at the top of the CSS
+   explains why it and the traced grid lines were removed.)
 
    Every animation is one-shot-to-identity or lives inside
    `prefers-reduced-motion: no-preference`, so the base stylesheet IS the
@@ -218,7 +226,12 @@ const CSS = `
 .hv2-h1{grid-column:1 / span 9;font-family:var(--font-display);font-weight:400;
   color:#fff;font-size:clamp(2.5rem, calc(11.1vw - 6.66px), 7.9rem);line-height:.88;
   letter-spacing:-.026em;margin-block:34px 30px;}
-.hv2-l{display:block;overflow:hidden;padding-bottom:.1em;margin-bottom:-.1em;}
+/* The mask is gone with the reveal it existed for. Keeping overflow:hidden
+   here would only be a liability now: line-height is .88, so the descenders of
+   "first." and "capital." already sit near the box edge, and DM Serif Display
+   is a swapped webfont — a late metric change against Georgia could clip them
+   past the .1em allowance the padding used to buy. */
+.hv2-l{display:block;}
 .hv2-l > span{display:block;}
 .hv2-l2{color:#d1c9ff;}
 
@@ -282,12 +295,36 @@ const CSS = `
 }
 
 /* ---- motion ----------------------------------------------------------- */
+/* Opacity and transform are split, and the split is the whole point. It is the
+   site's documented entrance (the .fade-in rule in globals.css): originFadeIn
+   lands the content fast on an ease-out, originRise keeps the slow atmospheric
+   travel underneath it. Same keyframes, same curves, same stagger values as every
+   other h1 on the site — a hero is not a reason to re-invent the motion.
+
+   This block used to gate content, which DESIGN.md forbids in writing ("It
+   never gates content becoming visible") and whose Motion note records fixing
+   once already. It came back here in transform form, which is exactly why an
+   opacity-based check never caught it: hv2Rise moved each display line 102% of
+   its own height under overflow:hidden, so the headline was not faint early on,
+   it was ABSENT — the LCP element, unpainted. Measured on the old block:
+
+     line 1   still 51% behind the mask at 100ms, 25% at 200ms
+     line 2   fully hidden until 110ms, still 55% hidden at 200ms
+     lead     opacity 0.00 through 300ms, 0.56 at 500ms, solid at ~1000ms
+     actions  identical — both buttons invisible for the first third of a second
+
+   Every one of those is now painted in the first frame and only settles after.
+   The 340ms hold on the lead and the actions is gone; the reading stagger it
+   was trying to buy is kept, at the house 90/180ms, where it costs nothing. */
 @media (prefers-reduced-motion: no-preference){
-  .hv2-l > span{animation:hv2Rise 1000ms cubic-bezier(.16,1,.3,1) both;}
-  .hv2-l2 > span{animation-delay:110ms;}
-  .hv2-mast > *,.hv2-foot > *{animation:hv2In 700ms cubic-bezier(.22,.61,.36,1) both;}
-  .hv2-m2{animation-delay:60ms;} .hv2-m3{animation-delay:120ms;} .hv2-m4{animation-delay:180ms;}
-  .hv2-foot > *{animation-delay:340ms;}
+  .hv2-l > span,.hv2-mast > *,.hv2-foot > *{
+    animation:originFadeIn 620ms cubic-bezier(.22,.61,.36,1) both,
+              originRise 1600ms cubic-bezier(.455,.03,.515,.955) both;}
+  .hv2-l2 > span{animation-delay:90ms,90ms;}
+  .hv2-m2{animation-delay:60ms,60ms;}
+  .hv2-m3{animation-delay:120ms,120ms;}
+  .hv2-m4{animation-delay:180ms,180ms;}
+  .hv2-foot > *{animation-delay:180ms,180ms;}
   /* the wedge wipes down one step at a time, left to right */
   .hv2-strip{animation:hv2Wipe 1000ms cubic-bezier(.22,.61,.36,1) both;}
   .hv2-strip[data-s="1"]{animation-delay:90ms;}
@@ -299,8 +336,8 @@ const CSS = `
      reads as a single source moving rather than five things drifting. */
   .hv2-strip-light{animation:hv2Drift 22s cubic-bezier(.45,.05,.55,.95) infinite alternate both;}
 }
-@keyframes hv2Rise{from{transform:translate3d(0,102%,0)}to{transform:none}}
-@keyframes hv2In{from{opacity:0;transform:translate3d(0,8px,0)}to{opacity:1;transform:none}}
+/* hv2Rise and hv2In are gone: the entrance uses originFadeIn / originRise from
+   globals.css. hv2Wipe and hv2Drift stay — they move light, not content. */
 @keyframes hv2Wipe{from{transform:scaleY(0)}to{transform:none}}
 @keyframes hv2Drift{from{transform:translate3d(0,-7%,0)}to{transform:translate3d(0,7%,0)}}
 `;
