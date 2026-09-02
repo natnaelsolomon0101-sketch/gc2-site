@@ -199,7 +199,13 @@
   .btn-inverted:hover { background: var(--color-paper); }
 
   /* Standalone links: their own control, not a word inside a sentence. */
-  .link-block { display: inline-flex; align-items: center; min-height: 44px; }
+  /* A 44px tap target on a link that sits in a row with plain text values
+     pushed those values ~7px apart, breaking A.2's "values on one baseline".
+     The height is bought with padding around the line box instead, and the
+     negative margin keeps the row's baseline where it was. */
+  .link-block { display: inline-flex; align-items: center; min-height: 44px;
+                padding-block: calc((44px - 1.5em) / 2);
+                margin-block: calc((1.5em - 44px) / 2); }
 
   /* A real underline, not a border: a border cannot skip a descender, and it
      sits on the box edge rather than under the baseline. 4.1 fixes the metrics;

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Wordmark from "./Wordmark";
@@ -9,6 +9,7 @@ import { nav } from "@/config/nav";
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const burgerRef = useRef<HTMLButtonElement>(null);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -44,6 +45,7 @@ export default function Nav() {
           </nav>
 
           <button
+            ref={burgerRef}
             type="button"
             onClick={() => setOpen((v) => !v)}
             aria-label={open ? "Close menu" : "Open menu"}
@@ -68,7 +70,7 @@ export default function Nav() {
         </div>
       </header>
 
-      <MobileNav open={open} onClose={() => setOpen(false)} />
+      <MobileNav open={open} onClose={() => { setOpen(false); burgerRef.current?.focus(); }} />
     </>
   );
 }

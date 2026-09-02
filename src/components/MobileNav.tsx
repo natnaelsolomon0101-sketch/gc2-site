@@ -32,7 +32,10 @@ export default function MobileNav({ open, onClose }: { open: boolean; onClose: (
       ref={panel}
       id="mobile-nav"
       hidden={!open}
-      className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-6 bg-paper md:hidden"
+      aria-hidden={!open}
+      className={`fixed inset-0 z-40 flex flex-col justify-center gap-6 bg-paper px-6 transition-opacity duration-200 md:hidden ${
+        open ? "opacity-100" : "opacity-0"
+      }`}
     >
       {nav.map((n) => (
         <Link key={n.href} href={n.href} onClick={onClose}
