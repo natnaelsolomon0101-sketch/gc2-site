@@ -1,0 +1,303 @@
+@import "tailwindcss";
+
+/* ===========================================================================
+   GC2 tokens. Everything in src/ resolves to a value defined here.
+   No arbitrary values anywhere in the codebase.
+   ========================================================================= */
+@theme {
+  /* color */
+  --color-paper:             #FFFFFF;
+  --color-stone:             #F3F4F1;
+  --color-hairline:          #E3E5E1;
+  --color-mist:              #C9CCC7;
+  --color-slate:             #696F76;
+  --color-ink:               #1F2326;
+  --color-black:             #000000;
+  --color-ledger:            #0F4C3A;
+  --color-ledger-tint:       #E8F0EC;
+  --color-muted-on-black:    #9AA0A6;
+  --color-hairline-on-black: rgba(255,255,255,0.14);
+
+  /* families */
+  --font-display: var(--font-newsreader), Georgia, serif;
+  --font-text:    var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
+
+  /* spacing scale, base 4 */
+  --spacing-1:   4px;  --spacing-2:   8px;  --spacing-3:  12px;
+  --spacing-4:  16px;  --spacing-6:  24px;  --spacing-8:  32px;
+  --spacing-12: 48px;  --spacing-16: 64px;  --spacing-24: 96px;
+  --spacing-30:120px;  --spacing-40:160px;
+
+  /* shape */
+  --radius-control: 2px;
+  --radius-surface: 4px;
+
+  /* motion */
+  --ease-gc2: cubic-bezier(.2,.8,.2,1);
+}
+
+:root {
+  --container: 1240px;
+  --nav-h: 72px;
+  --dur-hover: 150ms;
+  --dur-reveal: 500ms;
+}
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-text);
+    font-weight: 400;
+    font-size: 17px;
+    line-height: 1.6;
+    font-variant-numeric: tabular-nums;
+    /* A.4/4.1: kerning and ligatures on everywhere. Grayscale antialiasing is
+       NOT global — it thins Newsreader on paper. It is scoped to .on-black
+       below, where the light-on-dark stroke needs thinning instead. */
+    font-kerning: normal;
+    text-rendering: optimizeLegibility;
+  }
+  html { color-scheme: light; }
+  ::selection { background: var(--color-ledger-tint); color: var(--color-black); }
+  h1,h2,h3,h4 { font-family: var(--font-display); font-weight: 300; }
+
+  /* 4.1 wrap discipline. `balance` is a hint, not a promise — wraps were
+     checked by eye at 1280 and 390. */
+  h1,h2,h3,h4 { text-wrap: balance; }
+  p, li, dd, dt, figcaption { text-wrap: pretty; }
+}
+
+@layer components {
+  /* ---- layout ---- */
+  .container-gc2 {
+    width: 100%; max-width: var(--container);
+    margin-inline: auto; padding-inline: 24px;
+  }
+  @media (min-width: 1024px) { .container-gc2 { padding-inline: 48px; } }
+
+  .grid-gc2 { display: grid; grid-template-columns: repeat(12, minmax(0,1fr)); gap: 24px; }
+  @media (max-width: 1023px) { .grid-gc2 { grid-template-columns: repeat(4, minmax(0,1fr)); } }
+
+  .section-y { padding-block: 72px; }
+  @media (min-width: 768px) { .section-y { padding-block: 120px; } }
+
+  /* Grayscale smoothing lives only inside the inverted band (4.1). On paper it
+     thins Newsreader 300; on black it keeps the light-on-dark stroke from
+     blooming. */
+  .on-black {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* ---- type scale ---- */
+  /* Display and headline roles carry `balance` on the class as well as the tag,
+     because the statement band's headline is a <p>, not an <hN>. Components
+     layer beats base, so this wins over the paragraph `pretty` above. */
+  .t-display, .t-h1, .t-h2, .t-h3, .t-article-title, .t-nav-mobile,
+  .t-wordmark { text-wrap: balance; }
+
+  .t-display { font-family: var(--font-display); font-weight: 300; font-size: 52px;
+               line-height: 1.00; letter-spacing: -0.01em; font-optical-sizing: auto; }
+  .t-h1      { font-family: var(--font-display); font-weight: 300; font-size: 44px;
+               line-height: 1.02; letter-spacing: -0.01em; font-optical-sizing: auto; }
+  .t-h2      { font-family: var(--font-display); font-weight: 300; font-size: 34px;
+               line-height: 1.08; letter-spacing: -0.005em; font-optical-sizing: auto; }
+  .t-h3      { font-family: var(--font-display); font-weight: 400; font-size: 24px;
+               line-height: 1.20; letter-spacing: 0; font-optical-sizing: auto; }
+  .t-lead    { font-size: 19px; line-height: 1.45; }
+  .t-body    { font-size: 17px; line-height: 1.60; }
+  .t-small   { font-size: 15px; line-height: 1.50; }
+  .t-caption { font-size: 13px; line-height: 1.50; }
+
+  @media (min-width: 769px) {
+    .t-display { font-size: 96px; }
+    .t-h1      { font-size: 72px; }
+    .t-h2      { font-size: 48px; }
+    .t-h3      { font-size: 28px; }
+    .t-lead    { font-size: 22px; }
+  }
+
+  /* measures — every max-width in src/ resolves to one of these */
+  .measure-hero      { max-width: 11em; }
+  .measure-head      { max-width: 16em; }
+  .measure-head-sm   { max-width: 14em; }
+  /* cols 1-9 of the 1240 container (A.8 home 5). 22em ran to ~1011px
+     at h2 size and read as a wide paragraph, not a held statement. */
+  .measure-statement { max-width: 852px; }
+
+  /* ---- optical margin alignment (4.1) ----
+     Newsreader 300 left side bearings, measured two ways (canvas TextMetrics
+     actualBoundingBoxLeft and an 8x-supersampled fillText scan), identical to
+     4 decimal places and scale-invariant:
+        E H I R (stem + serif) ....  0.03125em
+        N ........................   0.0260em
+        c ........................   0.0391em
+        S ........................   0.0403em
+        A (diagonal apex) ........  -0.0091em
+     The hero display begins "Evidence", the statement band begins "Risk" —
+     both 0.03125em. The offset is -0.03em: a hair under the full bearing so a
+     future first glyph that is slightly tighter cannot overhang.
+     This is deliberately NOT applied to .t-h1/.t-h2/.t-h3 generally. The
+     bearing is a property of the glyph, not the size: "A research house that
+     trades." has a NEGATIVE bearing, and a blanket -0.03em would push it
+     3.9px past the rule. Only the two roles whose first glyph is fixed by
+     A.8's copy are corrected. */
+  .t-display        { margin-left: -0.03em; }
+  .measure-statement{ margin-left: -0.03em; }
+
+  /* 4.1: hanging punctuation on the long-form column and the statement band.
+     Honoured by Safari today; inert but harmless elsewhere. */
+  .prose-gc2, .measure-statement { hanging-punctuation: first last; }
+  .measure-legal     { max-width: 34em; }
+  .measure-body { max-width: 34em; }
+  .measure-lead { max-width: 30em; }
+  /* 680px at 17px is 40em / ~88 characters. A.4 caps body measure at 34em. */
+  .measure-prose{ max-width: 34em; }
+  /* Fixed so rules under the article column all draw the same width
+     regardless of the font-size of the element carrying them. */
+  .measure-article{ max-width: 612px; }
+  /* The closing caption carries one of those rules, but at 13px a 612px column
+     sets 101 characters — over 4.1's 80-character ceiling. Narrowing the box
+     would pull the hairline off the prose column it has to align with, so the
+     measure is cut with an inset instead: the border still spans 612px, the
+     text wraps at 452px (~74 characters). Only above the breakpoint; at 390 the
+     column is 342px and already sets ~56. */
+  @media (min-width: 769px) {
+    .t-caption.measure-article { padding-right: var(--spacing-40); }
+  }
+
+  /* one-off type roles, tokenized so no component carries a raw size */
+  .t-wordmark      { font-family: var(--font-display); font-weight: 400; font-size: 22px; line-height: 1; }
+  .t-nav-mobile    { font-family: var(--font-display); font-weight: 300; font-size: 40px; line-height: 1; }
+  /* A.8 sets 56px and gives no mobile size. At 390 that runs every note title
+     to three lines and strands the last word ("convexity", "problem") —
+     4.1's widow pass forbids it. 44px is the A.4 mobile h1 size, so this
+     introduces no new value into the scale, and it takes all three titles to
+     two clean lines. */
+  .t-article-title { font-family: var(--font-display); font-weight: 300; font-size: 44px;
+                     line-height: 1.05; letter-spacing: -0.01em; }
+  @media (min-width: 769px) { .t-article-title { font-size: 56px; } }
+  .t-prose         { font-size: 18px; line-height: 1.7; }
+
+  /* frames */
+  .nav-frame  { height: var(--nav-h); }
+  .hero-frame { min-height: min(calc(100vh - var(--nav-h)), 900px); padding-block: 72px; }
+
+  /* ---- controls ---- */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: var(--font-text); font-weight: 500; font-size: 15px; line-height: 1.2;
+    padding: 12px 20px; border-radius: var(--radius-control);
+    background: var(--color-black); color: var(--color-stone);
+    transition: background var(--dur-hover) var(--ease-gc2);
+  }
+  .btn:hover { background: var(--color-ink); }
+  .btn { min-height: 44px; }
+  .btn-inverted { background: var(--color-stone); color: var(--color-black); }
+  .btn-inverted:hover { background: var(--color-paper); }
+
+  /* Standalone links: their own control, not a word inside a sentence. */
+  /* A 44px tap target on a link that sits in a row with plain text values
+     pushed those values ~7px apart, breaking A.2's "values on one baseline".
+     The height is bought with padding around the line box instead, and the
+     negative margin keeps the row's baseline where it was. */
+  .link-block { display: inline-flex; align-items: center; min-height: 44px;
+                padding-block: calc((44px - 1.5em) / 2);
+                margin-block: calc((1.5em - 44px) / 2); }
+
+  /* A real underline, not a border: a border cannot skip a descender, and it
+     sits on the box edge rather than under the baseline. 4.1 fixes the metrics;
+     A.6 fixes the hover (underline ink -> ledger, 150ms), so the transition is
+     on text-decoration-color and the text colour never moves. */
+  .link {
+    color: var(--color-ledger);
+    text-decoration: underline;
+    /* A.6 describes the hover as "underline ink -> ledger" because it assumed
+       ink-coloured links. A.3 assigns ledger to links, and the accent was
+       restored at rest in an earlier round, so the literal A.6 reading leaves a
+       near-black rule under green glyphs. The rule matches the text at rest and
+       the hover moves the decoration, which is what §4.1 actually protects
+       ("transition text-decoration-color, not color"). */
+    text-decoration-color: currentColor;
+    text-underline-offset: 0.18em;
+    text-decoration-thickness: 1px;
+    text-decoration-skip-ink: auto;
+    transition: text-decoration-color var(--dur-hover) var(--ease-gc2);
+  }
+  .link:hover { text-decoration-color: var(--color-black); }
+  /* Inside the black band the same two-step runs on the inverted pair. */
+  .link-on-black { color: var(--color-stone); text-decoration-color: var(--color-muted-on-black); }
+  .link-on-black:hover { text-decoration-color: var(--color-stone); }
+
+  /* ---- hairline list ---- */
+  .rule-t { border-top: 1px solid var(--color-hairline); }
+  .rule-b { border-bottom: 1px solid var(--color-hairline); }
+  .rule-t-black { border-top: 1px solid var(--color-hairline-on-black); }
+}
+
+/* ---- the one orchestrated moment: hero reveal on load ---- */
+@keyframes gc2Rise { from { opacity: 0; transform: translate3d(0,12px,0); }
+                     to   { opacity: 1; transform: none; } }
+.reveal { animation: gc2Rise var(--dur-reveal) var(--ease-gc2) both; }
+
+.reveal-1 { animation-delay:   0ms; }
+.reveal-2 { animation-delay:  70ms; }
+.reveal-3 { animation-delay: 140ms; }
+.reveal-4 { animation-delay: 210ms; }
+
+/* ---- the surface ---- */
+@keyframes gc2Drift { from { transform: translate3d(0,0,0) scale(1); }
+                      to   { transform: translate3d(-1.5%,-1%,0) scale(1.04); } }
+.surface-drift { animation: gc2Drift 90s var(--ease-gc2) infinite alternate; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { animation: none; opacity: 1; transform: none; }
+  .surface-drift { animation: none; }
+  *, *::before, *::after {
+    animation-duration: .001ms !important; animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important; scroll-behavior: auto !important;
+  }
+}
+
+@layer components {
+  /* A.8 active route marker. Was an inline style; C-7 asks that every value
+     trace to a token. */
+  .nav-active { border-bottom: 1px solid var(--color-ledger); padding-bottom: 6px; }
+
+  .surface-mask {
+    -webkit-mask-image: linear-gradient(to left, #000 35%, transparent 92%);
+    mask-image: linear-gradient(to left, #000 35%, transparent 92%);
+  }
+}
+
+@layer components {
+  /* Long-form article typography (A.8 /insights/[slug]).
+     Measure is 34em, not A.8's literal 680px: at 18px that is 38em and ~86
+     characters per line, which A.4's "body measure <= 34em" and the 5.4 hunt
+     list ("body measure over 75 characters") both rule out. The narrower of the
+     two conflicting spec lines wins because it is the readability floor. */
+  .prose-gc2 { max-width: 612px; } /* 34em at the 18px body size */
+  .prose-gc2 > p { font-size: 18px; line-height: 1.7; color: var(--color-ink); margin-top: 24px; }
+  .prose-gc2 > h2 {
+    font-family: var(--font-display); font-weight: 400; font-size: 30px;
+    line-height: 1.2; color: var(--color-black); margin-top: 48px;
+  }
+  .prose-gc2 > ul { margin-top: 24px; padding-left: 24px; list-style: disc; }
+  .prose-gc2 > ul > li { margin-top: 8px; font-size: 18px; line-height: 1.7; color: var(--color-ink); }
+}
+
+/* Focus ring (A.9). Deliberately unlayered: inside @layer base this lost the
+   cascade on elements carrying utility classes and the ring rendered as
+   currentColor (ink) instead of ledger. */
+:focus-visible {
+  outline: 2px solid var(--color-ledger);
+  outline-offset: 3px;
+  border-radius: var(--radius-control);
+  /* Tailwind v4 puts outline-color in transition-colors, so on rows carrying
+     that utility the ring faded in from currentColor and read as ink for the
+     first 150ms. A focus ring has to be correct on the frame it appears. */
+  transition: none;
+}
+.on-black :focus-visible { outline-color: var(--color-stone); }

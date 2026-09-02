@@ -1,0 +1,60 @@
+{
+  "/": {
+    "colorScheme": "light",
+    "bodyFont": "\"Instrument Sans\", \"Instrument Sans Fallback\", ui-sans-serif",
+    "hydrated": true,
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  "/firm": {
+    "colorScheme": "light",
+    "bodyFont": "\"Instrument Sans\", \"Instrument Sans Fallback\", ui-sans-serif",
+    "hydrated": true,
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  "/strategies": {
+    "colorScheme": "light",
+    "bodyFont": "\"Instrument Sans\", \"Instrument Sans Fallback\", ui-sans-serif",
+    "hydrated": true,
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  "/insights": {
+    "colorScheme": "light",
+    "bodyFont": "\"Instrument Sans\", \"Instrument Sans Fallback\", ui-sans-serif",
+    "hydrated": true,
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  "/insights/trade-the-regime-not-the-forecast": {
+    "colorScheme": "light",
+    "bodyFont": "\"Instrument Sans\", \"Instrument Sans Fallback\", ui-sans-serif",
+    "hydrated": true,
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  "/contact": {
+    "colorScheme": "light",
+    "bodyFont": "\"Instrument Sans\", \"Instrument Sans Fallback\", ui-sans-serif",
+    "hydrated": true,
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  "/disclosures": {
+    "colorScheme": "light",
+    "bodyFont": "\"Instrument Sans\", \"Instrument Sans Fallback\", ui-sans-serif",
+    "hydrated": true,
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  "/not-a-real-page": {
+    "colorScheme": "light",
+    "bodyFont": "\"Instrument Sans\", \"Instrument Sans Fallback\", ui-sans-serif",
+    "hydrated": true,
+    "consoleErrors": [
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "failedRequests": []
+  }
+}

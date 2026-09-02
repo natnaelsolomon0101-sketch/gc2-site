@@ -1,0 +1,33 @@
+{
+  "round": "round-8",
+  "killist": "empty",
+  "punctuation": "[straight punctuation in prose]\nsrc/content/notes/the-honest-cost-of-convexity.mdx:30: the desk's hands. A hedge that can be switched off to improve a period will be\nsrc/content/notes.ts:10:    dek: \"A permanent hedge looks expensive in every month it isn't needed. The arithmetic that makes it cheap across a full cycle.\" },",
+  "secrets": "clean",
+  "axeViolations": 0,
+  "consoleErrors": 0,
+  "checklist": "53/53",
+  "checklistFailures": [],
+  "lighthouse": {
+    "home-mobile": {
+      "performance": 96,
+      "accessibility": 100,
+      "best-practices": 96,
+      "seo": 100,
+      "agentic-browsing": 100
+    },
+    "strategies-mobile": {
+      "performance": 96,
+      "accessibility": 100,
+      "best-practices": 96,
+      "seo": 100,
+      "agentic-browsing": 100
+    },
+    "home-desktop": {
+      "performance": 100,
+      "accessibility": 100,
+      "best-practices": 96,
+      "seo": 100,
+      "agentic-browsing": 100
+    }
+  }
+}

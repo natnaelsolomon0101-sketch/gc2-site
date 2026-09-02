@@ -1,0 +1,57 @@
+# Checklist
+
+53/53 passing
+
+- [x] / returns 200
+- [x] / has exactly one h1
+- [x] / heading order
+- [x] / landmarks main/nav/footer
+- [x] / images have alt
+- [x] / skip link is first focusable
+- [x] / title carries site name
+- [x] /firm returns 200
+- [x] /firm has exactly one h1
+- [x] /firm heading order
+- [x] /firm landmarks main/nav/footer
+- [x] /firm images have alt
+- [x] /firm skip link is first focusable
+- [x] /firm title carries site name
+- [x] /strategies returns 200
+- [x] /strategies has exactly one h1
+- [x] /strategies heading order
+- [x] /strategies landmarks main/nav/footer
+- [x] /strategies images have alt
+- [x] /strategies skip link is first focusable
+- [x] /strategies title carries site name
+- [x] /insights returns 200
+- [x] /insights has exactly one h1
+- [x] /insights heading order
+- [x] /insights landmarks main/nav/footer
+- [x] /insights images have alt
+- [x] /insights skip link is first focusable
+- [x] /insights title carries site name
+- [x] /contact returns 200
+- [x] /contact has exactly one h1
+- [x] /contact heading order
+- [x] /contact landmarks main/nav/footer
+- [x] /contact images have alt
+- [x] /contact skip link is first focusable
+- [x] /contact title carries site name
+- [x] /disclosures returns 200
+- [x] /disclosures has exactly one h1
+- [x] /disclosures heading order
+- [x] /disclosures landmarks main/nav/footer
+- [x] /disclosures images have alt
+- [x] /disclosures skip link is first focusable
+- [x] /disclosures title carries site name
+- [x] /insights/capacity-is-a-research-problem returns 200
+- [x] /insights/capacity-is-a-research-problem has exactly one h1
+- [x] /insights/capacity-is-a-research-problem heading order
+- [x] /insights/capacity-is-a-research-problem landmarks main/nav/footer
+- [x] /insights/capacity-is-a-research-problem images have alt
+- [x] /insights/capacity-is-a-research-problem skip link is first focusable
+- [x] /insights/capacity-is-a-research-problem title carries site name
+- [x] home links to strategy anchors
+- [x] every strategy anchor exists
+- [x] sitemap has entries
+- [x] every sitemap route returns 200

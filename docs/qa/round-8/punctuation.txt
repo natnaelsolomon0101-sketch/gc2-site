@@ -1,0 +1,3 @@
+[straight punctuation in prose]
+src/content/notes/the-honest-cost-of-convexity.mdx:30: the desk's hands. A hedge that can be switched off to improve a period will be
+src/content/notes.ts:10:    dek: "A permanent hedge looks expensive in every month it isn't needed. The arithmetic that makes it cheap across a full cycle." },

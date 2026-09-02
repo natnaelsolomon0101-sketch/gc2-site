@@ -40,3 +40,15 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .gstack/
+
+# QA screenshots. The audit evidence that matters is textual (CRITIQUE.md,
+# FIXES.md, summary.json, checklist.md, killist.txt) and stays tracked; the
+# PNGs are ~96MB per full run and do not belong in history.
+docs/qa/**/screens/
+docs/qa/**/lighthouse-*.json
+docs/baseline/lighthouse-*.json
+docs/baseline/*.png
+docs/screens/
+
+# Agent worktrees are transient checkouts, never repo content.
+.claude/worktrees/
