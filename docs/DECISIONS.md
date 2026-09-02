@@ -83,3 +83,37 @@ The ui-ux-pro-max design-system generator recommended, and Appendix A overrode:
 - **The /disclosures email stays under 44px.** It sits inside a sentence
   ("...may be sent to <email>."), where WCAG 2.5.8 explicitly exempts inline
   links and a 44px box would break the line.
+
+## Swarm — Wave 1 idea rulings (SWARM §5, cap of two)
+
+**Accepted**
+- **IDEA 1 — full-month dates + `<time datetime>`.** `formatDate` used
+  `month: "short"`, rendering "Feb 20, 2026" against §4.1's "July 14, 2026", on
+  four surfaces. Converges with punch-list item 8. Cited: aqr.com Perspectives.
+- **IDEA 2 — render the note dek as the article standfirst.** Every note already
+  carries a `dek` in `notes.ts` that `/insights/[slug]` discards, so all three
+  articles open cold. The compliance officer reached the same finding
+  independently from the other direction (§4.4 "every page has a standfirst").
+  Costs no new copy. Cited: press.stripe.com.
+
+**Rejected**
+- **IDEA 3 — article foot becomes a full insights row.** A.8 specifies
+  "plain-text prev/next" for `/insights/[slug]`. Appendix A is authority #1 and
+  the idea adds structure the spec does not ask for.
+- **IDEA 4 — collapse the strategy definition lists.** Aimed at the persistent
+  criterion-3 score on `/strategies`. Two independent critics already ruled that
+  uniformity spec-mandated, not a defect: A.8 requires "definition list (Markets,
+  Instruments)" in six parallel blocks. Rejected to avoid churning a settled call.
+- **IDEA 5 — extend the print stylesheet to /disclosures and /strategies.**
+  Genuinely good and low-risk; rejected only because §5 caps acceptance at two
+  per round. Re-propose next round if the two above land clean.
+
+## Director ruling — Appendix A outranks §4.4 on "books"
+
+The compliance officer flagged "the book is sized against delivery capacity",
+"runs across the whole book", and "hold conviction through a drawdown it did not
+cause" in `strategies.ts`. Those three strings are **verbatim Appendix A §A.10
+copy**. §4.4 bans "books" and drawdown language in customer-facing copy, so the
+two authorities conflict. §0.1 puts Appendix A first: the three verbatim strings
+stay. Every other instance of "book" — in copy written for this build rather than
+supplied by the spec — is being changed.
