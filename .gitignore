@@ -49,3 +49,6 @@ docs/qa/**/lighthouse-*.json
 docs/baseline/lighthouse-*.json
 docs/baseline/*.png
 docs/screens/
+
+# Agent worktrees are transient checkouts, never repo content.
+.claude/worktrees/
