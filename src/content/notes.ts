@@ -7,7 +7,7 @@ export const notes: Note[] = [
     dek: "Point estimates decay in days. Regime classification survives quarters. Why we stopped asking where the market is going." },
   { slug: "the-honest-cost-of-convexity", title: "The honest cost of convexity",
     date: "2026-05-02", category: "Risk",
-    dek: "A permanent hedge looks expensive in every month it isn't needed. The arithmetic that makes it cheap across a full cycle." },
+    dek: "A permanent hedge looks expensive in every month it isn’t needed. The arithmetic that makes it cheap across a full cycle." },
   { slug: "capacity-is-a-research-problem", title: "Capacity is a research problem",
     date: "2026-02-20", category: "Process",
     dek: "A strategy that cannot be sized is a hobby. Why we underwrite market impact before we underwrite edge." },
@@ -15,5 +15,5 @@ export const notes: Note[] = [
 
 export const formatDate = (iso: string) =>
   new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-US", {
-    year: "numeric", month: "short", day: "numeric", timeZone: "UTC",
+    year: "numeric", month: "long", day: "numeric", timeZone: "UTC",
   });

@@ -14,9 +14,9 @@ const sections = [
     "The firm was built small and has stayed small. Headcount is a constraint we chose, because every position has to be defensible by the person who owns it.",
   ]},
   { h: "How we work", p: [
-    "We build our own data and write our own models. An idea earns capital only after adversarial review, where the desk argues the other side in good faith.",
+    "Data and models are built in house. An idea earns capital only after adversarial review, where the desk argues the other side in good faith.",
     "Every position has a named owner who defends it in front of the desk. There is no house view that overrides the person carrying the risk.",
-    "We size to survive the tail, not to flatter the mean. A book that cannot hold through a drawdown it did not cause is mis-sized regardless of its expected return.",
+    "Positions are sized to survive the tail, not to flatter the mean. A strategy that cannot hold through a loss it did not cause is mis-sized, whatever the case for it.",
   ]},
   { h: "Governance", p: [
     "The Investment Committee sets mandate and limits. It does not pick trades.",
@@ -24,9 +24,9 @@ const sections = [
     "The tail overlay is permanent, not discretionary. It is never switched off to improve a quarter.",
   ]},
   { h: "Where we are", p: [
-    `The partnership is based in ${site.city}. The desk, the research, and the risk function sit in one room, which is deliberate: the review that decides whether an idea earns capital happens in person, and it happens often.`,
+    `${site.name} sits in ${site.city}. The desk, the research, and the risk function share one room, which is deliberate: the review that decides whether an idea earns capital happens in person, and it happens often.`,
     `Being outside a financial center costs us some proximity and saves us a great deal of noise. We do not need to be near the flow to model it, and the people who join us tend to be the kind who would rather read the data than the tape.`,
-    `We hold no branch offices and run no external sales desk. Introductions come through people who already know the work.`,
+    `There are no branch offices and no external sales desk. Introductions come through people who already know the work.`,
   ]},
 ];
 

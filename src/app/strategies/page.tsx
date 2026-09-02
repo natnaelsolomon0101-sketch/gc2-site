@@ -13,7 +13,7 @@ export default function Strategies() {
     <>
       <PageHeader
         title="Six strategies. One risk framework."
-        standfirst="Six books run independently and are underwritten against the same limits. One framework governs them because correlated risk does not respect a mandate boundary."
+        standfirst="Six strategies run independently and are underwritten against the same limits. One framework governs them because correlated risk does not respect a mandate boundary."
       />
       {strategies.map((s) => (
         <section key={s.slug} id={s.slug} className="scroll-mt-24 bg-paper">

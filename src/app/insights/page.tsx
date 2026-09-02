@@ -12,7 +12,10 @@ export const metadata: Metadata = {
 export default function Insights() {
   return (
     <>
-      <PageHeader title="Notes from the desk." />
+      <PageHeader
+        title="Notes from the desk."
+        standfirst="Occasional notes on how the firm thinks about regime, risk, convexity, and capacity."
+      />
       <section className="bg-paper">
         <Container>
           <div className="pb-16 md:pb-24">
