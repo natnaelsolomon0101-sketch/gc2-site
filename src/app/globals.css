@@ -103,7 +103,7 @@
   /* cols 1-9 of the 1240 container (A.8 home 5). 22em ran to ~1011px
      at h2 size and read as a wide paragraph, not a held statement. */
   .measure-statement { max-width: 852px; }
-  .measure-legal     { max-width: 60em; }
+  .measure-legal     { max-width: 34em; }
   .measure-body { max-width: 34em; }
   .measure-lead { max-width: 30em; }
   /* 680px at 17px is 40em / ~88 characters. A.4 caps body measure at 34em. */
