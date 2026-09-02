@@ -31,7 +31,6 @@ export default function Footer() {
 
           <div className="t-caption mt-6 flex flex-wrap justify-between gap-3 text-muted-on-black">
             <span>&copy; {new Date().getFullYear()} {site.name}. All rights reserved.</span>
-            <span>{site.city}</span>
           </div>
         </div>
       </Container>

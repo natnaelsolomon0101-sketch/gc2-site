@@ -100,7 +100,9 @@
   .measure-hero      { max-width: 11em; }
   .measure-head      { max-width: 16em; }
   .measure-head-sm   { max-width: 14em; }
-  .measure-statement { max-width: 22em; }
+  /* cols 1-9 of the 1240 container (A.8 home 5). 22em ran to ~1011px
+     at h2 size and read as a wide paragraph, not a held statement. */
+  .measure-statement { max-width: 852px; }
   .measure-legal     { max-width: 60em; }
   .measure-body { max-width: 34em; }
   .measure-lead { max-width: 30em; }

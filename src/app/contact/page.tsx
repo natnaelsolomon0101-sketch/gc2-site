@@ -21,20 +21,20 @@ export default function Contact() {
           <dl className="rule-t grid grid-cols-1 gap-10 py-16 sm:grid-cols-3 md:py-24">
             <div>
               <dt className="t-caption text-slate">Investors</dt>
-              <dd className="t-lead mt-3">
+              <dd className="t-body mt-3">
                 <TextLink href={`mailto:${site.emails.investors}`}>{site.emails.investors}</TextLink>
               </dd>
             </div>
             <div>
               <dt className="t-caption text-slate">Press</dt>
-              <dd className="t-lead mt-3">
+              <dd className="t-body mt-3">
                 <TextLink href={`mailto:${site.emails.press}`}>{site.emails.press}</TextLink>
               </dd>
             </div>
             <div>
               <dt className="t-caption text-slate">Office</dt>
-              <dd className="t-lead mt-3 text-ink">{site.address ?? site.city}</dd>
-              {site.phone && <dd className="t-lead mt-1 text-ink">{site.phone}</dd>}
+              <dd className="t-body mt-3 text-ink">{site.address ?? site.city}</dd>
+              {site.phone && <dd className="t-body mt-1 text-ink">{site.phone}</dd>}
             </div>
           </dl>
         </Container>

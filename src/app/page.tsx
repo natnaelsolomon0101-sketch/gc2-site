@@ -144,20 +144,20 @@ export default function Home() {
             <dl className="col-span-4 grid grid-cols-1 gap-8 lg:col-span-6 lg:col-start-7 lg:grid-cols-3">
               <div>
                 <dt className="t-caption text-muted-on-black">Investors</dt>
-                <dd className="t-small mt-2">
+                <dd className="t-body mt-2">
                   <TextLink href={`mailto:${site.emails.investors}`} onBlack>{site.emails.investors}</TextLink>
                 </dd>
               </div>
               <div>
                 <dt className="t-caption text-muted-on-black">Press</dt>
-                <dd className="t-small mt-2">
+                <dd className="t-body mt-2">
                   <TextLink href={`mailto:${site.emails.press}`} onBlack>{site.emails.press}</TextLink>
                 </dd>
               </div>
               <div>
                 <dt className="t-caption text-muted-on-black">Office</dt>
-                <dd className="t-small mt-2 text-stone">{site.address ?? site.city}</dd>
-                {site.phone && <dd className="t-small mt-1 text-stone">{site.phone}</dd>}
+                <dd className="t-body mt-2 text-stone">{site.address ?? site.city}</dd>
+                {site.phone && <dd className="t-body mt-1 text-stone">{site.phone}</dd>}
               </div>
             </dl>
           </div>
