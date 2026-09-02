@@ -10,6 +10,39 @@ Base branch: `redesign/origin-100k`, cut from `redesign/origin`.
 - Only one of six strategies is ever visible.
 - The page is sparse: hero, a scroll gimmick, three cards, a footer.
 
+
+## WHO THIS IS FOR — read before designing anything
+
+Girlscantrade2 is a hedge fund trading equities, and its audience is **women**.
+The name is the whole premise. That is not a footnote to the design, it is the
+brief.
+
+What this changes:
+
+- **Warmth is a requirement, not a decoration.** The default institutional
+  register — cold black, hard chrome, austere restraint — is what every other
+  fund site does, and it is precisely the wrong signal for a fund whose entire
+  point is that it is not those firms. The site should feel like it was made by
+  people, for people.
+- **Credibility is still non-negotiable.** Warm must not become soft. This is a
+  fund managing real capital; it cannot read as a lifestyle brand or a
+  newsletter. The bar is: a woman allocating capital takes it seriously AND
+  feels it was built with her in mind. Both, or it fails.
+- **Lean the palette warm.** Of the six chromatic tokens, favour orchid
+  `#dd90d8`, pale-iris `#d1c9ff` and periwinkle `#90b8f0`. Use cyan `#00b3dd`
+  sparingly — it is the coldest and most generically "fintech" of the set.
+  Deep-iris `#4b49aa` for depth.
+- **The bloom and atmosphere work is the point, not garnish.** Organic, living,
+  luminous. That is what separates this from a Bloomberg terminal.
+- **Never gender it cheaply.** No pink-because-women, no florals as wallpaper,
+  no soft-focus stock, no "empowerment" copy, no exclamation marks. The warmth
+  comes from light, colour temperature, generous type and human sentences — not
+  from decoration that would embarrass a serious reader.
+- Copy stays declarative and specific. Confidence, not cheer.
+
+The test: a woman who runs money looks at it and thinks "these people are
+serious, and they were thinking about me." Not one or the other.
+
 ## Target
 
 Dark, dense, expensive. Every section must be a DIFFERENT treatment — no two
