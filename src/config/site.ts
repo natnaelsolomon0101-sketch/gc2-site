@@ -1,5 +1,5 @@
 export const site = {
-  name: "Girlscantrade2",
+  name: "Girls Can Trade 2",
   mark: "GC2",
   domain: "gc2.fund",
   city: "Miami, Florida",
