@@ -1,6 +1,6 @@
 import { HERO, FUND, SCALE, NAV_CTA, NAV } from "@/content/site";
 import Emphasis from "./Emphasis";
-import Surface from "./Surface";
+import Panel from "./Panel";
 
 /**
  * Mercury hero — white canvas, left-weighted type, one blue accent on the
@@ -46,37 +46,7 @@ export default function Hero() {
 
           {/* ---- product card ----------------------------------------- */}
           <div className="col-span-12 min-w-0 lg:col-span-6">
-            <div className="card overflow-hidden">
-              <div className="flex items-center justify-between gap-4 border-b border-line px-5 py-3.5">
-                <span className="text-[13px] font-medium tracking-[-0.01em] text-ink">
-                  {FUND.mark}
-                </span>
-                <span className="text-[12px] text-muted">{SCALE.label}</span>
-              </div>
-
-              <div className="relative aspect-[16/11] bg-surface text-ink">
-                <Surface
-                  className="absolute inset-0 h-full w-full"
-                  lines={44}
-                  tone="currentColor"
-                  opacity={0.45}
-                />
-                <p className="absolute left-5 top-5 max-w-[22ch] text-[13px] leading-[1.4] font-medium text-ink">
-                  {SCALE.statement}
-                </p>
-              </div>
-
-              <dl className="grid grid-cols-1 divide-y divide-line border-t border-line sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-                {SCALE.facts.map((f) => (
-                  <div key={f.k} className="min-w-0 px-5 py-4">
-                    <dt className="text-[11px] font-medium uppercase tracking-[0.06em] text-muted">
-                      {f.k}
-                    </dt>
-                    <dd className="mt-1 text-[13px] leading-[1.4] text-ink">{f.v}</dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
+            <Panel />
           </div>
         </div>
       </div>

@@ -53,7 +53,7 @@ export default function Newsletter() {
             </button>
           </form>
 
-          <p aria-live="polite" className="t-cap mt-4 max-w-[52ch]">
+          <p aria-live="polite" className="t-cap mt-4 max-w-[52ch] md:col-span-6 md:col-start-7">
             {sent ? "Thank you. We will be in touch." : NEWSLETTER.note}
           </p>
         </div>

@@ -129,6 +129,29 @@ export const TICKER = [
   { symbol: "6J", label: "Japanese Yen" },
 ];
 
+
+/* Product panel — the hero's real UI, not decoration.
+   ⚠️ ILLUSTRATIVE. These are not live positions. The panel renders an
+   "Illustrative" marker so it can never read as real exposure data.
+   Replace with a real feed or real end-of-day figures before publishing. */
+export const PANEL = {
+  label: "Book",
+  marker: "Illustrative",
+  columns: ["Instrument", "Mandate", "Weight"],
+  rows: [
+    { sym: "ES", name: "S&P 500 futures",  mandate: "Systematic Macro",  weight: "18.4%" },
+    { sym: "ZN", name: "10Y Treasury note", mandate: "Systematic Macro",  weight: "14.1%" },
+    { sym: "CL", name: "WTI crude",         mandate: "Commodity Carry",   weight: "11.7%" },
+    { sym: "VX", name: "Volatility index",  mandate: "Tail Overlay",      weight: "9.2%"  },
+    { sym: "6E", name: "Euro FX",           mandate: "Stat. Rel. Value",  weight: "7.5%"  },
+  ],
+  summary: [
+    { k: "Mandates live", v: "6" },
+    { k: "Instruments",   v: "42" },
+    { k: "Rebalance",     v: "Daily" },
+  ],
+};
+
 /* Contact ------------------------------------------------------------------ */
 export const CONTACT = {
   label: "Contact",
