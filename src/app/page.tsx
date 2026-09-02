@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Strategies from "@/components/sections/Strategies";
-import MarketsBand from "@/components/sections/MarketsBand";
 import Approach from "@/components/sections/Approach";
 import Insights from "@/components/sections/Insights";
 import ContactBand from "@/components/sections/ContactBand";
@@ -43,7 +42,6 @@ export default function Home() {
       </section>
 
       {/* the pinned scroll section */}
-      <MarketsBand />
 
       <Approach />
 
