@@ -56,7 +56,7 @@ export const strategies: Strategy[] = [
     instruments: "Cash equities, futures",
     body: [
       "Reconstitutions, auctions, and forced flows move prices for reasons unrelated to value. We are paid to absorb that, and we size to the impact estimate rather than the headline.",
-      "The estimate is built before the event, not fitted afterward. An event we cannot model in advance is one we sit out.",
+      "That estimate is built before the event, not fitted afterward. An event we cannot model in advance is one we sit out.",
     ],
   },
   {

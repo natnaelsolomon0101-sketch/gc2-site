@@ -41,6 +41,7 @@ export default async function Note({ params }: { params: Promise<{ slug: string 
             >
               {note.title}
             </h1>
+            <p className="t-lead mt-6 text-slate">{note.dek}</p>
           </div>
 
           <div className="mt-12">
