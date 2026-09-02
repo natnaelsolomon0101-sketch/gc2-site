@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Strategies from "@/components/sections/Strategies";
+import Atmosphere from "@/components/sections/Atmosphere";
+import BloomField from "@/components/sections/BloomField";
 import Approach from "@/components/sections/Approach";
 import Insights from "@/components/sections/Insights";
 import ContactBand from "@/components/sections/ContactBand";
@@ -24,8 +26,10 @@ export default function Home() {
   return (
     <>
       {/* hero */}
-      <section className="wrap" style={{ paddingBlock: "120px" }}>
-        <div className="mx-auto max-w-4xl text-center">
+      <section className="relative isolate overflow-hidden" style={{ paddingBlock: "120px" }}>
+        <Atmosphere />
+        <BloomField intensity={0.85} className="mix-blend-screen" />
+        <div className="wrap relative z-10 mx-auto max-w-4xl text-center">
           <span className="chip fade-in fade-1">
             <span className="t-mono" style={{ letterSpacing: ".16em" }}>{site.city}</span>
           </span>
