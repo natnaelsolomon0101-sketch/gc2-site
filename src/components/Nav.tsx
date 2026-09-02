@@ -21,7 +21,7 @@ export default function Nav() {
       <header className="sticky top-0 z-50" style={{ backdropFilter: "blur(24px)" }}>
         <div className="wrap flex items-center justify-between" style={{ height: "var(--nav-h)" }}>
           <Link href="/" aria-label={`${site.mark} home`}
-                className="t-wordmark text-pure">
+                className="t-wordmark text-pure inline-flex min-h-11 min-w-11 items-center">
             {site.mark}
           </Link>
 
