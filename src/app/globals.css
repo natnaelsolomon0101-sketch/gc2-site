@@ -57,12 +57,6 @@
     -moz-osx-font-smoothing: grayscale;
   }
   ::selection { background: var(--color-ledger); color: var(--color-paper); }
-  :focus-visible {
-    outline: 2px solid var(--color-ledger);
-    outline-offset: 3px;
-    border-radius: var(--radius-control);
-  }
-  .on-black :focus-visible { outline-color: var(--color-stone); }
   h1,h2,h3,h4 { font-family: var(--font-display); font-weight: 300; }
 }
 
@@ -137,12 +131,12 @@
   .btn-inverted:hover { background: var(--color-paper); }
 
   .link {
-    color: var(--color-ink);
+    color: var(--color-ledger);
     border-bottom: 1px solid currentColor;
     transition: color var(--dur-hover) var(--ease-gc2),
                 border-color var(--dur-hover) var(--ease-gc2);
   }
-  .link:hover { color: var(--color-ledger); }
+  .link:hover { color: var(--color-black); }
   .link-on-black { color: var(--color-stone); }
   .link-on-black:hover { color: var(--color-paper); }
 
@@ -156,6 +150,7 @@
 @keyframes gc2Rise { from { opacity: 0; transform: translate3d(0,12px,0); }
                      to   { opacity: 1; transform: none; } }
 .reveal { animation: gc2Rise var(--dur-reveal) var(--ease-gc2) both; }
+
 .reveal-1 { animation-delay:   0ms; }
 .reveal-2 { animation-delay:  70ms; }
 .reveal-3 { animation-delay: 140ms; }
@@ -201,3 +196,17 @@
   .prose-gc2 > ul { margin-top: 24px; padding-left: 24px; list-style: disc; }
   .prose-gc2 > ul > li { margin-top: 8px; font-size: 18px; line-height: 1.7; color: var(--color-ink); }
 }
+
+/* Focus ring (A.9). Deliberately unlayered: inside @layer base this lost the
+   cascade on elements carrying utility classes and the ring rendered as
+   currentColor (ink) instead of ledger. */
+:focus-visible {
+  outline: 2px solid var(--color-ledger);
+  outline-offset: 3px;
+  border-radius: var(--radius-control);
+  /* Tailwind v4 puts outline-color in transition-colors, so on rows carrying
+     that utility the ring faded in from currentColor and read as ink for the
+     first 150ms. A focus ring has to be correct on the frame it appears. */
+  transition: none;
+}
+.on-black :focus-visible { outline-color: var(--color-stone); }

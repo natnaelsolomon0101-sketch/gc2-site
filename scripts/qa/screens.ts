@@ -72,6 +72,7 @@ export async function runScreens(base: string, outDir: string, routes: string[])
     await page.waitForTimeout(700);
     await page.keyboard.press("Tab");
     await page.keyboard.press("Tab");
+    await page.waitForTimeout(260); // outlast any focus transition
     await page.screenshot({ path: path.join(outDir, "screens", `${slug}-focus-nav.png`) });
     // Focus a link inside the black band directly. A fixed tab count landed
     // mid-page and produced a capture that could not evidence the stone ring.

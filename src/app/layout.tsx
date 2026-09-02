@@ -37,6 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${newsreader.variable} ${instrument.variable}`}>
       <body>
+        <link rel="preload" as="image" href="/surface.svg" fetchPriority="high" />
         <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-6 focus:top-6 focus:z-50 focus:bg-black focus:px-4 focus:py-3 focus:text-stone">
           Skip to content
         </a>

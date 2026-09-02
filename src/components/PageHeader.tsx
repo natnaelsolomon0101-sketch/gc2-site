@@ -7,7 +7,7 @@ export default function PageHeader({
   return (
     <section className="relative overflow-hidden bg-paper">
       {withSurface && (
-        <Surface opacity={0.4} className="absolute right-0 top-0 hidden h-full w-1/2 md:block" />
+        <Surface opacity={0.4} className="surface-mask absolute right-0 top-0 h-full w-3/5 md:w-1/2" />
       )}
       <Container className="relative">
         <div className="section-y">

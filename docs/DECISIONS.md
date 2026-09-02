@@ -50,3 +50,20 @@ The ui-ux-pro-max design-system generator recommended, and Appendix A overrode:
 - **"leverage" kept in the convexity note.** A.10 bans it as a marketing verb
   ("leverage our platform"). The note uses the financial noun, "leverage you can
   actually defend", which is correct domain language.
+
+## Round 1
+
+- **LCP is 2.3-2.9s against A.9's "<1.5s".** Measured the LCP element rather
+  than guessing: it is the surface SVG (240k px2 painted area), not the
+  headline. A first fix targeting the headline's fade was wrong and was
+  reverted. `fetchPriority="high"` plus a preload did not move it either; the
+  cost is decoding ~40 contour paths under Lighthouse's 4x CPU throttle, and
+  A.6 mandates the ~40 isolines. CLS is 0 and the Lighthouse performance score
+  is 96-98, so the §5.2 exit gate (>=95) passes. Logged as an open deviation
+  rather than solved by thinning the visual the spec requires.
+- **Focus ring is unlayered and has `transition: none`.** Tailwind v4 includes
+  `outline-color` in `transition-colors`, so on rows carrying that utility the
+  ring faded in from `currentColor` and read as ink for its first 150ms. Both
+  the critic and an early probe of mine sampled it mid-transition and called it
+  a wrong-colored ring. The ring was correct after 150ms; it is now correct on
+  the first frame.
