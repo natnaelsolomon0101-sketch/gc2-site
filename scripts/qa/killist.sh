@@ -12,7 +12,7 @@ add "italic" "italic"
 add "tracking-\[" "ad-hoc tracking"
 add "shadow-" "shadow"
 add "rounded-lg\|rounded-xl\|rounded-2xl\|rounded-full" "off-spec radius"
-add "text-\[\|bg-\[\|p-\[\|px-\[\|py-\[\|m-\[\|w-\[\|h-\[\|gap-\[" "arbitrary value"
+add "text-\[\|bg-\[\|p-\[\|px-\[\|py-\[\|m-\[\|w-\[\|h-\[\|gap-\[\|z-\[\|top-\[\|left-\[\|right-\[\|bottom-\[\|min-h-\[\|max-w-\[" "arbitrary value"
 add "font-mono\|monospace" "monospace"
 add "Girls Country\|Frost Bank\|555-" "stale placeholder"
 # Color gradients only. A mask-image gradient is an alpha ramp that A.6 requires

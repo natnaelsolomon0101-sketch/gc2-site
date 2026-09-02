@@ -33,7 +33,7 @@ export default function MobileNav({ open, onClose }: { open: boolean; onClose: (
       id="mobile-nav"
       hidden={!open}
       aria-hidden={!open}
-      className={`fixed inset-0 z-40 flex flex-col justify-center gap-6 bg-paper px-6 transition-opacity duration-200 md:hidden ${
+      className={`fixed inset-0 z-30 flex flex-col justify-center gap-6 bg-paper px-6 transition-opacity duration-200 md:hidden ${
         open ? "opacity-100" : "opacity-0"
       }`}
     >

@@ -24,7 +24,7 @@ export default function Nav() {
   return (
     <>
       <header
-        className={`nav-frame sticky top-0 z-50 bg-paper ${scrolled ? "border-b border-hairline" : "border-b border-transparent"}`}
+        className={`nav-frame sticky top-0 z-40 bg-paper ${scrolled ? "border-b border-hairline" : "border-b border-transparent"}`}
       >
         <div className="container-gc2 flex h-full items-center justify-between">
           <Wordmark />
