@@ -78,7 +78,7 @@ export default function PinnedStrategies() {
                   </p>
                   <h3 className="t-heading-lg mt-6" style={{ color: tile.fg }}>{active.name}</h3>
                   <p className="t-sub mt-5" style={{ color: tile.fg, opacity: .9 }}>{active.oneLiner}</p>
-                  <p className="mt-8" style={{ color: tile.fg, opacity: .8, fontSize: 14, lineHeight: 1.67 }}>
+                  <p className="t-small mt-8" style={{ color: tile.fg, opacity: .8 }}>
                     {active.markets} &nbsp;&middot;&nbsp; {active.instruments}
                   </p>
                 </div>

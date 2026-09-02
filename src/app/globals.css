@@ -63,12 +63,20 @@
     .t-heading-lg { font-size: 38px; line-height: .9; }
   }
 
+  /* Card-title tier. The scale jumped 38px -> 16px with nothing between, so
+     card headings were being patched with inline font-size overrides. */
+  .t-heading-sm { font-family: var(--font-display); font-weight: 400;
+                  font-size: 26px; line-height: 1.1; }
   .t-sub   { font-size: 18px; line-height: 1.5; font-weight: 300; }
   .t-body  { font-size: 16px; line-height: 1.5; color: var(--color-ash); }
   .t-small { font-size: 14px; line-height: 1.67; color: var(--color-ash); }
   .t-mono  { font-family: var(--font-mono); font-size: 12px; line-height: 2;
              text-transform: uppercase; letter-spacing: .182em; font-weight: 500;
              color: var(--color-ash); }
+  /* Eyebrow tier — the 11px label used above cards and definition terms. */
+  .t-mono-xs { font-family: var(--font-mono); font-size: 11px; line-height: 2;
+               text-transform: uppercase; letter-spacing: .182em; font-weight: 500;
+               color: var(--color-ash); }
 
   /* white-on-black is the only primary action */
   .btn { display:inline-flex; align-items:center; gap:10px; border-radius: 8px;
@@ -113,7 +121,7 @@
   .measure-body{max-width:34em;} .measure-lead{max-width:30em;} .measure-prose{max-width:680px;}
   .measure-hero{max-width:11em;} .measure-head{max-width:16em;} .measure-head-sm{max-width:14em;}
   .measure-statement{max-width:22em;} .measure-legal{max-width:60em;}
-  .t-wordmark{font-family:var(--font-display);font-weight:400;font-size:22px;line-height:1;}
+  .t-wordmark{font-family:var(--font-display);font-weight:400;font-size:24px;line-height:1;}
   .t-nav-mobile{font-family:var(--font-display);font-weight:400;font-size:40px;line-height:1;}
   .t-article-title{font-family:var(--font-display);font-weight:400;font-size:56px;
                    line-height:1.05;letter-spacing:-0.02em;color:var(--color-pure);}

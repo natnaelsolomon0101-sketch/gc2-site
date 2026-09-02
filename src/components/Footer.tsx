@@ -7,7 +7,7 @@ export default function Footer() {
     <footer className="bg-abyss">
       <div className="wrap band">
         <div className="flex flex-wrap items-center justify-between gap-6">
-          <span className="t-heading-lg text-pure" style={{ fontSize: 24, lineHeight: 1 }}>{site.mark}</span>
+          <span className="t-wordmark text-pure">{site.mark}</span>
           <nav aria-label="Footer" className="flex flex-wrap gap-6">
             {footerNav.map((n) => (
               <Link key={n.href} href={n.href} className="t-small flex min-h-11 items-center text-ash">

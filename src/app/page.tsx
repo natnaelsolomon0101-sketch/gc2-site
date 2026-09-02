@@ -59,8 +59,8 @@ export default function Home() {
         <div className="mt-12 grid gap-6 md:grid-cols-3">
           {notes.map((n) => (
             <Link key={n.slug} href={`/insights/${n.slug}`} className="card-dark block p-8">
-              <p className="t-mono" style={{ fontSize: 11 }}>{n.category}</p>
-              <h3 className="t-heading-lg mt-5 text-cloud" style={{ fontSize: 26, lineHeight: 1.1 }}>
+              <p className="t-mono-xs">{n.category}</p>
+              <h3 className="t-heading-sm mt-5 text-cloud">
                 {n.title}
               </h3>
               <p className="t-small mt-4">{n.dek}</p>
@@ -79,15 +79,15 @@ export default function Home() {
           </div>
           <dl className="grid gap-8 sm:grid-cols-3 md:col-span-6 md:col-start-7">
             <div>
-              <dt className="t-mono" style={{ fontSize: 11 }}>Investors</dt>
+              <dt className="t-mono-xs">Investors</dt>
               <dd className="mt-3"><a href={`mailto:${site.emails.investors}`} className="t-body text-pure">{site.emails.investors}</a></dd>
             </div>
             <div>
-              <dt className="t-mono" style={{ fontSize: 11 }}>Press</dt>
+              <dt className="t-mono-xs">Press</dt>
               <dd className="mt-3"><a href={`mailto:${site.emails.press}`} className="t-body text-pure">{site.emails.press}</a></dd>
             </div>
             <div>
-              <dt className="t-mono" style={{ fontSize: 11 }}>Office</dt>
+              <dt className="t-mono-xs">Office</dt>
               <dd className="t-body mt-3 text-pure">{site.address ?? site.city}</dd>
               {site.phone && <dd className="t-body mt-1 text-pure">{site.phone}</dd>}
             </div>
