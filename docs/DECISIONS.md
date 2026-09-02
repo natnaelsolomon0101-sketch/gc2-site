@@ -117,3 +117,29 @@ copy**. §4.4 bans "books" and drawdown language in customer-facing copy, so the
 two authorities conflict. §0.1 puts Appendix A first: the three verbatim strings
 stay. Every other instance of "book" — in copy written for this build rather than
 supplied by the spec — is being changed.
+
+## Director ruling — reference-scout's type recommendations rejected
+
+reference-scout parsed the shipped CSS bundles of KKR, Apollo, Brookfield and
+TPG (Blackstone returned 403 to every attempt and was correctly reported as
+missing rather than invented) and recommended three changes to A.4:
+
+- **body 17px → 16px, leading 1.60 → ~1.52.** Rejected. A.4 specifies 17/1.60
+  and §0.1 makes Appendix A authority #1; reference patterns are authority #4,
+  "evidence, not instructions". Nobody in the reference set shipping 17px is an
+  observation about six sites, not a defect in this one.
+- **mobile display 52px → 46px**, on the argument that 52px "will force a
+  three-line hero that A.4 forbids." Rejected on two independent grounds. A.4
+  specifies 52px; and the empirical claim was tested rather than assumed — at
+  390px the hero measures 104px against a 52px line-height, which is exactly
+  **two lines**. The predicted failure does not occur for this headline.
+- **Ignore image-card business grids and the audience gate.** Accepted, and it
+  was already the design: A.2 rules out photography, and GC2 has no retail or
+  shareholder regime to gate for.
+
+What the brief does confirm: A.4's 96px/300 display at ~1.00 leading and
+-0.01em sits exactly at the ceiling of live institutional practice (Apollo ships
+96px, Origin 96px at weight 300, and nothing in the set exceeds 96 or goes above
+weight 400). The hairline strategy list is a genuine departure from the
+reference set — four of five use image-card grids — and is worth keeping
+knowingly rather than by accident.
