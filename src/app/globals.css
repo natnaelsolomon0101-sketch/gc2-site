@@ -108,6 +108,9 @@
   .measure-lead { max-width: 30em; }
   /* 680px at 17px is 40em / ~88 characters. A.4 caps body measure at 34em. */
   .measure-prose{ max-width: 34em; }
+  /* Fixed so rules under the article column all draw the same width
+     regardless of the font-size of the element carrying them. */
+  .measure-article{ max-width: 612px; }
 
   /* one-off type roles, tokenized so no component carries a raw size */
   .t-wordmark      { font-family: var(--font-display); font-weight: 400; font-size: 22px; line-height: 1; }
@@ -189,7 +192,7 @@
      characters per line, which A.4's "body measure <= 34em" and the 5.4 hunt
      list ("body measure over 75 characters") both rule out. The narrower of the
      two conflicting spec lines wins because it is the readability floor. */
-  .prose-gc2 { max-width: 34em; }
+  .prose-gc2 { max-width: 612px; } /* 34em at the 18px body size */
   .prose-gc2 > p { font-size: 18px; line-height: 1.7; color: var(--color-ink); margin-top: 24px; }
   .prose-gc2 > h2 {
     font-family: var(--font-display); font-weight: 400; font-size: 30px;

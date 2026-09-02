@@ -47,12 +47,12 @@ export default async function Note({ params }: { params: Promise<{ slug: string 
             <Prose><Body /></Prose>
           </div>
 
-          <p className="t-caption measure-prose rule-t mt-16 pt-6 text-slate">
+          <p className="t-caption measure-article rule-t mt-16 pt-6 text-slate">
             This note is commentary from the desk. It is not investment advice and does
             not describe any position the fund holds.
           </p>
 
-          <nav aria-label="More notes" className="measure-prose rule-t mt-12 flex flex-col items-start gap-3 pt-6">
+          <nav aria-label="More notes" className="measure-article rule-t mt-12 flex flex-col items-start gap-3 pt-6">
             {prev ? <Link href={`/insights/${prev.slug}`} className="t-small link">{prev.title}</Link> : <span />}
             {next ? <Link href={`/insights/${next.slug}`} className="t-small link">{next.title}</Link> : <span />}
           </nav>
