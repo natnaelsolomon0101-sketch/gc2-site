@@ -1,0 +1,68 @@
+/*
+ * Print rules for notes. SWARM §4.3: nav and footer hidden, black on white,
+ * article measure 100%, links show their URL after the text.
+ *
+ * Scoped to notes on purpose. DECISIONS.md rejected extending this to
+ * /disclosures and /strategies (wave 1, IDEA 5), so the rules must not leak
+ * onto the other routes. `/insights/[slug]` is the one page whose main content
+ * root is an <article>, which gives a scope that needs no change to page.tsx.
+ *
+ * Kept out of globals.css because the typographer owns that file this round.
+ */
+
+@media print {
+  body:has(main > article) {
+    background: #ffffff;
+    color: #000000;
+  }
+
+  /* Site chrome. The skip link is the first child of body and prints as a
+     stray line otherwise. */
+  body:has(main > article) > header,
+  body:has(main > article) > footer,
+  body:has(main > article) > a[href="#main"] {
+    display: none;
+  }
+
+  /* Measure 100%: paper is already a fixed measure, so every on-screen cap
+     just wastes the page. */
+  body:has(main > article) .container-gc2,
+  body:has(main > article) .measure-prose,
+  body:has(main > article) .measure-article,
+  body:has(main > article) .prose-gc2 {
+    max-width: none;
+    padding-inline: 0;
+  }
+
+  body:has(main > article) .section-y {
+    padding-block: 0;
+  }
+
+  /* Ink is #1F2326 and slate is #696F76 on screen. Toner has no such nuance. */
+  body:has(main > article) h1,
+  body:has(main > article) h2,
+  body:has(main > article) p,
+  body:has(main > article) li,
+  body:has(main > article) a,
+  body:has(main > article) time,
+  body:has(main > article) span {
+    color: #000000;
+  }
+
+  /* A link on paper is a dead end unless it says where it goes. */
+  body:has(main > article) a[href] {
+    text-decoration: underline;
+  }
+
+  body:has(main > article) a[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    word-break: break-all;
+  }
+
+  /* Headings should not be orphaned at the foot of a sheet. */
+  body:has(main > article) h1,
+  body:has(main > article) h2 {
+    break-after: avoid;
+  }
+}

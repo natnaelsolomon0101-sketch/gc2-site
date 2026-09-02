@@ -1,0 +1,18 @@
+{
+  "/insights/trade-the-regime-not-the-forecast": {
+    "header": "hidden",
+    "footer": "hidden",
+    "skipLink": "hidden",
+    "headingColor": "rgb(0, 0, 0)",
+    "proseMaxWidth": "none",
+    "linkUrlAfter": "\" (/insights/the-honest-cost-of-convexity)\""
+  },
+  "/disclosures": {
+    "header": "visible",
+    "footer": "visible",
+    "skipLink": "visible",
+    "headingColor": "rgb(0, 0, 0)",
+    "proseMaxWidth": null,
+    "linkUrlAfter": "none"
+  }
+}
