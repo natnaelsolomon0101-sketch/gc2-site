@@ -204,3 +204,29 @@ That deference was right, and the ruling is: **do not ship it.**
 
 LCP stays open and honestly reported, now with the correct cause on record.
 The numbers are preserved in a comment in `layout.tsx` if this is ever revisited.
+
+## Round 9 — a low finding traded back for a high one
+
+critic-lp filed a **high** on `/firm` at 390: the isolines run through the h1 and
+the standfirst, "the only place decoration fights type."
+
+It is a regression I caused. An earlier round flagged the same surface as
+*invisible* at 390 (low), and my fix changed it from `hidden md:block` to
+full-height — which put it behind the copy on mobile.
+
+There is no size that satisfies both halves of A.6's "top-right of the /firm
+header" at 390: the header is 348px tall and only its first **72px (20.7%)**
+clear the h1, so anything tall enough to read as terrain runs through the
+headline, and anything short enough to clear it is a sliver. Measured, not
+estimated.
+
+Trading the low back for the high: the header surface is hidden below `md`. The
+home **hero** keeps its mobile surface — it has the vertical room the header
+does not, and it was verified earlier to read as calm terrain without touching
+legibility. So the site still carries its signature visual on a phone; it just
+does not carry it twice.
+
+Desktop is unchanged and correct: at 1280 the surface sits top-right and
+dissolves leftward well clear of the headline. A bounding-box overlap test says
+otherwise and is wrong — it cannot see the CSS mask's alpha ramp, so that check
+was resolved by looking at the render.
