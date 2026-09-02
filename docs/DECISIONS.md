@@ -162,3 +162,45 @@ Corrected: "The book is sized" → "The position is sized". This was the last
 customer-facing "book" on the site that Appendix A does not require. The agent
 obeyed the wrong instruction and escalated it rather than silently overriding
 it, which is the right order of operations.
+
+## CORRECTION — the LCP diagnosis in this file was wrong
+
+An earlier entry recorded that the LCP element is the surface SVG and that the
+cost is decoding ~40 contour paths under CPU throttle. perf-engineer disproved
+it with a measurement I had not taken: **every route reports LCP within 1ms of
+2.855s, including `/contact`, which contains zero references to `Surface` and
+paints no isolines at all.** One number shared by seven structurally different
+pages is not a per-page paint cost.
+
+Observed in-page LCP (PerformanceObserver, `docs/qa/perf/vitals.json`):
+`/` 76ms · `/firm` 28ms · `/strategies` 24ms · `/insights` 24ms — and the LCP
+element differs per route (IMG, IMG, P, SPAN). The 2.9s figure is Lighthouse's
+**Lantern simulation** under a ~1.6 Mbps model, where the binding constraint is
+~190KB of high-priority bytes queued around a 7.5KB render-blocking stylesheet.
+**163KB of that is fonts**, not the 27KB SVG.
+
+My original entry generalised a home-page-only measurement to the whole site.
+The lesson is the same one this engagement keeps teaching: measure the thing,
+then measure whether the explanation holds anywhere else.
+
+## Director ruling — the font subset is NOT shipped
+
+perf-engineer measured, without shipping, that `Newsreader({weight:["300","400"]})`
+cuts the woff2 from 132,692 to 58,994 bytes (−56%), high-priority bytes from
+189,885 to 116,131, and Lantern LCP from ~2.86s to 2.0–2.5s (score 96 → 98/99).
+It declined to ship it because static instances drop the `opsz` axis, and it
+judged that a typographer's call rather than its own.
+
+That deference was right, and the ruling is: **do not ship it.**
+
+- SWARM §4.1 explicitly requires `font-optical-sizing: auto` "confirmed in
+  DevTools (opsz should read the rendered size)". The typographer then *proved*
+  it is live: normalized advance is a flat 10.885 with `none`, but
+  12.470 / 10.885 / 11.508 / 11.875 at 12/18/52/96px with `auto`. The axis is
+  doing visible work from 15px captions to 56px titles.
+- Even with the subset, LCP lands at 2.0s against A.9's 1.5s. Trading a
+  spec-mandated typographic property for a win that still misses the target is a
+  bad trade.
+
+LCP stays open and honestly reported, now with the correct cause on record.
+The numbers are preserved in a comment in `layout.tsx` if this is ever revisited.
