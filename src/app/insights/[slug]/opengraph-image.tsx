@@ -1,6 +1,15 @@
 import { ImageResponse } from "next/og";
 import { site } from "@/config/site";
 import { notes } from "@/content/notes";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+
+// A.4: the display face is the identity. next/og has no Newsreader, so the
+// face is loaded explicitly or the card silently renders in fallback sans.
+async function newsreader() {
+  return readFile(path.join(process.cwd(), "src/app/_og/Newsreader-Light.ttf"));
+}
+
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
@@ -12,6 +21,7 @@ export function generateStaticParams() {
 
 export default async function OG({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  const display = await newsreader();
   const note = notes.find((n) => n.slug === slug);
   return new ImageResponse(
     (
@@ -25,7 +35,7 @@ export default async function OG({ params }: { params: Promise<{ slug: string }>
         </div>
         <div style={{
           display: "flex", fontSize: 68, lineHeight: 1.05, color: "#000000",
-          letterSpacing: -0.8, maxWidth: 960,
+          letterSpacing: -0.8, maxWidth: 960, fontFamily: "Newsreader",
         }}>
           {note?.title ?? "Notes from the desk"}
         </div>
@@ -35,6 +45,6 @@ export default async function OG({ params }: { params: Promise<{ slug: string }>
         </div>
       </div>
     ),
-    size,
+    { ...size, fonts: [{ name: "Newsreader", data: display, weight: 300, style: "normal" }] },
   );
 }

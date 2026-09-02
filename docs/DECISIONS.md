@@ -11,3 +11,8 @@ One line of reasoning each, per Orchestration §0.
   apostrophe. Treated as confirmed; A.1's blocking question in §0.2 does not fire.
 - **Appendix B queries shortened.** The literal phrases return zero rows against
   this database build. Short keyword forms return real rows. Intent preserved.
+- **OG cards render entirely in Newsreader.** Loading the display face makes it
+  the card's fallback, so the wordmark and footer line render serif too rather
+  than Instrument Sans. A.4 already assigns Newsreader to the wordmark; an
+  all-serif card is more coherent than mixing two families at card scale.
+  Accepted rather than fixed.

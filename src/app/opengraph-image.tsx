@@ -1,12 +1,22 @@
 import { ImageResponse } from "next/og";
 import { site } from "@/config/site";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+
+// A.4: the display face is the identity. next/og has no Newsreader, so the
+// face is loaded explicitly or the card silently renders in fallback sans.
+async function newsreader() {
+  return readFile(path.join(process.cwd(), "src/app/_og/Newsreader-Light.ttf"));
+}
+
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 export const alt = `${site.name} — private investment partnership`;
 
 // Built from the A.3 tokens. No imagery, no gradient: paper, hairline, black.
-export default function OG() {
+export default async function OG() {
+  const display = await newsreader();
   return new ImageResponse(
     (
       <div style={{
@@ -18,7 +28,7 @@ export default function OG() {
         </div>
         <div style={{
           display: "flex", fontSize: 82, lineHeight: 1.02, color: "#000000",
-          letterSpacing: -1, maxWidth: 940,
+          letterSpacing: -1, maxWidth: 940, fontFamily: "Newsreader",
         }}>
           Evidence first. Then capital.
         </div>
@@ -31,6 +41,6 @@ export default function OG() {
         </div>
       </div>
     ),
-    size,
+    { ...size, fonts: [{ name: "Newsreader", data: display, weight: 300, style: "normal" }] },
   );
 }
