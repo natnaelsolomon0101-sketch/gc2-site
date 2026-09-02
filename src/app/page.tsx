@@ -4,6 +4,7 @@ import PinnedStrategies from "@/components/PinnedStrategies";
 import MarketsBand from "@/components/sections/MarketsBand";
 import Approach from "@/components/sections/Approach";
 import Insights from "@/components/sections/Insights";
+import ContactBand from "@/components/sections/ContactBand";
 import { site, siteUrl } from "@/config/site";
 import { notes, formatDate } from "@/content/notes";
 
@@ -61,32 +62,7 @@ export default function Home() {
 
       <Insights />
 
-      {/* contact */}
-      <section className="wrap band">
-        <div className="grid gap-10 md:grid-cols-12">
-          <div className="md:col-span-5">
-            <p className="t-mono">Contact</p>
-            <h2 className="t-display-sm mt-6">Inquiries</h2>
-          </div>
-          <dl className="grid gap-8 sm:grid-cols-3 md:col-span-6 md:col-start-7">
-            <div>
-              <dt className="t-mono-xs">Investors</dt>
-              <dd><a href={`mailto:${site.emails.investors}`} className="t-body text-pure inline-flex min-h-11 items-center">{site.emails.investors}</a></dd>
-            </div>
-            <div>
-              <dt className="t-mono-xs">Press</dt>
-              <dd><a href={`mailto:${site.emails.press}`} className="t-body text-pure inline-flex min-h-11 items-center">{site.emails.press}</a></dd>
-            </div>
-            <div>
-              <dt className="t-mono-xs">Office</dt>
-              <dd className="t-body mt-3 text-pure">{site.address ?? site.city}</dd>
-              {site.phone && <dd className="t-body mt-1 text-pure">{site.phone}</dd>}
-            </div>
-          </dl>
-        </div>
-      </section>
-
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <ContactBand />
     </>
   );
 }

@@ -127,47 +127,7 @@ export default function ContactBand() {
       </section>
 
       {/* Footer, on the same ground. Not a second band — the close of this one. */}
-      <footer className="wrap pb-12 md:pb-16">
-        <div className="border-t border-white/12 pt-10">
-          <div className="flex flex-wrap items-center justify-between gap-x-10 gap-y-2">
-            <Link
-              href="/"
-              aria-label={`${site.mark} home`}
-              className={`t-wordmark inline-flex min-h-11 items-center text-pure ${focusRing}`}
-            >
-              {site.mark}
-            </Link>
-            <nav aria-label="Footer" className="flex flex-wrap items-center gap-x-8">
-              {footerNav.map((n) => (
-                <Link
-                  key={n.href}
-                  href={n.href}
-                  className={`t-small inline-flex min-h-11 items-center text-ash transition-colors duration-200 hover:text-cloud ${focusRing}`}
-                >
-                  {n.label}
-                </Link>
-              ))}
-            </nav>
-          </div>
-
-          {/* Copyright sits under the heading column, legal under the ledger,
-              so the footer inherits the same two-column spine as the band. */}
-          <div className="mt-12 grid gap-6 md:grid-cols-12 md:gap-10">
-            <p className="t-small order-2 text-fog md:order-1 md:col-span-6 lg:col-span-4">
-              &copy; {year} {site.name}. All rights reserved.
-            </p>
-            {/* Legal. Measured, not guessed: at 58ch the longest rendered line
-                was 80 characters. 52ch caps the widest line at 72. */}
-            <p className="t-small order-1 max-w-[52ch] text-ash md:order-2 md:col-span-6 md:col-start-7 lg:col-span-6 lg:col-start-7">
-              {site.name} is a private investment partnership. This website is
-              for informational purposes only and does not constitute an offer
-              to sell or a solicitation of an offer to buy any security. Past
-              performance is not indicative of future results. Access to the
-              fund is limited to qualified investors.
-            </p>
-          </div>
-        </div>
-      </footer>
+      
     </div>
   );
 }

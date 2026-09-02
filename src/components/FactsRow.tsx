@@ -12,8 +12,8 @@ export default function FactsRow() {
     <dl className="rule-t rule-b grid grid-cols-2 md:grid-cols-4">
       {facts.map((f) => (
         <div key={f.label} className="py-8 pr-6">
-          <dt className="t-caption text-slate">{f.label}</dt>
-          <dd className="t-h3 mt-2 text-black">{f.value}</dd>
+          <dt className="t-caption text-fog">{f.label}</dt>
+          <dd className="t-h3 mt-2 text-pure">{f.value}</dd>
         </div>
       ))}
     </dl>

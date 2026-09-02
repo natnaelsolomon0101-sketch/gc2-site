@@ -16,25 +16,25 @@ export default function Strategies() {
         standfirst="Six books run independently and are underwritten against the same limits. One framework governs them because correlated risk does not respect a mandate boundary."
       />
       {strategies.map((s) => (
-        <section key={s.slug} id={s.slug} className="scroll-mt-24 bg-paper">
+        <section key={s.slug} id={s.slug} className="scroll-mt-24 bg-obsidian">
           <Container>
             <div className="grid-gc2 rule-t py-16 md:py-24">
               <div className="col-span-4 md:col-span-5">
-                <h2 className="t-h2 text-black">{s.name}</h2>
+                <h2 className="t-h2 text-pure">{s.name}</h2>
                 <dl className="mt-8">
                   <div className="rule-t flex justify-between gap-6 py-3">
-                    <dt className="t-small text-slate">Markets</dt>
-                    <dd className="t-body text-right text-ink">{s.markets}</dd>
+                    <dt className="t-small text-fog">Markets</dt>
+                    <dd className="t-body text-right text-ash">{s.markets}</dd>
                   </div>
                   <div className="rule-t rule-b flex justify-between gap-6 py-3">
-                    <dt className="t-small text-slate">Instruments</dt>
-                    <dd className="t-body text-right text-ink">{s.instruments}</dd>
+                    <dt className="t-small text-fog">Instruments</dt>
+                    <dd className="t-body text-right text-ash">{s.instruments}</dd>
                   </div>
                 </dl>
               </div>
               <div className="col-span-4 md:col-span-6 md:col-start-7">
                 {s.body.map((t, i) => (
-                  <p key={i} className={`t-body measure-body text-ink ${i ? "mt-6" : ""}`}>{t}</p>
+                  <p key={i} className={`t-body measure-body text-ash ${i ? "mt-6" : ""}`}>{t}</p>
                 ))}
               </div>
             </div>

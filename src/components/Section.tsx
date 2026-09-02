@@ -1,9 +1,9 @@
 type Surface = "paper" | "stone" | "black";
 
 const bg: Record<Surface, string> = {
-  paper: "bg-paper text-ink",
-  stone: "bg-stone text-ink",
-  black: "bg-black text-stone on-black",
+  paper: "bg-obsidian text-ash",
+  stone: "bg-graphite text-ash",
+  black: "bg-black text-cloud on-black",
 };
 
 export default function Section({
