@@ -17,11 +17,11 @@ the existing build was never held to.
 - [x] Baseline of the live site captured (`docs/baseline/`)
 
 ## Wave 1 — Recon
-- [ ] reference-scout -> `docs/references/PATTERNS.md`
-- [ ] ideas-lab round 0 -> five ideas
-- [ ] design-director -> `docs/design-plan.md`
-- [ ] compliance-officer round 0 -> copy review
-- [ ] `docs/PLAN.md` merged, <= 2 ideas accepted, rejections logged
+- [x] reference-scout -> `docs/references/PATTERNS.md`
+- [x] ideas-lab round 0 -> five ideas
+- [x] design-director -> `docs/design-plan.md`
+- [x] compliance-officer round 0 -> copy review
+- [x] `docs/PLAN.md` merged, <= 2 ideas accepted, rejections logged
 
 ## Waves 2-3 — Foundation and build
 - [x] Tokens, site.ts, fonts, Nav, MobileNav, Footer, Section, Container, Grid
@@ -32,6 +32,9 @@ the existing build was never held to.
 - [ ] Re-audited against the §4 bar (this is what Wave 4 does)
 
 ## Wave 4 — Polish rounds
+- [x] builders dispatched: typographer, copy-chief, perf-engineer (worktree, disjoint ownership)
+- [x] copy-chief merged: 11 findings; director ruling corrected on one string
+- [ ] typographer + perf-engineer merged
 - [ ] round 1: qa-runner, six read-only agents, TRIAGE, dispatch, merge
 - [ ] exit: three critics >= 4.5 and every criterion >= 4, two consecutive rounds
 
