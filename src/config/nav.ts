@@ -17,6 +17,9 @@ export const allocatorNav = [
   { label: "Access", href: "/access" },
 ] as const;
 
-export const legalNav = [{ label: "Disclosures", href: "/disclosures" }] as const;
+export const legalNav = [
+  { label: "Legal", href: "/legal" },
+  { label: "Disclosures", href: "/disclosures" },
+] as const;
 
 export const footerNav = [...nav, ...allocatorNav, ...legalNav] as const;

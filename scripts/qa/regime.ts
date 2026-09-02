@@ -33,7 +33,7 @@ const PROHIBITED_506C = [
 
 const ROUTES = ["/", "/firm", "/strategies", "/insights", "/diligence", "/governance",
                 "/partnership", "/letters", "/tearsheet", "/questions", "/access",
-                "/contact", "/disclosures"];
+                "/contact", "/legal", "/legal/terms", "/legal/privacy", "/disclosures"];
 
 async function main() {
   const base = process.env.REGIME_BASE ?? "http://localhost:3000";
@@ -48,8 +48,10 @@ async function main() {
   // here should be construed as a track record"), which is the opposite of
   // solicitation. Excluding them is not a loophole: their whole job is to deny.
   const DISCLAIMER = ["/legal", "/disclosures"];
+  let scanned = 0;
+  let skipped = 0;
   for (const route of ROUTES) {
-    if (DISCLAIMER.some((d) => route.startsWith(d))) continue;
+    if (DISCLAIMER.some((d) => route.startsWith(d))) { skipped++; continue; }
     const res = await page.goto(base + route, { waitUntil: "networkidle" });
     if (!res || res.status() !== 200) { console.log(`  skip ${route} (${res?.status()})`); continue; }
     // Rendered text, not markup: a term inside a class name is not solicitation.
@@ -67,6 +69,7 @@ async function main() {
       body.querySelectorAll("script, style, noscript, template").forEach((n) => n.remove());
       return body.textContent ?? "";
     })).toLowerCase();
+    scanned++;
     for (const term of list) {
       if (text.includes(term)) hits.push(`${route}  "${term}"`);
     }
@@ -78,6 +81,12 @@ async function main() {
     for (const h of hits) console.log("  " + h);
     process.exit(1);
   }
-  console.log(`[regime ${regime}] clean across ${ROUTES.length} public routes`);
+  // Report what was actually READ, not the length of the route list. Counting
+  // ROUTES would have credited the gate for the disclaimer pages it skips and
+  // for any route that failed to return 200.
+  console.log(
+    `[regime ${regime}] clean across ${scanned} public routes` +
+      (skipped ? ` (${skipped} disclaimer route${skipped > 1 ? "s" : ""} excluded)` : "")
+  );
 }
 main();
