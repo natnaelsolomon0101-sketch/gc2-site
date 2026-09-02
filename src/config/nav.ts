@@ -11,6 +11,8 @@ export const allocatorNav = [
   { label: "Partnership", href: "/partnership" },
   { label: "Diligence", href: "/diligence" },
   { label: "Governance", href: "/governance" },
+  { label: "Letters", href: "/letters" },
+  { label: "Tearsheet", href: "/tearsheet" },
   { label: "Questions", href: "/questions" },
   { label: "Access", href: "/access" },
 ] as const;
