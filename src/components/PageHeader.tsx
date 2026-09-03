@@ -42,7 +42,26 @@ import Container from "./Container";
    It does not take part in the landscape reorder — it is not a tap target
    and there is no first-screen requirement for it — so it keeps a fixed
    position relative to the standfirst in both layouts; `quickLink` shifts
-   one slot further down to stay after it. */
+   one slot further down to stay after it.
+
+   Round 5: `.measure-lead`'s 30em cap (390px) wasn't the problem it looked
+   like; the caption itself renders fine. `quickLink` did not: /diligence
+   (sec-allocators) passes its own founding-caption paragraph through
+   `quickLink` with no measure at all, so on laptops/desktops it ran to one
+   long line well past 80ch.
+
+   `caption` gets `max-w-[60ch]` directly — `ch` is relative to the element
+   it's set on, and `caption` carries `.t-caption` itself (13px mono), so it
+   resolves against the same font the text renders in. `quickLink` is a
+   generic slot with no font of its own (it inherits Inter from this flex
+   column, not `.t-caption`'s mono), so `ch` there would cap against the
+   wrong font's character width — on /diligence it measured out to the
+   equivalent of ~77 mono-ch, still under 80 but not the same 60 as `caption`.
+   `max-w-[468px]` is what `.t-caption`'s own 60ch resolves to (13px ×
+   60 × the mono `0`-glyph's ~0.6em), applied in px so both slots cap the
+   same visual line length regardless of what font the wrapped content
+   happens to inherit. It costs `quickLink`'s other use — /contact's
+   investors mailto — nothing, since an email address never approaches it. */
 export default function PageHeader({
   eyebrow, title, standfirst, caption, quickLink,
 }: {
@@ -72,10 +91,10 @@ export default function PageHeader({
             </p>
           )}
           {caption && (
-            <p className="order-4 t-caption measure-lead mt-6 md:mt-8">{caption}</p>
+            <p className="order-4 t-caption max-w-[60ch] mt-6 md:mt-8">{caption}</p>
           )}
           {quickLink && (
-            <div className="order-5 mt-6 md:mt-8 [@media(max-height:480px)_and_(orientation:landscape)]:order-3">
+            <div className="order-5 max-w-[468px] mt-6 md:mt-8 [@media(max-height:480px)_and_(orientation:landscape)]:order-3">
               {quickLink}
             </div>
           )}
