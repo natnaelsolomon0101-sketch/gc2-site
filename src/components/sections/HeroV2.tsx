@@ -1,5 +1,3 @@
-"use client";
-
 /* ===========================================================================
    HeroV2 — "ruled composition, one hard-edged step wedge of light".
 
@@ -92,6 +90,7 @@
 import Link from "next/link";
 import { site } from "@/config/site";
 import SessionClock from "@/components/viz/SessionClock";
+import YieldCurve from "@/components/viz/YieldCurve";
 
 /* -- grain ---------------------------------------------------------------
    Turbulence pushed into the alpha channel over a fixed pale fill: sparse
@@ -125,13 +124,6 @@ const louvre = (pitch: number) =>
   ` rgba(9,10,11,0) 0px, rgba(9,10,11,0) ${pitch - 1}px,` +
   ` rgba(9,10,11,.84) ${pitch - 1}px, rgba(9,10,11,.84) ${pitch}px)`;
 
-/* The curve slot's aspect. YieldCurve (sec-motion) renders into the same box;
-   the placeholder below uses the same viewBox so nothing reflows when the real
-   component lands. 4:1 is wide enough to read as a curve on a 320px phone and
-   short enough that at 3440 the slot does not eat the frame — where it would,
-   --hv2-curve-cap takes over and the drawing stretches rather than the box. */
-const CURVE_VIEWBOX = "0 0 1200 300";
-
 const CSS = `
 .hv2{
   /* the page measure, one of its 12 columns, and the column lines the
@@ -150,9 +142,13 @@ const CSS = `
   --hv2-bleed-l: var(--hv2-side);
   --hv2-bleed-r: calc(100vw - var(--hv2-side) - (var(--hv2-meas) - 48px));
   --hv2-col: calc((var(--hv2-meas) - 48px - 264px) / 12);
-  --hv2-c9: calc(var(--hv2-side) + 8 * (var(--hv2-col) + 24px));
+  /* The column-9 line, measured from the CONTAINER's content box and not from
+     the viewport: the striped field is positioned inside .hv2-upper now, so a
+     page-coordinate value would push it --hv2-side further right (264px at
+     1920, 1024px at 3440 before the left-anchor) and shrink the light to a
+     sliver. --hv2-side still carries the page geometry for the two bleeds. */
+  --hv2-c9: calc(8 * (var(--hv2-col) + 24px));
   --hv2-pt: 28px; --hv2-pb: 40px;
-  --hv2-curve-cap: 150px;
   position:relative; isolation:isolate; overflow:hidden;
   min-height:min(calc(100vh - var(--nav-h, 72px)), 900px);
   display:flex; flex-direction:column;
@@ -172,8 +168,15 @@ const CSS = `
 /* the lit field: from the column-9 line of the measure out to the viewport
    edge. Its left edge lands on the same line the reading column stops on;
    the strips inside then share that width equally. */
-.hv2-measure{position:absolute;top:0;bottom:0;left:var(--hv2-c9);right:0;
+.hv2-measure{position:absolute;z-index:0;top:0;bottom:0;
+  left:var(--hv2-c9);right:calc(-1 * var(--hv2-bleed-r));
   display:flex;gap:24px;}
+/* The field carries its own grain. It used to sit in .hv2-bg under the shared
+   grain layer; now that it is a foreground element bounded by .hv2-upper, that
+   layer is beneath it, and a wedge without grain reads as a flat swatch beside
+   a filmic ground. Absolutely positioned so it is not a flex item. */
+.hv2-measure::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:${GRAIN_URL};background-size:140px 140px;opacity:.30;}
 
 /* ---- the light: a step wedge built ON the grid ------------------------
    Not a panel laid over the layout. It steps in measured increments like a
@@ -204,6 +207,21 @@ const CSS = `
 .hv2-fg{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;
   max-width:var(--page-max, 1200px);width:100%;margin-inline:auto;padding-inline:24px;
   padding-block:var(--hv2-pt) var(--hv2-pb);}
+/* THE SHARED HORIZONTAL. Everything above the curve lives in .hv2-upper, and
+   the striped field is absolutely positioned inside it — so the field's bottom
+   IS the foot's top IS the curve's top rule, by construction rather than by a
+   number that has to be kept in sync with what YieldCurve happens to measure.
+   That is the whole answer to the frame's two-object problem: the light stops
+   on the line the curve hangs from, and both run off the right viewport edge,
+   so the right half reads as one object in two registers instead of a striped
+   panel with a black rectangle parked under it. */
+.hv2-upper{position:relative;flex:1 1 0;display:flex;flex-direction:column;}
+/* The field is a positioned z-index:0 child, which paints above non-positioned
+   text; the content has to be positioned too or the light covers the words.
+   :not(.hv2-measure) because the field IS a direct child, and a blanket rule
+   here overwrote its position:absolute — it became a zero-height flex item and
+   the whole wedge vanished from the frame. */
+.hv2-upper > *:not(.hv2-measure){position:relative;z-index:1;}
 .hv2-row{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px;}
 
 /* masthead — real facts only. It carries its own full-bleed dark bar so the
@@ -273,9 +291,9 @@ const CSS = `
 
 /* two explicit rows on the left, the curve on the right, so the reading path
    runs down-left and then out to the object that closes the frame */
-.hv2-foot{padding-top:24px;align-items:start;row-gap:26px;}
+.hv2-foot{padding-top:0;align-items:start;row-gap:26px;}
 .hv2-lead{grid-row:1;grid-column:1 / span 5;font-size:18px;line-height:1.55;
-  font-weight:300;color:#9f9fa0;max-width:30em;hyphens:manual;}
+  font-weight:300;color:#9f9fa0;max-width:30em;hyphens:manual;padding-top:20px;}
 /* the actions sit on the column-1 line, under the sentence they close, so the
    masthead, the headline, the lead and the buttons all share one left edge. */
 .hv2-cta{grid-row:2;grid-column:1 / span 5;display:flex;flex-wrap:wrap;gap:12px;
@@ -295,23 +313,18 @@ const CSS = `
 .hv2-btn-ghost:active{background:rgba(255,255,255,.14);border-color:#fff;}
 
 /* ---- the curve slot ----------------------------------------------------
-   Columns 6-12, bleeding to the right viewport edge, level with the lead and
-   the actions. It carries its own near-black ground out to that edge: the
-   wedge is stopped by a hard horizontal instead of running under a 1px line
-   that then cannot be read, which is the same job .hv2-mast::before does at
-   the top of the frame. No gradient touches it (APPENDIX-A: no gradient on a
-   data component), and the placeholder claims nothing, so there is no source
-   line until YieldCurve lands with one. */
+   Columns 6-12, hanging from the rule the striped field stops on, running off
+   the right viewport edge. No ground of its own any more: round 0 gave it a
+   near-black slab to cut the light, which is what turned it into a second
+   rectangle. The field ends where this begins instead.
+
+   padding-right, though, and not a true bleed to the pixel: YieldCurve pins its
+   last tenor label to the right edge of the plot, and "30Y" hard against the
+   glass is a defect, not a bleed. The 1px rule is on the border box and does
+   reach the edge. */
 .hv2-curve{position:relative;grid-row:1 / span 2;grid-column:6 / span 7;
-  margin-right:calc(-1 * var(--hv2-bleed-r));align-self:end;
-  padding:20px 0 0;}
-.hv2-curve::before{content:"";position:absolute;z-index:0;
-  top:0;bottom:-100vh;left:0;right:0;
-  background:rgba(9,10,11,.92);border-top:1px solid rgba(255,255,255,.12);}
-.hv2-curve-box{position:relative;z-index:1;width:100%;aspect-ratio:4 / 1;
-  max-height:var(--hv2-curve-cap);margin-left:auto;}
-.hv2-curve-svg{display:block;width:100%;height:100%;max-width:100%;
-  opacity:.6;}
+  margin-right:calc(-1 * var(--hv2-bleed-r));padding:20px 24px 0 0;
+  align-self:start;border-top:1px solid rgba(255,255,255,.12);}
 
 /* ---- narrow ----------------------------------------------------------- */
 @media (max-width:767px){
@@ -382,18 +395,28 @@ const CSS = `
   .hv2-gap{flex:.6 1 0;min-height:16px;}
   .hv2-gap-b{flex:1 1 0;min-height:12px;}
   .hv2-foot{padding-top:16px;row-gap:16px;}
-  /* Full-bleed under the lead, per §5.2's poster. */
+  .hv2-lead{padding-top:0;}
+  /* Under the lead, per §5.2's poster: the rule bleeds to both edges, the
+     plot and its labels stay inside the 24px measure. */
   .hv2-curve{grid-row:2;grid-column:1 / -1;align-self:stretch;
-    margin-inline:-24px;padding-top:14px;}
-  /* no wedge on the phone, so there is nothing to cut: the ground goes and
-     only the full-bleed hairline above the curve stays (§5.2's poster). */
-  .hv2-curve::before{bottom:0;background:none;}
-  .hv2-curve-box{aspect-ratio:4 / 1;max-height:none;}
+    margin-inline:-24px;padding:14px 24px 0;}
   .hv2-cta{grid-row:3;grid-column:1 / -1;justify-content:flex-start;gap:10px;}
   /* Content-width buttons on one row, exactly as on desktop, rather than two
      identical full-width pills with centred labels. 15px of side padding and a
      10px gap are what make both fit inside a 312px measure at 360px. */
   .hv2-btn{flex:0 1 auto;padding:12px 15px;}
+}
+
+/* The curve is 242px on a phone — its 132px plot floor, the tenor axis, and a
+   source line that wraps to two lines under 430px. That is a third of the
+   poster, and on anything shorter than a full-height 393x852 it costs the
+   actions their place above the fold. Measured at 360x740: the stack runs 788px
+   against 683px of usable height with the curve, 546 without. So it is gated on
+   the viewport being at least as tall as the poster — the same devices with
+   browser chrome showing (412x839, 430x739, 393x659) get the composition
+   without it, which is the r0 poster plus a session strip. */
+@media (max-width:767px) and (max-height:839px){
+  .hv2-curve{display:none;}
 }
 
 /* Short phones: the 320x568 floor, and every phone measured with the browser
@@ -410,8 +433,7 @@ const CSS = `
   .hv2-h1{margin-block:10px 0;}
   .hv2-gap{min-height:8px;}
   .hv2-gap-b{min-height:6px;}
-  .hv2-foot{padding-top:10px;row-gap:10px;}
-  .hv2-curve{padding-top:8px;}
+  .hv2-foot{padding-top:10px;row-gap:8px;}
 }
 
 /* ---- tablets are not big phones (§7 rule 7) ---------------------------- */
@@ -444,8 +466,8 @@ const CSS = `
      full-height wedge here (measured at 768: the type reaches x=601, the
      column-8 line is at x=458). 34% of an 820px hero stops at 279px; the
      headline's cap line is at 341. */
-  .hv2-measure{left:calc(var(--hv2-side) + 7 * (var(--hv2-col) + 24px));}
-  .hv2-strip{align-self:start;height:34%;}
+  .hv2-measure{left:calc(7 * (var(--hv2-col) + 24px));}
+  .hv2-strip{align-self:start;height:46%;}
 }
 
 /* ---- short desktop frames (1280x720, 1366x768: the corporate laptop) ----
@@ -454,7 +476,10 @@ const CSS = `
    slot takes a lower cap so it stops being the tallest thing in the frame —
    at 1280 it was 181px of a 750px hero and pushed the actions past the fold. */
 @media (min-width:1024px) and (max-height:820px){
-  .hv2{--hv2-pt:20px;--hv2-pb:28px;--hv2-curve-cap:130px;}
+  .hv2{--hv2-pt:20px;--hv2-pb:28px;}
+  /* the plot is the one block in the frame with a free height, so it is what
+     gives when a 720p laptop has 647px of hero to spend. */
+  .hv2-curve .yc-svg{height:132px;}
   .hv2-h1{margin-block:20px 16px;}
   .hv2-gap{min-height:16px;}
   .hv2-gap-b{min-height:12px;}
@@ -481,6 +506,22 @@ const CSS = `
   .hv2{--hv2-side: calc((1920px - var(--page-max)) / 2 + 24px);}
   .hv2-fg{margin-inline: calc((1920px - var(--page-max)) / 2) auto;}
   .hv2-h1{margin-block:24px 20px;}
+  /* DEFENSIVE OVERRIDE, and a bug in src/components/viz/YieldCurve.tsx that is
+     sec-motion's to fix. That path carries pathLength=1 with
+     stroke-dasharray:1 -- "one dash the length of the whole path" -- AND
+     vector-effect=non-scaling-stroke. The dash pattern is then measured in
+     SCREEN px while pathLength normalises USER units, so the two agree only
+     while one user unit is one screen px, i.e. while the plot is no wider than
+     the path's own 1036 user units. Past that the dash is short and the tail
+     of the curve is simply not painted: measured, the plot is 1042px at 1920
+     (fine), 1682px at 2560 -- where the line STOPS just past 1Y and 10Y and
+     30Y are missing -- and 2562px at 3440, where it draws, breaks, and
+     resumes. A Treasury curve that ends at 1Y is a false statement, which is
+     worse than no curve. Dropping the dash paints the whole path; the cost is
+     that the draw-in does not run above 1920 (ycDraw animates dashoffset, which
+     now has nothing to offset). Below 1920 the component is untouched and
+     draws in normally. Remove this the day the component stops needing it. */
+  .hv2-curve .yc-line{stroke-dasharray:none;}
 }
 
 /* ---- landscape phones: a letterbox, composed as one (§7 rule 8) --------
@@ -520,7 +561,10 @@ const CSS = `
   /* The wedge stays — it is the only light in a letterbox — but it starts at
      the column-9 line of a very wide, very short frame, so it reads as a band
      down the right rather than a panel. */
-  .hv2-measure{display:flex;gap:16px;}
+  /* .hv2-upper now bounds the field, and in a letterbox that would stop the
+     light two thirds of the way down for no reason — there is no curve here
+     for it to stop on. Negative bottom, clipped by .hv2's overflow. */
+  .hv2-measure{display:flex;gap:16px;bottom:-100vh;}
 }
 
 /* ---- motion ------------------------------------------------------------
@@ -573,37 +617,6 @@ const CSS = `
 @keyframes hv2Drift{from{transform:translate3d(0,-7%,0)}to{transform:translate3d(0,7%,0)}}
 `;
 
-/** The slot's stand-in until src/components/viz/YieldCurve.tsx (sec-motion)
- *  lands. Deliberately NOT data: one 1px stroke, no fill, no axes, no tenor
- *  ticks, no labels, no source line, at a quarter opacity — it holds the box
- *  and states nothing. It carries no `data-source`, because there is nothing
- *  to source; scripts/qa/sources.ts should see this slot appear on the
- *  whitelist only once the real component is in it. */
-function CurvePlaceholder() {
-  return (
-    <svg
-      className="hv2-curve-svg"
-      viewBox={CURVE_VIEWBOX}
-      preserveAspectRatio="none"
-      aria-hidden="true"
-      focusable="false"
-      data-hv2-curve="placeholder"
-    >
-      <path
-        className="hv2-curve-path"
-        d="M0 268 C 220 266 330 190 560 132 C 790 74 960 46 1200 26"
-        fill="none"
-        stroke="#ffffff"
-        strokeWidth="1"
-        vectorEffect="non-scaling-stroke"
-        pathLength={1}
-        strokeDasharray={1}
-        strokeDashoffset={0}
-      />
-    </svg>
-  );
-}
-
 export default function HeroV2() {
   return (
     <section className="hv2">
@@ -611,43 +624,47 @@ export default function HeroV2() {
 
       <div className="hv2-bg" aria-hidden="true">
         <div className="hv2-ground" />
-        <div className="hv2-measure">
-          {WEDGE.map((s, i) => (
-            <div key={i} data-s={i} className="hv2-strip">
-              <div className="hv2-strip-light" style={{ opacity: s.o }} />
-              <div className="hv2-strip-louvre" style={{ background: louvre(s.pitch) }} />
-            </div>
-          ))}
-        </div>
         <div className="hv2-grain" />
       </div>
 
       <div className="hv2-fg">
-        <div className="hv2-row hv2-mast">
-          <span className="t-mono hv2-m1">{site.city}</span>
-          <span className="t-mono hv2-m2">{site.structure}</span>
-          <span className="t-mono hv2-m3 hv2-mono-lit">{site.mandate}</span>
-          {/* Cross-section object (OWNERSHIP.md): sec-motion builds it,
-              sec-chrome places it in the nav and the footer, the hero shows it
-              where its own local clock used to be. It renders nothing until it
-              hydrates, so the server HTML carries no time-shaped placeholder --
-              which is what STATE.md §0.2 item 6 was about. */}
-          <SessionClock className="hv2-clock" />
+        <div className="hv2-upper">
+          {/* The striped field is bounded by this block, so its bottom edge is
+              the foot's top edge is the curve's rule. */}
+          <div className="hv2-measure" aria-hidden="true">
+            {WEDGE.map((w, i) => (
+              <div key={i} data-s={i} className="hv2-strip">
+                <div className="hv2-strip-light" style={{ opacity: w.o }} />
+                <div className="hv2-strip-louvre" style={{ background: louvre(w.pitch) }} />
+              </div>
+            ))}
+          </div>
+
+          <div className="hv2-row hv2-mast">
+            <span className="t-mono hv2-m1">{site.city}</span>
+            <span className="t-mono hv2-m2">{site.structure}</span>
+            <span className="t-mono hv2-m3 hv2-mono-lit">{site.mandate}</span>
+            {/* Cross-section object (OWNERSHIP.md): sec-motion builds it,
+                sec-chrome places it in the nav and the footer, the hero shows
+                it where its own local clock used to be. It renders nothing
+                until it hydrates, so the server HTML carries no time-shaped
+                placeholder — STATE.md §0.2 item 6. */}
+            <SessionClock className="hv2-clock" />
+          </div>
+
+          <div className="hv2-gap" />
+
+          <div className="hv2-row">
+            <h1 className="t-display hv2-h1">
+              <span className="hv2-l">
+                <span>Evidence first.</span>
+              </span>
+              <span className="hv2-l hv2-l2">
+                <span>Then capital.</span>
+              </span>
+            </h1>
+          </div>
         </div>
-
-        <div className="hv2-gap" />
-
-        <div className="hv2-row">
-          <h1 className="t-display hv2-h1">
-            <span className="hv2-l">
-              <span>Evidence first.</span>
-            </span>
-            <span className="hv2-l hv2-l2">
-              <span>Then capital.</span>
-            </span>
-          </h1>
-        </div>
-
 
         <div className="hv2-row hv2-foot">
           <p className="hv2-lead">
@@ -663,13 +680,14 @@ export default function HeroV2() {
               Investor inquiries
             </Link>
           </div>
-          {/* sec-motion builds src/components/viz/YieldCurve.tsx; this slot is
-              its box and its placement. Swap CurvePlaceholder for <YieldCurve/>
-              and add the source line under it — nothing else here moves. */}
+          {/* sec-motion's component; this is its box and its placement. It is
+              a server component with ISR, which is why HeroV2 is no longer a
+              client one — its only hooks were the local clock SessionClock
+              replaced. If the Treasury fetch fails it renders nothing at all,
+              and the slot collapses to its rule rather than showing a shape
+              where a curve would go. */}
           <div className="hv2-curve">
-            <div className="hv2-curve-box">
-              <CurvePlaceholder />
-            </div>
+            <YieldCurve />
           </div>
         </div>
 
