@@ -180,7 +180,15 @@ html{ scroll-padding-top: var(--nav-h); }
   mask-composite:exclude;
   pointer-events:none;
 }
-.sn-pill-nav{ display:flex; align-items:center; padding-inline:6px; gap:2px; }
+/* Round 7 (Conductor, matrix at every iPad descriptor 768-1366): gap:2px
+   between the pill's own links measured under 8px between hit boxes
+   ("Firm" 52x44, "Strategies" 93x44, ... 2px apart). gap:8px is the fix;
+   trimming the links' own padding-inline from 10px to 8px inside the pill
+   only (not the base .sn-link rule inner routes still use) keeps the pill
+   from growing wider than it needs to just to hold the wider gap -- each
+   link is still comfortably >=44px wide even at "Firm" (4 letters). */
+.sn-pill-nav{ display:flex; align-items:center; padding-inline:4px; gap:8px; }
+.sn-pill-nav .sn-link{ padding-inline:8px; }
 
 .sn-pill-cta{
   display:none; align-items:center; justify-content:center;
