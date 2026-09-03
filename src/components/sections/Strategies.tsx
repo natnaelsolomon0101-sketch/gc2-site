@@ -1,4 +1,5 @@
 import { strategies } from "@/content/strategies";
+import ECBGrid from "@/components/viz/ECBGrid";
 
 /* ===========================================================================
    STRATEGIES — six hairline rows.
@@ -24,6 +25,15 @@ import { strategies } from "@/content/strategies";
    once on load, and is gone under `prefers-reduced-motion: reduce` — so a
    no-JS client and a reduced-motion client both get the full list, readable,
    with nothing pinned and nothing to scroll-jack.
+
+   Round 1: the ECB euro reference-rate grid (sec-motion's, src/components/
+   viz/ECBGrid.tsx) sits under the six rows as a quiet full-width strip —
+   "Markets" is this section's own vocabulary, so a grid of majors reads as
+   the section finishing its sentence rather than a bolted-on widget. It is
+   rendered directly, with no wrapping element of ours around it: ECBGrid
+   returns null when its feed is unreachable, and because there is no div
+   here to carry margin or a border in that case, a down feed leaves no gap
+   — the section just ends one row earlier.
    ========================================================================= */
 
 /** Index-matched to `strategies`. A swatch, not a card ground — no text sits
@@ -83,6 +93,19 @@ const css = `
   .stx-top { gap: 16px; }
 }
 
+/* The ECB strip. A sibling of .stx-list, not a child, so the two-column
+   split above does not touch it — full section width at every size. */
+.stx-ecb {
+  margin-top: 40px; padding-top: 24px;
+  border-top: 1px solid rgba(255,255,255,.12);
+}
+@media (max-width: 767px) {
+  .stx-ecb { margin-top: 32px; padding-top: 20px; }
+}
+@media (min-width: 1280px) {
+  .stx-ecb { margin-top: 48px; }
+}
+
 @keyframes stxIn {
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: none; }
@@ -125,6 +148,8 @@ export default function Strategies() {
             </li>
           ))}
         </ul>
+
+        <ECBGrid className="stx-ecb" />
       </div>
     </section>
   );
