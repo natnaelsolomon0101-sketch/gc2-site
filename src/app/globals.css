@@ -221,7 +221,10 @@
   }
 
   /* Chrome that means nothing on paper. */
-  header nav, footer nav, .hv2-bg, .hv2-grain, [aria-hidden="true"] svg {
+  /* svg[aria-hidden], not [aria-hidden] svg. The descendant form needs an
+     ANCESTOR carrying the attribute; every decorative svg on this site carries
+     it on the svg element itself, so the rule matched almost nothing. */
+  header nav, footer nav, .hv2-bg, .hv2-grain, svg[aria-hidden="true"] {
     display: none !important;
   }
 
@@ -231,15 +234,29 @@
   details { display: block !important; }
   details > *:not(summary) { display: revert !important; }
   details:not([open]) > *:not(summary) { display: revert !important; }
-  [style*="opacity"], .fade-in {
+  /* These three rules named nothing that ships. `[style*="opacity"]` is an
+     attribute match on the inline style STRING, and the strategy tiles set
+     background/color/transform/zIndex inline but keep opacity in a stylesheet,
+     so five of six printed as blank coloured slivers with the fan transform
+     still applied. `[class*="sticky"]` matched only four dead components; the
+     two elements that are actually sticky are .stx-panel and .sn-header, whose
+     class names contain neither word — so a pinned 240vh track printed about
+     two and a half blank sheets. The gates are named explicitly now. */
+  [style*="opacity"], .fade-in, .stx-tile, .stx-tile * {
     opacity: 1 !important;
     transform: none !important;
     animation: none !important;
     transition: none !important;
   }
-  [class*="sticky"], [class*="fixed"] {
+  [class*="sticky"], [class*="fixed"], .stx-panel, .sn-header {
     position: static !important;
   }
+  /* Release the pinned track and let the deck lay out at its natural height. */
+  .stx--pinned .stx-track { height: auto !important; }
+  .stx--pinned .stx-panel { height: auto !important; overflow: visible !important;
+    display: block !important; padding-block: 0 !important; }
+  .stx--pinned .stx-deck { height: auto !important; }
+  .stx-tile { position: static !important; }
 
   /* Keep a band and its heading together, and never break a table row. */
   h1, h2, h3 { break-after: avoid-page; }

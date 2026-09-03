@@ -325,7 +325,16 @@ export default function Strategies() {
     if (mode !== "pinned") return;
     const el = trackRef.current;
     if (!el) return;
-    const total = el.offsetHeight - window.innerHeight;
+    /* Measure the panel, exactly as read() does thirty lines above. This used
+       window.innerHeight, which is the bug read() was written to avoid: the
+       panel is sized in svh, and on a phone innerHeight grows and shrinks with
+       the URL bar, so the two denominators disagree. It survived the floor()
+       today, but only by luck, and it became reachable on phones the moment the
+       pin was re-gated on height rather than width. Two readers of the same
+       track must not measure it two ways. */
+    const panel = el.firstElementChild as HTMLElement | null;
+    const panelH = panel?.getBoundingClientRect().height || window.innerHeight;
+    const total = el.getBoundingClientRect().height - panelH;
     if (total <= 0) return;
     const top = el.getBoundingClientRect().top + window.scrollY;
     window.scrollTo({ top: Math.round(top + total * ((k + 0.5) / N)), behavior: "smooth" });

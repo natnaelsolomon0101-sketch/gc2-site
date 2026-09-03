@@ -22,7 +22,10 @@ import { fund } from "@/config/fund";
  */
 
 export const metadata: Metadata = {
-  title: `Team — ${site.name}`,
+  /* Bare title. The root layout's template is `%s — ${site.name}`, so passing
+     the suffix here rendered "Team — Girls Can Trade 2 — Girls Can Trade 2".
+     Every other page passes a bare title; this was the one that did not. */
+  title: "Team",
   description:
     "The seats that exist at the firm, what each one holds, and what a reader should demand of a biography.",
 };
@@ -119,7 +122,11 @@ export default function TeamPage() {
   const dark = (key: string) => index(key) % 2 === 0;
 
   return (
-    <main>
+    /* A fragment, not <main>. layout.tsx already renders <main id="main"> around
+       every page, and this was nesting a second landmark inside it — which
+       breaks landmark navigation and leaves the layout's skip link pointing at
+       one of two mains. Every other route file returns a fragment. */
+    <>
       <section>
         <div className="wrap band">
           <p className="t-mono-xs text-fog">Team</p>
@@ -230,6 +237,6 @@ export default function TeamPage() {
           </p>
         </div>
       </Band>
-    </main>
+    </>
   );
 }

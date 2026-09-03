@@ -27,9 +27,18 @@ export const metadata: Metadata = {
   },
   description:
     "A private investment partnership running concentrated, systematic strategies across liquid global markets.",
-  alternates: { canonical: "/" },
+  /* No `alternates.canonical` here, and no `openGraph.url`. Next shallow-merges
+     both from the root layout into every child that does not override them, and
+     no page does — so `canonical: "/"` told Google that /diligence, /governance,
+     /questions, /tearsheet and 15 others were all duplicates of the homepage.
+     Verified in the built HTML: firm.html and tearsheet.html both carried
+     rel="canonical" href="https://gc2.fund". That silently de-indexed every
+     allocator-facing page, which is the entire reason this site exists, while
+     sitemap.ts submitted all 17 for indexing and robots said index: true.
+     With them absent Next emits no canonical unless a page sets one, and derives
+     the correct per-page og:url from metadataBase. */
   robots: { index: true, follow: true },
-  openGraph: { type: "website", siteName: site.name, url: siteUrl, locale: "en_US" },
+  openGraph: { type: "website", siteName: site.name, locale: "en_US" },
   twitter: { card: "summary_large_image" },
 };
 

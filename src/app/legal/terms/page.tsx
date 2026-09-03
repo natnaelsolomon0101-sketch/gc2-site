@@ -62,7 +62,7 @@ const CSS = `
   .rule-t { border-color: #cccccc !important; }
   .measure-body, .measure-lead, .measure-head, .measure-prose { max-width: none !important; }
   .grid-gc2 { display: block !important; }
-  .section-y { padding-block: 0 0 12pt 0 !important; }
+  .section-y { padding-block: 0 12pt !important; }
   .tm-band { break-inside: avoid; page-break-inside: avoid; }
   .tm-band h2 { margin-top: 14pt; }
 }
