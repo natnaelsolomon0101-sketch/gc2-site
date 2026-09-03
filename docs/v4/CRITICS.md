@@ -10,4 +10,7 @@ Content findings for Nate (not layout): #1 no person named anywhere (fund.people
 
 ## securities-counsel — see COUNSEL.md (second read: kit SHIPPABLE; site promotable once sec-motion r4 lands).
 
-## thumb-critic — PENDING.
+## thumb-critic (opus, read-only; ~110 phone shots)
+Interior pages score 4/5 almost everywhere; home 2–4; strategies 2 (strip clipped both edges); tearsheet 2 (skeleton-looking mock — since deleted). Best as-is posts: home 814×380 landscape, strategies 814 landscape, questions 863 landscape. Worst: strategies 360 portrait, tearsheet 393, home 568×320 landscape (CTAs guillotined).
+Verdict: "the interior pages are finished editorial spreads while the home screen is a finished layout waiting for its image."
+Routed: .btn non-monotonic height (33px at 360) → foundation r5; landscape CTAs cut at 568/740 + portrait hero missing its visual + masthead 4 lines at 430 → sec-hero; contact rule inconsistency + landscape address below fold + h1 measure at 734 → sec-firm r3; inline links weight-only → sec-allocators r4; legal heading gap / disclosures dek / 404 button placement → sec-legal; iphone-se descriptor is 320 not 375 → runner r7. Not routed (content/low): insights index shows one note then footer; the fold lands mid-paragraph on interior pages; occasional hyphenation in the article at 320.
