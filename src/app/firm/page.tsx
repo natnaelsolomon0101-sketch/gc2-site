@@ -34,11 +34,11 @@ const seats =
     <dl className="mt-10">
       {people.map((p) => (
         <div key={p.name} className="rule-t py-8">
-          <dt className="t-mono-xs text-fog">{p.role}</dt>
+          <dt className="t-mono-xs text-ink-3">{p.role}</dt>
           <dd className="t-h3 mt-2">{p.name}</dd>
           <dd className="t-body measure-body mt-3">{p.bio}</dd>
           {p.priorFirms.length > 0 && (
-            <dd className="t-small mt-3 text-fog">Previously {p.priorFirms.join(", ")}</dd>
+            <dd className="t-small mt-3 text-ink-3">Previously {p.priorFirms.join(", ")}</dd>
           )}
         </div>
       ))}
@@ -93,16 +93,19 @@ export default function Firm() {
         title="A research house that trades."
         standfirst="We are a small partnership. The work is research; trading is how the research is expressed."
       />
-      {/* Bands alternate obsidian / abyss rather than every section sitting on
+      {/* Bands alternate ground / ground-2 rather than every section sitting on
           one flat ground, so the page has rhythm the way the home page does.
-          The hairline only closes the page header — once the ground itself
-          changes between sections, a rule as well is noise.
-          Heading pure 19.05:1 (obsidian) / 19.81:1 (abyss); body ash 7.20:1 /
-          7.49:1; ordinal fog 4.61:1 / 4.80:1. */}
+          On the light canvas the ground->ground-2 step is 1.10 — DESIGN.md:
+          "bands read as bands only with a hairline or a real tonal step" — so
+          the step alone is not enough; every band now also gets its own
+          top hairline (previously only the first one did, closing the page
+          header, on the dark build's theory that a colour change was rule
+          enough on its own). Heading ink 17.04:1 (ground) / 15.47:1
+          (ground-2); body ink-2 7.55:1 / 6.85:1; ordinal ink-3 5.61:1 / 5.09:1. */}
       {sections.map((s, si) => (
-        <section key={s.h} className={si % 2 ? "bg-abyss" : ""}>
+        <section key={s.h} className={si % 2 ? "bg-ground-2" : ""}>
           <Container>
-            <div className={`grid-gc2 py-16 md:py-24 ${si === 0 ? "rule-t" : ""}`}>
+            <div className="grid-gc2 py-16 md:py-24 rule-t">
               {/* h2 left / prose right is a 5/7 split of the 12-col grid, but
                   only at ≥1024: `grid-gc2` is already 12 columns at ≥768, so
                   without the `md:col-span-12` bridge this pair would go
@@ -110,7 +113,7 @@ export default function Firm() {
                   for ≥1024. `break-after-avoid` keeps the h2 from ever being
                   the last line visible on a screen with none of its prose. */}
               <div className="col-span-4 md:col-span-12 lg:col-span-5 break-after-avoid">
-                <p className="t-mono-xs text-fog">{String(si + 1).padStart(2, "0")}</p>
+                <p className="t-mono-xs text-ink-3">{String(si + 1).padStart(2, "0")}</p>
                 <h2 className="t-h2 mt-3">{s.h}</h2>
               </div>
               <div className="col-span-4 md:col-span-12 lg:col-span-7 lg:col-start-6">

@@ -84,7 +84,12 @@ const DEMANDS = [
    ≥1024: `grid-gc2` is already 12 columns at ≥768, so the `md:col-span-12`
    bridge keeps the pair stacked through tablet, and `break-after-avoid` on
    the left column keeps the h2 from ever being the last line visible on a
-   screen with none of its own content. */
+   screen with none of its own content.
+
+   Band alternates ground / ground-2, and (light canvas) every band also
+   carries its own top hairline: the ground->ground-2 step measures 1.10, so
+   per DESIGN.md a colour step alone does not read as a band boundary — it
+   needs the hairline too. */
 function Band({
   n,
   label,
@@ -99,11 +104,11 @@ function Band({
   ground: boolean;
 }) {
   return (
-    <section className={ground ? "bg-abyss" : ""}>
+    <section className={ground ? "bg-ground-2" : ""}>
       <Container>
-        <div className="grid-gc2 py-16 md:py-24">
+        <div className="grid-gc2 py-16 md:py-24 rule-t">
           <div className="col-span-4 md:col-span-12 lg:col-span-5 break-after-avoid">
-            <p className="t-mono-xs text-fog">
+            <p className="t-mono-xs text-ink-3">
               {String(n).padStart(2, "0")}
             </p>
             <h2 className="t-h2 mt-3">{title}</h2>
@@ -151,10 +156,10 @@ export default function TeamPage() {
         label="Seats"
         title="What the seats are"
       >
-        <dl className="border-t border-white/12">
+        <dl className="rule-t">
           {SEATS.map((s) => (
-            <div key={s.seat} className="border-b border-white/12 py-6">
-              <dt className="t-heading-sm text-pure">{s.seat}</dt>
+            <div key={s.seat} className="rule-b py-6">
+              <dt className="t-heading-sm text-ink">{s.seat}</dt>
               <dd className="t-body measure-body mt-3">{s.holds}</dd>
             </div>
           ))}
@@ -178,12 +183,12 @@ export default function TeamPage() {
           label="Roster"
           title="Who holds them"
         >
-          <dl className="border-t border-white/12">
+          <dl className="rule-t">
             {people.map((p) => (
-              <div key={p.name} className="border-b border-white/12 py-8">
+              <div key={p.name} className="rule-b py-8">
                 <dt>
-                  <span className="t-mono-xs block text-fog">{p.role}</span>
-                  <span className="t-h3 mt-2 block text-pure">{p.name}</span>
+                  <span className="t-mono-xs block text-ink-3">{p.role}</span>
+                  <span className="t-h3 mt-2 block text-ink">{p.name}</span>
                 </dt>
                 <dd className="t-body measure-body mt-4">{p.bio}</dd>
                 {p.priorFirms.length ? (
@@ -203,10 +208,10 @@ export default function TeamPage() {
         label="Reading a bio"
         title="What to demand of a name"
       >
-        <dl className="border-t border-white/12">
+        <dl className="rule-t">
           {DEMANDS.map((d) => (
-            <div key={d.q} className="border-b border-white/12 py-6">
-              <dt className="t-heading-sm text-pure">{d.q}</dt>
+            <div key={d.q} className="rule-b py-6">
+              <dt className="t-heading-sm text-ink">{d.q}</dt>
               <dd className="t-body measure-body mt-3">{d.a}</dd>
             </div>
           ))}
