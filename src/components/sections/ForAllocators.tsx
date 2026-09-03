@@ -138,7 +138,7 @@ export default function ForAllocators() {
       <div className="wrap band">
         <div className="max-w-[46em]">
           <p className="t-mono">For allocators</p>
-          <h2 id="allocators-title" className="t-heading-lg mt-5">
+          <h2 id="allocators-title" className="t-display-sm mt-5">
             {count(allocatorNav.length, true)} pages, {count(allocatorNav.length)} questions.
           </h2>
           <p className="t-sub mt-7 max-w-[34ch] text-ink-2">
