@@ -6,11 +6,11 @@
 | viewport-runner | 1 | DONE (tool merged 2639fec→recommitted) | — | rerun baseline-full against a healthy :3000 |
 | sec-chrome | 0 | RUNNING (worktree ~/gc2-wt/chrome, port 3101) | — | round-0 brief sent |
 | sec-hero | 0 | RUNNING (worktree ~/gc2-wt/hero, port 3102) | — | round-0 brief sent |
-| sec-framework | 0 | RUNNING (worktree ~/gc2-wt/framework, port 3103) | — | round-0 brief sent |
-| sec-strategies | 0 | RUNNING (worktree ~/gc2-wt/strategies, port 3104) | — | round-0 brief sent |
-| sec-approach | 0 | RUNNING (worktree ~/gc2-wt/approach, port 3105) | — | round-0 brief sent |
-| sec-insights | 0 | RUNNING (worktree ~/gc2-wt/insights, port 3106) | — | round-0 brief sent |
-| sec-allocators | 0 | RUNNING (worktree ~/gc2-wt/allocators, port 3107) | — | round-0 brief sent |
-| sec-firm | 0 | RUNNING (worktree ~/gc2-wt/firm, port 3108) | — | round-0 brief sent |
-| sec-legal | 0 | RUNNING (worktree ~/gc2-wt/legal, port 3109) | — | round-0 brief sent |
+| sec-framework | 1 | MERGED r0 (cf69cb1); awaiting Conductor review of r0-a sheets | — | score against §5 |
+| sec-strategies | 1 | MERGED r0 (1dee6e9); awaiting Conductor review of r0-a sheets | — | score against §5 |
+| sec-approach | 1 | MERGED r0 (fabaa0d); awaiting Conductor review of r0-a sheets | — | score against §5 |
+| sec-insights | 1 | MERGED r0 (f149f03); awaiting Conductor review of r0-a sheets | — | score against §5 |
+| sec-allocators | 1 | MERGED r0 (4b1c47d); awaiting Conductor review of r0-a sheets | — | score against §5 |
+| sec-firm | 1 | MERGED r0 (d0c47b6); awaiting Conductor review of r0-a sheets | — | score against §5 |
+| sec-legal | 1 | MERGED r0 (ab18de2); awaiting Conductor review of r0-a sheets | — | score against §5 |
 | sec-motion | 0 | RUNNING (worktree ~/gc2-wt/motion, port 3110) | — | round-0 brief sent |
