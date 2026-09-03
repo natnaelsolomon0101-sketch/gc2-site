@@ -12,12 +12,12 @@
 │                          96px/300      │   and down into paper        │   │
 │                                        │   drifts on a 90s loop       │   │
 │  Girlscantrade2 is a private           │                              │   │ min(100vh-72, 900)
-│  investment partnership in Austin…     ╰ ── ── ── ── ── ── ── ── ── ─╯   │
+│  investment partnership in Miami…     ╰ ── ── ── ── ── ── ── ── ── ─╯   │
 │                                                                          │
 │  [Our approach]   Investor inquiries                                     │
 ├──────────────────────────────────────────────────────────────────────────┤ hairline
 │ Founded        Headquarters      Structure          Mandate              │ 32px pad
-│ 2019           Austin, Texas     Private partner…   Liquid markets…      │ Newsreader 400/28
+│ Sept 2026      Miami, Florida     Private partner…   Liquid markets…      │ Newsreader 400/28
 ├──────────────────────────────────────────────────────────────────────────┤ hairline
 │                                                                          │
 │  The firm            │  Durable returns in liquid markets come from      │ 5 / 7 split
@@ -45,11 +45,11 @@
 │  Inquiries                                                               │
 │  We speak with a small number of aligned partners each year.             │
 │  Investors              Press                 Office                     │
-│  investors@gc2.fund     press@gc2.fund        Austin, Texas              │
+│  investors@gc2.fund     press@gc2.fund        Miami, Florida              │
 │ ──────────────────────────────────────────────────────────────────────── │ hairline-on-black
 │  GC2      Firm  Strategies  Insights  Contact  Disclosures               │
 │  Girlscantrade2 is a private investment partnership. …                   │ caption/muted
-│  © 2026 Girlscantrade2. All rights reserved.        Austin, Texas        │
+│  © 2026 Girlscantrade2. All rights reserved.        Miami, Florida        │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -70,7 +70,7 @@
 │  Investor inquiries        │
 ├────────────────────────────┤
 │ Founded      Headquarters  │ 2×2
-│ 2019         Austin, Texas │
+│ Sep 2026       Miami, Florida │
 │ Structure    Mandate       │
 ├────────────────────────────┤
 │ The firm                   │ stacks: h2 then prose
