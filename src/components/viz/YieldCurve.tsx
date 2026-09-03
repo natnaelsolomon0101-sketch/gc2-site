@@ -17,6 +17,13 @@ import {
  * labels, the source, the date. No y scale, so it states a shape and not a
  * level; no fund data of any kind, per §1 and the 506(b) list.
  *
+ * ONE 1px INK HAIRLINE ON PAPER. The rule never changed — one hairline, no
+ * fill, no gradient — only which end of the scale it sits at: it is now
+ * `--color-ink` on `--color-ground` (LIGHT-PASS.md). Nothing else about the drawing changes: no fill, no
+ * gradient, no second colour, and the accents stay out of it — a data
+ * component is the one place DESIGN.md's "one accent per section" ration is
+ * spent on nothing at all.
+ *
  * preserveAspectRatio="none", DELIBERATELY, with vector-effect="non-scaling-
  * stroke" on the path. The alternative, "xMidYMid meet", scales the drawing
  * uniformly: at 320 the hairline thins below a pixel and at 3440 it fattens to
@@ -37,7 +44,22 @@ const LABELLED = new Set(["1M", "1Y", "10Y", "30Y"]);
 
 const VIEW = { w: 1000, h: 260 };
 
-export default async function YieldCurve({ className = "" }: { className?: string }) {
+export type YieldCurveProps = {
+  className?: string;
+  /**
+   * Share-card mode. securities-counsel's round-2 read (docs/v4/COUNSEL.md,
+   * finding 1, BLOCKING): on the page the curve sits inside a section that says
+   * what it is, but a card travels alone — an unlabelled rising hairline beside
+   * a fund's wordmark can be read as the fund's own record. So a card NAMES the
+   * plot in type and says what it is not, and it drops the vertical
+   * exaggeration: the page fills its box with preserveAspectRatio="none", a
+   * card renders the viewBox's own 1000:260 so the line on the card is never
+   * steeper than the line in the data.
+   */
+  card?: boolean;
+};
+
+export default async function YieldCurve({ className = "", card = false }: YieldCurveProps) {
   const curve = await fetchYieldCurve();
   if (!curve) return null;
 
@@ -48,26 +70,26 @@ export default async function YieldCurve({ className = "" }: { className?: strin
   return (
     <figure
       className={`yc ${className}`}
+      data-card={card ? "true" : undefined}
       data-source={TREASURY_SOURCE}
       data-asof={curve.date}
     >
       <style>{css}</style>
+      {card ? <h3 className="t-h3 yc-title">U.S. Treasury par yield curve</h3> : null}
       <div className="yc-plot">
         <svg
           className="yc-svg"
           viewBox={`0 0 ${VIEW.w} ${VIEW.h}`}
-          preserveAspectRatio="none"
+          preserveAspectRatio={card ? "xMidYMid meet" : "none"}
           role="img"
           aria-label={`United States Treasury par yield curve as of ${date}, from one month to thirty years.`}
         >
           <path
             className="yc-line"
             d={d}
-            pathLength={1}
             fill="none"
-            stroke="var(--color-pure)"
+            stroke="var(--color-ink)"
             strokeWidth={1}
-            strokeLinecap="square"
             strokeLinejoin="round"
             vectorEffect="non-scaling-stroke"
           />
@@ -103,47 +125,85 @@ export default async function YieldCurve({ className = "" }: { className?: strin
       <figcaption className="t-caption yc-source">
         {TREASURY_ATTRIBUTION} · as of {date}
       </figcaption>
+      {card ? (
+        <p className="t-caption yc-note">Public market data. Not fund performance.</p>
+      ) : null}
     </figure>
   );
 }
 
-/* Timing reads --dur-draw and --ease, the globals.css mirror of
-   src/lib/motion.ts. pathLength={1} normalizes the path so the dash length is
-   1 regardless of the curve's real length, which changes daily — without it the
-   draw would run at a different apparent speed on a steep day than a flat one. */
+/* Timing reads --dur-draw and --ease, the globals.css mirror of src/lib/motion.ts.
+
+   THE DRAW IS A CLIP, NOT A DASH. It was `pathLength={1}` with
+   `stroke-dasharray: 1` and `stroke-dashoffset` animated 1 -> 0, which is what
+   EVERY-SCREEN.md §2 names. That is broken in combination with
+   `vector-effect="non-scaling-stroke"`, which this component needs for the 1px
+   hairline: non-scaling-stroke moves the dash properties into SCREEN space
+   while `pathLength` normalizes the path in USER units, so the two disagree the
+   moment the rendered plot is wider than the path's ~1036 user units. sec-hero
+   caught it in the hero: at 2560 the line stopped just past 1Y and 10Y and 30Y
+   never painted; at 3440 it drew, broke, and resumed. A Treasury curve that
+   ends at 1Y is a false statement, which is worse than no animation.
+
+   A left-to-right inset clip does the same thing to the eye on a curve that is
+   read left to right, costs one composited property, is independent of path
+   length and of width, and leaves the stroke geometry — and therefore
+   non-scaling-stroke — completely alone. The insets are negative on three
+   sides because `inset()` resolves against the SVG fill-box, which is the
+   path's bounding box and excludes the stroke: without the slack the top and
+   bottom of a 1px hairline get shaved.
+
+   The base rule sets no clip-path, so anything that stops the animation from
+   running leaves the whole line painted rather than an empty box. */
 const css = `
 .yc { margin: 0; container-type: inline-size; }
 .yc-plot { position: relative; }
 .yc-svg {
   display: block;
   width: 100%;
-  height: clamp(132px, 15vw, 240px);
+  /* A consumer sets its slot's height by assigning --yc-h on the figure rather
+     than reaching inside for .yc-svg — the hero's short-desktop slot height is
+     the case this exists for. */
+  height: var(--yc-h, clamp(132px, 15vw, 240px));
   overflow: visible;
 }
 .yc-axis { position: relative; height: 1.9em; margin-top: 12px; }
 .yc-tick { position: absolute; top: 0; white-space: nowrap; }
 .yc-source { display: block; margin-top: 6px; }
 
+/* Card mode. The heading is .t-h3 — the display face at the caption-to-h3 size
+   counsel asked for — and the plot takes its own aspect from the viewBox rather
+   than a forced height, which is what removes the stretch. */
+.yc-title { margin: 0 0 22px; }
+.yc-note { display: block; margin: 2px 0 0; color: var(--color-ink-3); hyphens: none; }
+.yc[data-card="true"] .yc-svg { height: auto; }
+
 /* Below ~430px of CONTAINER width — not viewport: the component has to survive
    a narrow column at 1920 the same way it survives a 320 phone — 10Y (81% of
    the axis) and 30Y (pinned to the right edge) collide. Three labels still
    span the axis. §7 rule 4. */
 @container (max-width: 430px) {
+  .yc[data-card="true"] .yc-tick[data-t="10Y"] { display: revert; }
   .yc-tick[data-t="10Y"] { display: none; }
 }
+/* A card is a fixed frame, never a phone. The share kit scales the whole block
+   to fill it, which shrinks the CONTAINER's layout width below 430px and was
+   dropping 10Y from the square card while the portrait card kept it — the same
+   plot labelled two different ways. Card mode keeps all four. */
+.yc[data-card="true"] .yc-tick[data-t="10Y"] { display: revert; }
 
-@keyframes ycDraw { from { stroke-dashoffset: 1 } to { stroke-dashoffset: 0 } }
-.yc-line {
-  stroke-dasharray: 1;
-  animation: ycDraw var(--dur-draw) var(--ease) both;
+@keyframes ycDraw {
+  from { clip-path: inset(-8% 100% -8% -2%); }
+  to   { clip-path: inset(-8% -2% -8% -2%); }
 }
+.yc-line { animation: ycDraw var(--dur-draw) var(--ease) both; }
 
 @media (prefers-reduced-motion: reduce) {
-  .yc-line { animation: none; stroke-dasharray: none; stroke-dashoffset: 0; }
+  .yc-line { animation: none; clip-path: none; }
 }
-/* A dash offset has no meaning on paper, and a half-drawn curve under a source
-   line would be a false statement. */
+/* A half-drawn curve under a source line would be a false statement, and on
+   paper there is no moment at which it finishes. */
 @media print {
-  .yc-line { animation: none; stroke-dasharray: none; stroke-dashoffset: 0; }
+  .yc-line { animation: none; clip-path: none; }
 }
 `;

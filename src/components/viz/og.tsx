@@ -4,12 +4,14 @@
  * card is decided at the call site, which is the only way eighteen routes stay
  * one design.
  *
- * The composition is APPENDIX-A read literally: obsidian ground, the route
- * title in the display face at 96px in `pure`, the route's own one-line
- * description in `ash`, the wordmark bottom-left. Nothing else. No rule, no
- * gradient, no icon, no chromatic tile — a share card is the smallest surface
- * the site has and it is the one place where "left-aligned, tokens only" has
- * nowhere to hide.
+ * The composition is APPENDIX-A read literally: paper ground, the route title
+ * in the display face at 96px in `ink`, the route's own one-line description in
+ * `ink-2`, the wordmark bottom-left. Nothing else. No rule, no gradient, no
+ * icon, no accent — a share card is the smallest surface the site has and it is
+ * the one place where "left-aligned, tokens only" has nowhere to hide. The one
+ * accent LIGHT-PASS.md permits here, deep-iris, is deliberately not spent: on
+ * eighteen cards that share one layout, a colour used on all of them is not an
+ * accent, it is a second ground.
  *
  * FONTS: the two faces are VENDORED as TTFs under `src/app/fonts/`, not fetched
  * from fonts.googleapis.com at build. Both are SIL OFL 1.1 (licences beside
@@ -38,10 +40,12 @@ const displayFont = readFile(join(FONT_DIR, "DMSerifDisplay-Regular.ttf"));
 const uiFont = readFile(join(FONT_DIR, "Inter-Regular.ttf"));
 
 /* Tokens, copied as literals because satori resolves no custom properties and
-   no stylesheet. Keep in step with `src/app/globals.css`. */
-const OBSIDIAN = "#0f1011";
-const PURE = "#ffffff";
-const ASH = "#9f9fa0";
+   no stylesheet. Keep in step with `src/app/globals.css`:
+   --color-ground / --color-ink / --color-ink-2 / --color-ink-3. */
+const GROUND = "#f7f5f0";
+const INK = "#141311";
+const INK_2 = "#544e45";
+const INK_3 = "#67615a";
 
 /**
  * The route's own `metadata.description`, reduced to its opening statement.
@@ -94,7 +98,7 @@ export function ogImage({ title, description, curve = null }: OgCard) {
               flexDirection: "column",
               justifyContent: "space-between",
               alignItems: "flex-start",
-              background: OBSIDIAN,
+              background: GROUND,
               padding: "76px 84px",
               fontFamily: "Inter",
             }}
@@ -109,7 +113,7 @@ export function ogImage({ title, description, curve = null }: OgCard) {
                      in CSS instead of reaching for a 300 that does not exist,
                      and the card does the same. */
                   letterSpacing: "-0.021em",
-                  color: PURE,
+                  color: INK,
                 }}
               >
                 {title}
@@ -119,7 +123,7 @@ export function ogImage({ title, description, curve = null }: OgCard) {
                   marginTop: 40,
                   fontSize: 28,
                   lineHeight: 1.44,
-                  color: ASH,
+                  color: INK_2,
                   maxWidth: 880,
                 }}
               >
@@ -139,7 +143,7 @@ export function ogImage({ title, description, curve = null }: OgCard) {
                   fontFamily: "DM Serif Display",
                   fontSize: 34,
                   letterSpacing: "-0.01em",
-                  color: PURE,
+                  color: INK,
                 }}
               >
                 {site.mark}
@@ -160,12 +164,12 @@ export function ogImage({ title, description, curve = null }: OgCard) {
                     <path
                       d={curve.d}
                       fill="none"
-                      stroke={PURE}
+                      stroke={INK}
                       strokeWidth={1}
                       strokeLinejoin="round"
                     />
                   </svg>
-                  <div style={{ marginTop: 14, fontSize: 17, color: ASH, letterSpacing: "0.09em" }}>
+                  <div style={{ marginTop: 14, fontSize: 17, color: INK_3, letterSpacing: "0.09em" }}>
                     {curve.source}
                   </div>
                 </div>
