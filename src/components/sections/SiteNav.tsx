@@ -25,6 +25,21 @@
       drawer's fifth-link (CTA) distinction used to be `iris-gleam`; both are
       ink now -- the underline still marks "current," it just no longer
       borrows colour to do it.
+   7. ROUND 6 (Conductor, MotionSites "Velorah" / "Vibrant Wellness", logged
+      docs/v4/MOTIONSITES.md): on `/` ONLY, the bar becomes two floating
+      liquid-glass pills (links, CTA) plus a glass circle (burger) over the
+      hero, with no bar background until 8px of scroll. Inner routes are
+      untouched -- same bar as before, same code path, gated on
+      `pathname === "/"` rather than forked into a second component. The
+      glass pills are this file's one deliberate exception to "no shadows":
+      `box-shadow: inset 0 1px 1px rgba(255,255,255,.4)` is the prompt's own
+      value, standing in for the light catching a glass edge, not a card
+      drop-shadow -- APPENDIX-A's shadow ban is about depth-via-shadow on
+      cards, and doesn't have an opinion on a literal glass material. The
+      gradient ring border is the mask-composite:exclude technique: a
+      pseudo-element the size of the pill, padded by the border width, with
+      two masks XORed so only that padding ring paints, filled with the
+      hairline-alpha gradient instead of a flat colour.
    ========================================================================== */
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -52,14 +67,27 @@ html{ scroll-padding-top: var(--nav-h); }
 
 .sn-header{
   position:sticky; top:0; z-index:50;
-  background:color-mix(in srgb, var(--color-ground) 82%, transparent);
+  background-color:color-mix(in srgb, var(--color-ground) 82%, transparent);
   backdrop-filter:blur(20px) saturate(140%);
   -webkit-backdrop-filter:blur(20px) saturate(140%);
   /* constant 1px. only the colour moves. */
   border-bottom:1px solid transparent;
-  transition:border-bottom-color var(--dur-menu) var(--ease);
+  transition:border-bottom-color var(--dur-menu) var(--ease), background-color var(--dur-menu) var(--ease);
 }
 .sn-header[data-scrolled="true"]{ border-bottom-color:var(--color-hairline-strong); }
+
+/* Home: no bar at all until the page has moved -- the pills float directly
+   on the hero. Scrolling past 8px hands the bar back its ground colour
+   (solid, not the color-mix wash inner routes use) alongside the same
+   hairline every other route already gets from the rule above. */
+.sn-header[data-home="true"]{
+  background-color:transparent;
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+}
+.sn-header[data-home="true"][data-scrolled="true"]{
+  background-color:var(--color-ground);
+}
 
 .sn-header :focus-visible,
 .sn-drawer :focus-visible{
@@ -104,6 +132,68 @@ html{ scroll-padding-top: var(--nav-h); }
   transition:color var(--dur-fast) var(--ease);
 }
 .sn-burger:hover{ color:var(--color-ink-2); }
+
+/* ---- home: the three-track floating bar --------------------------------
+   Wordmark start / pill nav centre / CTA pill + burger end. A grid, not the
+   inner routes' justify-between flex row: with three flex children of
+   different widths, space-between does not put the middle one on the
+   page's true centreline, and "centered rounded-full glass pill" means the
+   centreline. 1fr auto 1fr does, symmetrically, regardless of how wide
+   the pill or the wordmark are. */
+.sn-bar-home{
+  display:grid; grid-template-columns:1fr auto 1fr; align-items:center; column-gap:16px;
+}
+.sn-bar-home .sn-mark{ justify-self:start; }
+.sn-bar-home .sn-pill-nav{ justify-self:center; }
+.sn-home-right{ justify-self:end; display:flex; align-items:center; gap:12px; }
+
+/* ---- the glass material -------------------------------------------------
+   Paper translation of the MotionSites prompt's .liquid-glass: white at low
+   opacity plus blur reads as frosted glass on ANY ground, light or dark,
+   because it is mixing toward white rather than toward the page colour --
+   that is the one deliberately non-token colour in this file, and it is the
+   material itself, not a text or fill colour, which is what LIGHT-PASS.md's
+   token list governs. The inset highlight is the prompt's own value,
+   standing in for a glass edge catching light -- see file-header note 7 for
+   why this is not the shadow ban. */
+.sn-pill-nav, .sn-pill-cta, .sn-burger-glass{
+  position:relative;
+  background:rgba(255,255,255,.35);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  border-radius:9999px;
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.4);
+}
+/* The gradient hairline ring: a pseudo-element padded by the border width,
+   two stacked masks XORed so only that padding-box ring survives, filled
+   with a three-stop hairline-alpha gradient (strong / transparent / strong)
+   rather than a flat line -- the "gradient hairline border" the prompt
+   calls for, in the site's own ink-alpha rather than an invented colour. */
+.sn-pill-nav::before, .sn-pill-cta::before, .sn-burger-glass::before{
+  content:"";
+  position:absolute; inset:0;
+  border-radius:inherit;
+  padding:1px;
+  background:linear-gradient(90deg, rgba(20,19,17,.28), rgba(20,19,17,0), rgba(20,19,17,.28));
+  -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  pointer-events:none;
+}
+.sn-pill-nav{ display:flex; align-items:center; padding-inline:6px; gap:2px; }
+
+.sn-pill-cta{
+  display:none; align-items:center; justify-content:center;
+  min-height:44px; padding-inline:20px;
+  font-size:15px; line-height:1.2; letter-spacing:0.01em;
+  color:var(--color-ink);
+  text-decoration-line:none;
+  transition:background-color var(--dur-fast) var(--ease);
+}
+@media (min-width:769px){ .sn-pill-cta{ display:inline-flex; } }
+.sn-pill-cta:hover{ background-color:rgba(255,255,255,.5); }
+
+.sn-burger-glass{ border-radius:9999px; }
 
 /* Desktop bar vs. the drawer trigger, two rules that must never disagree:
    1. THE THRESHOLD IS 769px, matching --nav-h's own max-width:768px tier
@@ -196,7 +286,7 @@ html{ scroll-padding-top: var(--nav-h); }
 .sn-meta-link:hover{ color:var(--color-ink); }
 
 @media (prefers-reduced-motion: reduce){
-  .sn-header,.sn-link,.sn-burger,.sn-drawer-link,.sn-meta-link{
+  .sn-header,.sn-link,.sn-burger,.sn-drawer-link,.sn-meta-link,.sn-pill-cta{
     transition-duration:1ms !important;
   }
   .sn-drawer,.sn-drawer[data-open="true"]{ transition:none; }
@@ -207,6 +297,7 @@ const FOCUSABLE = "a[href], button:not([disabled])";
 
 export default function SiteNav() {
   const pathname = usePathname();
+  const isHome = pathname === "/";
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -289,12 +380,49 @@ export default function SiteNav() {
     };
   }, [open, close]);
 
+  /* One burger, one place its aria-expanded/aria-controls/aria-label and its
+     two-glyph SVG are declared, whichever bar it renders inside of -- the
+     home bar just adds the glass-circle class, per round 6's own note 3
+     (keep every a11y property already verified: the attributes below are
+     unchanged from the audited version). */
+  const burgerButton = (
+    <button
+      ref={triggerRef}
+      type="button"
+      className={`sn-burger -mr-2${isHome ? " sn-burger-glass" : ""}`}
+      aria-expanded={open}
+      aria-controls="site-nav-drawer"
+      aria-label={open ? "Close menu" : "Open menu"}
+      onClick={() => (open ? close() : setOpen(true))}
+    >
+      {/* Glyph 1 of 2 on this site: two lines, 1.5px. Glyph 2 is the same
+          two lines rotated into the open state. Nothing else is drawn. */}
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+        {open ? (
+          <>
+            <path d="M3.5 3.5 L18.5 18.5" stroke="currentColor" strokeWidth="1.5" />
+            <path d="M18.5 3.5 L3.5 18.5" stroke="currentColor" strokeWidth="1.5" />
+          </>
+        ) : (
+          <>
+            <path d="M0 8.25 H22" stroke="currentColor" strokeWidth="1.5" />
+            <path d="M0 13.75 H22" stroke="currentColor" strokeWidth="1.5" />
+          </>
+        )}
+      </svg>
+    </button>
+  );
+
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
 
-      <header className="sn-header" data-scrolled={scrolled ? "true" : "false"}>
-        <div className="wrap nav-frame flex items-center justify-between">
+      <header
+        className="sn-header"
+        data-scrolled={scrolled ? "true" : "false"}
+        data-home={isHome ? "true" : "false"}
+      >
+        <div className={`wrap nav-frame flex items-center${isHome ? " sn-bar-home" : " justify-between"}`}>
           <Link
             href="/"
             aria-label={`${site.mark} — home`}
@@ -303,7 +431,10 @@ export default function SiteNav() {
             {site.mark}
           </Link>
 
-          <nav aria-label="Primary" className="sn-desktop-nav items-center gap-7">
+          <nav
+            aria-label="Primary"
+            className={`sn-desktop-nav items-center${isHome ? " sn-pill-nav" : " gap-7"}`}
+          >
             {nav.map((n) => (
               <Link
                 key={n.href}
@@ -314,37 +445,26 @@ export default function SiteNav() {
                 {n.label}
               </Link>
             ))}
-            <span aria-hidden="true" className="sn-rule" />
-            <Link href={CTA.href} className="btn">
-              {CTA.label}
-            </Link>
+            {!isHome && (
+              <>
+                <span aria-hidden="true" className="sn-rule" />
+                <Link href={CTA.href} className="btn">
+                  {CTA.label}
+                </Link>
+              </>
+            )}
           </nav>
 
-          <button
-            ref={triggerRef}
-            type="button"
-            className="sn-burger -mr-2"
-            aria-expanded={open}
-            aria-controls="site-nav-drawer"
-            aria-label={open ? "Close menu" : "Open menu"}
-            onClick={() => (open ? close() : setOpen(true))}
-          >
-            {/* Glyph 1 of 2 on this site: two lines, 1.5px. Glyph 2 is the same
-                two lines rotated into the open state. Nothing else is drawn. */}
-            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
-              {open ? (
-                <>
-                  <path d="M3.5 3.5 L18.5 18.5" stroke="currentColor" strokeWidth="1.5" />
-                  <path d="M18.5 3.5 L3.5 18.5" stroke="currentColor" strokeWidth="1.5" />
-                </>
-              ) : (
-                <>
-                  <path d="M0 8.25 H22" stroke="currentColor" strokeWidth="1.5" />
-                  <path d="M0 13.75 H22" stroke="currentColor" strokeWidth="1.5" />
-                </>
-              )}
-            </svg>
-          </button>
+          {isHome ? (
+            <div className="sn-home-right">
+              <Link href={CTA.href} className="sn-pill-cta">
+                {CTA.label}
+              </Link>
+              {burgerButton}
+            </div>
+          ) : (
+            burgerButton
+          )}
         </div>
       </header>
 

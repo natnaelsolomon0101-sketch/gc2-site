@@ -33,3 +33,38 @@ is already doing with the yield curve, not new information for the footer.
 from EVERY-SCREEN.md §5.1 / sec-chrome.md, not from a MotionSites structural
 idea. If the MCP is ever connected, footer prompt 2 is still unspent and
 should be read before the next footer pass.
+
+## sec-chrome, round 6 — nav (owner-pasted prompts, not the MCP)
+
+Prompts pasted directly by the owner (not fetched via the MCP, which is
+still not connected): **"Velorah"** and **"Vibrant Wellness"**. Both use a
+floating `.liquid-glass` nav -- a rounded-full pill (white at ~35% opacity,
+`backdrop-filter: blur`, an inset highlight, a gradient hairline ring) that
+sits with no bar background over a fullscreen hero/media background until
+the page scrolls, at which point the bar gains a solid ground and a
+hairline.
+
+**Kept:** the glass-pill nav structure (wordmark left / links in a
+centered rounded-full pill / CTA as a second glass pill), the glass
+treatment carried onto the mobile burger as a 44px glass circle, the
+transparent-until-8px-scroll bar behavior, and the general choreography of
+"chrome floats over the hero, then commits to a surface." Kept the
+fade-rise stagger idea in spirit (nothing new added here -- the hero's own
+load choreography is sec-hero's file) and the "fullscreen media background
+as structure" idea in the sense that the glass pills are designed to sit
+over whatever the hero renders, not to assume a particular hero visual.
+
+**Stripped:** Velorah's navy theme and Vibrant Wellness's stock video
+background and avatar imagery -- neither is a token this site has; the
+glass fill is white-at-low-opacity translated onto the paper canvas
+(DESIGN.md's ground/ink tokens), not a new colour. Stripped all wellness
+/ lifestyle copy -- words on this site come from `src/config` and existing
+content only. Stripped any chromatic accent on the pills or the burger:
+LIGHT-PASS.md bans accent colour in the chrome entirely, so the gradient
+ring uses the site's own hairline ink-alpha (`rgba(20,19,17,.28→0→.28)`),
+not a colour from either prompt.
+
+**Where it shipped:** `src/components/sections/SiteNav.tsx`, gated on
+`pathname === "/"` -- inner routes keep the plain bar from earlier rounds,
+unchanged. Screenshots: `docs/v4/shots/r6-chrome/home--{393,768,1280,1920}
+--scroll{0,200}.png`.
