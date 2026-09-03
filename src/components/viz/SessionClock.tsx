@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+import { css } from "@/lib/css";
+
 /**
  * Tokyo / London / New York: local time, and whether the cash session is
  * scheduled to be running. EVERY-SCREEN.md §2 candidate 2.
@@ -165,7 +167,7 @@ export default function SessionClock({
       data-dense={dense ? "true" : undefined}
       data-source={SESSION_SOURCE}
     >
-      <style>{css}</style>
+      <style>{CSS}</style>
       <ul className="sc-rows">
         {readings.map((r) => (
           <li
@@ -204,7 +206,7 @@ export default function SessionClock({
    caveat. Open and closed are told apart by TONE, not by hue — there is no
    green dot and there never was, which is the version of this that also works
    for a colour-blind reader and on paper. */
-const css = `
+const CSS = css`
 .sc { container-type: inline-size; }
 /* The three rows share one set of column tracks, so the times line up under
    each other. Without that, "CLOSED" and "IN SESSION" size their own row and

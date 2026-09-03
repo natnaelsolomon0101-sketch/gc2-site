@@ -2,12 +2,35 @@ import type { Metadata } from "next";
 import Container from "@/components/Container";
 import PageHeader from "@/components/PageHeader";
 import TextLink from "@/components/TextLink";
-import { site } from "@/config/site";
+import { site, siteUrl } from "@/config/site";
 
 export const metadata: Metadata = {
   title: "Contact",
+  // Trimmed to clear the 155-char description gate (round 4 search pass);
+  // the dropped clause ("and what each can and cannot do") is still true of
+  // the page, just not restated in the meta description.
   description:
-    "Two published addresses and no form. Which one to use if you are an allocator, an existing investor, a journalist, or a counterparty — and what each can and cannot do.",
+    "Two published addresses and no form. Which one to use if you are an allocator, an existing investor, a journalist, or a counterparty.",
+};
+
+/* Organization JSON-LD, round 4 (search): contactPoint per published
+   address, email only. contactType is lifted verbatim from the block title
+   each address actually sits under below ("Existing investors", "Press"),
+   not invented — the "Allocators and prospective investors" block links to
+   /access instead of publishing an address, so it contributes no
+   contactPoint. No telephone (`site.phone` is null) and no address
+   (`site.address` is null): both fields are simply absent, the same "a null
+   field renders nothing" rule the page itself follows. */
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: site.name,
+  alternateName: site.mark,
+  url: siteUrl,
+  contactPoint: [
+    { "@type": "ContactPoint", email: site.emails.investors, contactType: "Existing investors" },
+    { "@type": "ContactPoint", email: site.emails.press, contactType: "Press" },
+  ],
 };
 
 /* =============================================================================
@@ -210,6 +233,10 @@ const investorsQuickLink = (
 export default function Contact() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <PageHeader
         eyebrow="Contact"
         title="Where to write."

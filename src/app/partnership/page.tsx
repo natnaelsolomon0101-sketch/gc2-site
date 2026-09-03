@@ -5,7 +5,7 @@ import { fund } from "@/config/fund";
 import { site } from "@/config/site";
 
 export const metadata: Metadata = {
-  title: "Partnership",
+  title: "How families work with us",
   description:
     "Three structures a family can hold capital in, how alignment works, and how a relationship starts.",
 };

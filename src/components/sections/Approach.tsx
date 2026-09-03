@@ -223,9 +223,18 @@ export default function Approach() {
           </p>
         </div>
 
+        {/* The ledger is a heading, not a styled label: navigating this page by
+            heading should give "How an idea earns capital" (h2) and then, at
+            one level down, "Who holds what" followed by the four stages and
+            the tail overlay — one outline, no skipped level, and the <dl> gets
+            an accessible name from it. Tailwind's preflight resets heading
+            font-size and weight to inherit, so .t-caption still renders it as
+            the mono line it looks like. */}
         <div className="@4xl:col-span-4 @4xl:col-start-9">
-          <p className="t-caption text-ink-3">Who holds what</p>
-          <dl className="mt-2">
+          <h3 id="approach-ledger" className="t-caption text-ink-3">
+            Who holds what
+          </h3>
+          <dl className="mt-2" aria-labelledby="approach-ledger">
             {accountability.map((a) => (
               <div key={a.term} className="border-t border-hairline py-3">
                 <dt className="t-small text-ink-3">{a.term}</dt>

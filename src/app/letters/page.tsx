@@ -32,7 +32,7 @@ import { fund } from "@/config/fund";
  */
 
 export const metadata: Metadata = {
-  title: "Letters",
+  title: "Investor letters",
   description:
     "What the investor letters contain, what governs when they go out, and the structural reason none of them is readable on a public page.",
 };

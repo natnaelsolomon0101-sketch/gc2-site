@@ -136,7 +136,24 @@ const louvre = (pitch: number) =>
   ` rgba(20,19,17,0) 0px, rgba(20,19,17,0) ${pitch - 1}px,` +
   ` rgba(20,19,17,.16) ${pitch - 1}px, rgba(20,19,17,.16) ${pitch}px)`;
 
-const CSS = `
+/** The stylesheet below is written to be read: it carries the reasoning for
+ *  every measured number in it, and that reasoning is the reason the next
+ *  person does not undo a fix. But it is also inlined into the document, and
+ *  the document is the whole critical path on a phone — measured on Slow 4G at
+ *  the Pixel 7 descriptor, FCP lands at 860ms and LCP at 1124ms, and the HTML's
+ *  own 900ms transfer is what both are waiting for. The hero's <style> was
+ *  37.2KB of a 216KB document; the comments are 27KB of that.
+ *
+ *  So the comments stay in the source and do not ship. Run once at module
+ *  scope, not per request. Only /* *\/ comments and runs of whitespace go:
+ *  the CSS contains two quoted strings, content:"" (empty, so collapsing is a
+ *  no-op) and the grain's data URI (percent-encoded by encodeURIComponent, so
+ *  it holds no raw spaces and no comment opener). Verified by diffing the
+ *  rendered page against the unstripped build at 393 and 1920. */
+const min = (css: string) =>
+  css.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\s+/g, " ").trim();
+
+const CSS = min(`
 .hv2{
   /* the page measure, one of its 12 columns, and the column lines the
      composition is built on, in page coordinates. --page-max is foundation's
@@ -269,7 +286,16 @@ const CSS = `
    holidays not shown") is the caption scripts/qa/sources.ts checks for and is
    never hidden while the strip is painted; it wraps to two lines at this width
    and that is why the masthead aligns to start rather than to a baseline. */
-.hv2-clock{grid-column:10 / span 3;}
+/* THE SLOT, not the component, carries the placement — and a reserved height.
+   SessionClock renders null until it hydrates, which is right (a time that is
+   not known yet is not drawn as a shape where a time will go) but means there
+   is no element to size until it appears. Measured before this: the masthead
+   went 37px -> 75px on every phone and 40px -> 46px at 1920 when the clock
+   arrived, and everything under it moved down — CLS 0.0295 at 412 throttled,
+   which is a §9 gate failure on its own. 32px is what the component's dense
+   row occupies; the slot holds it open from the first paint. If dense ever
+   comes off the call below, this number moves to 44 with it. */
+.hv2-clockslot{grid-column:10 / span 3;min-height:32px;}
 /* Density and the caption are the component's own props now — dense,
    caption={false}, rows="open" — passed at the call site below. The three
    local overrides that stood in for them -- a zeroed row height, a compressed
@@ -402,7 +428,7 @@ const CSS = `
      under the three facts. flex-basis 100% and not auto on purpose — the
      component sets container-type: inline-size, and an inline-size container
      with an indefinite basis has no content-derived width to resolve to. */
-  .hv2-clock{order:2;flex:1 0 100%;margin-top:6px;}
+  .hv2-clockslot{order:2;flex:1 0 100%;margin-top:6px;}
 
   /* Two lines, at every phone width, in both engines. Sized off the measure
      rather than off a guess: DM Serif Display sets "Evidence first." at
@@ -499,7 +525,7 @@ const CSS = `
      columns get this narrow — city and time only */
   .hv2-m2,.hv2-m3{display:none;}
   .hv2-m1{grid-column:1 / span 6;}
-  .hv2-clock{grid-column:7 / span 6;}
+  .hv2-clockslot{grid-column:7 / span 6;}
 }
 @media (min-width:768px) and (max-width:1024px) and (orientation:portrait){
   /* A portrait tablet is a tall frame, not a wide one: the headline takes the
@@ -630,7 +656,7 @@ const CSS = `
      headline, a lead and two actions -- measured, the stack would run 401px.
      It comes off here for the same reason the record and the curve do, and the
      same strip is one tap away in the menu and the footer (sec-chrome). */
-  .hv2-clock{display:none;}
+  .hv2-clockslot{display:none;}
   .hv2-h1{grid-column:1 / span 8;
           font-size:clamp(2rem, calc(15.318vw - 7.83px), 44px);
           line-height:.92;letter-spacing:-.028em;margin-block:14px 0;}
@@ -717,7 +743,7 @@ const CSS = `
   .hv2-l2 > span{animation-delay:var(--stagger),var(--stagger);}
   .hv2-m2{animation-delay:var(--stagger),var(--stagger);}
   .hv2-m3{animation-delay:var(--stagger),var(--stagger);}
-  .hv2-clock{animation-delay:calc(var(--stagger) * 2),calc(var(--stagger) * 2);}
+  .hv2-clockslot{animation-delay:calc(var(--stagger) * 2),calc(var(--stagger) * 2);}
   .hv2-lead{animation-delay:calc(var(--stagger) * 2),calc(var(--stagger) * 2);}
   .hv2-cta{animation-delay:calc(var(--stagger) * 3),calc(var(--stagger) * 3);}
   .hv2-curve{animation-delay:calc(var(--stagger) * 4),calc(var(--stagger) * 4);}
@@ -739,7 +765,7 @@ const CSS = `
      while it ran; with it gone all three hash the same. */
 }
 @keyframes hv2Wipe{from{transform:scaleY(0)}to{transform:none}}
-`;
+`);
 
 export default function HeroV2() {
   return (
@@ -773,12 +799,14 @@ export default function HeroV2() {
                 it where its own local clock used to be. It renders nothing
                 until it hydrates, so the server HTML carries no time-shaped
                 placeholder — STATE.md §0.2 item 6. */}
-            <SessionClock
-              className="hv2-clock"
-              caption={false}
-              rows="open"
-              dense
-            />
+            <div className="hv2-clockslot">
+              <SessionClock
+                className="hv2-clock"
+                caption={false}
+                rows="open"
+                dense
+              />
+            </div>
           </div>
 
           <div className="hv2-gap" />
