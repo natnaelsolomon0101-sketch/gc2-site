@@ -1,10 +1,10 @@
-# GC2 v4 — Every Screen. Report (draft; finalised after critics + production)
+# GC2 v4 — Every Screen. Report
 
 Run: 3–4 September 2026. Conductor: Claude (main session). Branch: `v4/every-screen` (cut from `redesign/origin-100k`, NOT main). Budget used: ~10 h of the 8–12 h envelope.
 
 ## 1. URLs
 - Preview (light, final integration): https://gc2-site-orn07oc06-natnaelsolomon0101-sketchs-projects.vercel.app
-- Production: girlscantrade2.com — promoted at the gated milestone (see §9) — PENDING critics.
+- Production: https://girlscantrade2.com — promoted 4 Sep 2026 from 7d6e0ec (Vercel https://gc2-site-91h1t2h63-natnaelsolomon0101-sketchs-projects.vercel.app). Verified live: theme-color #f7f5f0, canonical https://girlscantrade2.com, /opengraph-image 200.
 
 ## 2. The two decisions that changed the brief
 1. **The doc was written for a paper design the client had rejected** (`docs/BUILD100K.md`), and it cited four foundation docs that do not exist in the repo. Nate chose: run the doc's process on the dark build. `docs/v4/APPENDIX-A.md` translated every paper token to the dark system; `docs/v4/OWNERSHIP.md` mapped the Ten to the files that exist.
@@ -31,7 +31,8 @@ Run: 3–4 September 2026. Conductor: Claude (main session). Branch: `v4/every-s
 | baseline-full | base (dark, pre-v4) | 0 / 703 (every shot failed at least one check) |
 | r1-b | round 1 merged (dark) | 539 / 703 |
 | r1-c | + hero r1 + counsel fixes | 577 / 703 |
-| light-final | all ten light passes | **700 / 722** (remaining 22: /strategies cross-reference links 18px → fixed in the last strategies commit) |
+| light-final | all ten light passes | 700 / 722 |
+| **final** | + critics' fixes (strip gutters, tearsheet mock deleted, short-phone hero, .btn floor, landscape h1 cap, disclosures on page/OG/ECB) | **722 / 722** |
 WARNs accepted and listed: 14px `.t-small` and 13px eyebrows counted as "phone body under 15px" (they are captions, not body); single-word last lines on a few h2/h3 after `text-wrap: balance`.
 Contact sheets: `docs/v4/shots/<round>/sheets/<route>.png`. Before/after for home: `baseline-full/sheets/home.png` vs `light-final/sheets/home.png`.
 
@@ -62,7 +63,7 @@ ui-ux-pro-max (queries logged per section), frontend-design (available), 21st MC
 | 8 | dates | single source `site.foundedLabel`; no literals | verified |
 
 ## 9. Gates at light-final
-build ✓ · killist (incl. motion-timing gate, 0 pins) ✓ · regime 506(b) ✓ (13 routes) · sources ✓ · print.ts ✓ (18 routes, after the bridge deletion) · share kit 5/5 written, clean against the word list, contrast-gated ✓ · matrix 700/722 → 722/722 after the strategies anchor fix · dark-scheme pixel-identical ✓ · counsel second read: PENDING · thumb-critic: PENDING · family-principal: PENDING.
+build ✓ · killist (incl. motion-timing gate, 0 pins) ✓ · regime 506(b) ✓ (13 routes) · sources ✓ · print.ts ✓ (18 routes) · share kit 5/5, word-list clean, contrast-gated ✓ · matrix **722/722** ✓ · dark-scheme pixel-identical ✓ · securities-counsel second read: kit SHIPPABLE; site promotable once three disclosure items landed (they did, motion r4) ✓ · thumb-critic: interior 4/5, home faults all routed and fixed (`docs/v4/CRITICS.md`) ✓ · family-principal: 4 / 4 / 3, layout findings fixed, content findings for Nate ✓.
 
 ## 10. Deviations from Appendix A (as translated)
 - Two primitive systems kept (home and inner); both fluid.
@@ -80,3 +81,6 @@ build ✓ · killist (incl. motion-timing gate, 0 pins) ✓ · regime 506(b) ✓
 5. **Photography** — none; the site is typographic + data-art by design.
 6. **Counsel** — a human securities lawyer must read the copy and the share kit before you treat any of this as compliance (the repo's own rule).
 7. **Copy-bound heights** — shorten the four stage bodies if "≤3 viewports" matters; tearsheet cannot be one page with its current content.
+8. **The firm's facts** (family-principal): `src/config/fund.ts` is null everywhere — no person, provider, registration, entity, reporting cadence or GP commitment. The site's own copy tells allocators to demand each of these. Fill `docs/INTAKE.md`; the components render them the moment they exist.
+9. **IA**: the eight allocator pages are footer-only (nav.ts). Consider a "For allocators" item in the top bar.
+10. **Memory note**: the Conductor's project memory could not be written this session (macOS blocked the Obsidian-vault path); everything is in `docs/v4/`.
