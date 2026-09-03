@@ -58,8 +58,13 @@
     font-family: var(--font-ui);
     font-size: 16px; line-height: 1.5; font-weight: 400;
     -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
-    /* §7 rule 9: hyphenation needs lang (html already carries lang="en"). */
-    hyphens: auto;
+    /* §7 rule 9 was over-broad: body-wide `hyphens: auto` was breaking
+       "frame-work", "cap-ital", "Commit-tee", "no-body", "po-sition" across
+       leads and body copy in the Conductor's screenshots. Hyphenation is now
+       opt-in per container (.measure-legal, .t-prose) instead of a blanket
+       rule; every display/heading tier below sets `hyphens: manual`
+       explicitly so it can never inherit auto from here or from a future
+       ancestor rule. */
   }
   ::selection { background: var(--color-pure); color: var(--color-void); }
   :focus-visible { outline: 2px solid var(--color-pure); outline-offset: 3px; border-radius: 8px; }
@@ -86,14 +91,17 @@
   .t-display    { font-family: var(--font-display); font-weight: 400;
                   font-size: clamp(52px, calc(20.57px + 9.82vw), 96px);
                   line-height: clamp(.9, calc(.9857 - .01116vw), .95);
+                  hyphens: manual;
                   letter-spacing: -0.022em; color: var(--color-pure); }
   .t-display-sm { font-family: var(--font-display); font-weight: 400;
                   font-size: clamp(40px, calc(11.43px + 8.93vw), 80px);
                   line-height: clamp(.95, calc(1.0357 - .01116vw), 1);
+                  hyphens: manual;
                   letter-spacing: -0.02em; color: var(--color-pure); }
   .t-heading-lg { font-family: var(--font-display); font-weight: 400;
                   font-size: clamp(32px, calc(27.71px + 1.34vw), 38px);
                   line-height: clamp(.9, calc(1.0714 - .02232vw), 1);
+                  hyphens: manual;
                   letter-spacing: -0.018em; }
   /* §7.6: above 1920 the container may widen and type ceilings rise with it.
      Only the tiers the brief names (display up to 128px, h1 up to 96px)
@@ -108,14 +116,21 @@
      card headings were being patched with inline font-size overrides. */
   .t-heading-sm { font-family: var(--font-display); font-weight: 400;
                   font-size: clamp(24px, calc(22.57px + .45vw), 26px);
-                  line-height: clamp(1.1, calc(1.1857 - .01116vw), 1.15); }
+                  line-height: clamp(1.1, calc(1.1857 - .01116vw), 1.15);
+                  hyphens: manual; }
   /* Fluid, floors at 15px per §7.1 ("lead floors at 15px at 320"); .t-sub
      gets the same treatment since it is the other half of this tier. */
   .t-sub   { font-size: clamp(15px, calc(11.57px + 1.07vw), 18px);
-             line-height: clamp(1.5, calc(1.6071 - .01786vw), 1.55); font-weight: 300; }
+             line-height: clamp(1.5, calc(1.6071 - .01786vw), 1.55); font-weight: 300;
+             hyphens: manual; }
   /* Body stays 16px on every viewport — §7.1 says so explicitly. */
   .t-body  { font-size: 16px; line-height: 1.5; color: var(--color-ash); overflow-wrap: anywhere; }
-  .t-small { font-size: 14px; line-height: 1.67; color: var(--color-ash); overflow-wrap: anywhere; }
+  /* The footer disclosure runs in uppercase mono; `hyphens: manual` here and
+     on .t-mono/.t-mono-xs/.t-caption stops "WEB-SITE", "PURPOS-ES" and
+     "SECU-RITY" from breaking on phones now that body no longer sets
+     `hyphens: auto` for them to (correctly) inherit. */
+  .t-small { font-size: 14px; line-height: 1.67; color: var(--color-ash); overflow-wrap: anywhere;
+             hyphens: manual; }
   /* Conductor amendment, first matrix run: §6.3's font floor is 13px and it
      is a hard gate, not a target — DESIGN.md's 12px mono tier and 11px
      mono-xs tier both failed it on every route. Both raised to a flat 13px;
@@ -123,10 +138,10 @@
      final report. */
   .t-mono  { font-family: var(--font-mono); font-size: 13px; line-height: 2;
              text-transform: uppercase; letter-spacing: .182em; font-weight: 500;
-             color: var(--color-ash); }
+             color: var(--color-ash); hyphens: manual; }
   .t-mono-xs { font-family: var(--font-mono); font-size: 13px; line-height: 2;
                text-transform: uppercase; letter-spacing: .182em; font-weight: 500;
-               color: var(--color-ash); }
+               color: var(--color-ash); hyphens: manual; }
 
   /* white-on-black is the only primary action */
   .btn { display:inline-flex; align-items:center; gap:10px; border-radius: 8px;
@@ -172,14 +187,17 @@
   .t-h1   { font-family: var(--font-display); font-weight:400;
             font-size: clamp(44px, calc(18.34px + 8.02vw), 80px);
             line-height: clamp(.95, calc(1.03564 - .011136vw), 1);
+            hyphens: manual;
             letter-spacing:-0.02em; color: var(--color-pure); }
   .t-h2   { font-family: var(--font-display); font-weight:400;
             font-size: clamp(32px, calc(27.72px + 1.34vw), 38px);
             line-height: clamp(1, calc(1.0856 - .011136vw), 1.05);
+            hyphens: manual;
             letter-spacing:-0.018em; color: var(--color-pure); }
   .t-h3   { font-family: var(--font-display); font-weight:400;
             font-size: clamp(24px, calc(21.15px + .89vw), 28px);
             line-height: clamp(1.15, calc(1.2356 - .011136vw), 1.2);
+            hyphens: manual;
             color: var(--color-cloud); }
   @media (min-width: 1920px) {
     .t-h1 { font-size: clamp(80px, calc(59.79px + 1.05vw), 96px);
@@ -187,17 +205,19 @@
   }
   .t-lead    { font-size: clamp(15px, calc(11.57px + 1.07vw), 18px);
                line-height: clamp(1.5, calc(1.6071 - .01786vw), 1.55);
-               font-weight:300; color: var(--color-ash); overflow-wrap: anywhere; }
+               font-weight:300; color: var(--color-ash); overflow-wrap: anywhere;
+               hyphens: manual; }
   /* Same §6.3 floor as .t-mono/.t-mono-xs above: 12px -> 13px. */
   .t-caption { font-size:13px; line-height:2; font-family: var(--font-mono);
-               text-transform:uppercase; letter-spacing:.182em; color: var(--color-ash); }
-  .t-prose   { font-size:18px; line-height:1.7; color: var(--color-ash); overflow-wrap: anywhere; }
+               text-transform:uppercase; letter-spacing:.182em; color: var(--color-ash);
+               hyphens: manual; }
+  .t-prose   { font-size:18px; line-height:1.7; color: var(--color-ash); overflow-wrap: anywhere; hyphens: auto; }
   .rule-t { border-top:1px solid rgba(255,255,255,.12); }
   .rule-b { border-bottom:1px solid rgba(255,255,255,.12); }
   .rule-t-black { border-top:1px solid rgba(255,255,255,.12); }
   .measure-body{max-width:34em;} .measure-lead{max-width:30em;} .measure-prose{max-width:680px;}
   .measure-hero{max-width:11em;} .measure-head{max-width:16em;} .measure-head-sm{max-width:14em;}
-  .measure-statement{max-width:22em;} .measure-legal{max-width:60em;}
+  .measure-statement{max-width:22em;} .measure-legal{max-width:60em; hyphens:auto;}
   /* The mark stays a mark: floor is 2px below ceiling on purpose, not a
      mistake in the interpolation — a brand wordmark shouldn't visibly
      shrink the way reading type does. */
@@ -205,10 +225,12 @@
               font-size:clamp(22px, calc(20.57px + .45vw), 24px);line-height:1;}
   .t-nav-mobile{font-family:var(--font-display);font-weight:400;
                 font-size:clamp(34px, calc(27.14px + 2.14vw), 40px);
-                line-height:clamp(1, calc(1.1071 - .017857vw), 1.05);}
+                line-height:clamp(1, calc(1.1071 - .017857vw), 1.05);
+                hyphens: manual;}
   .t-article-title{font-family:var(--font-display);font-weight:400;
                    font-size:clamp(40px, calc(28.57px + 3.57vw), 56px);
                    line-height:clamp(1.05, calc(1.1357 - .011161vw), 1.1);
+                   hyphens: manual;
                    letter-spacing:-0.02em;color:var(--color-pure);}
   /* Conductor amendment, first matrix run: safe-area-bottom warned on every
      iPhone descriptor because nothing referenced env(safe-area-inset-*) at
