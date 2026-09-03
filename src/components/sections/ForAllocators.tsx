@@ -100,7 +100,7 @@ function Arrow() {
       stroke="currentColor"
       strokeWidth="1.25"
       strokeLinecap="square"
-      className="shrink-0 transition-transform duration-200 ease-out group-hover:translate-x-1 motion-reduce:transform-none motion-reduce:transition-none"
+      className="shrink-0 transition-transform duration-[var(--dur-fast)] ease-[var(--ease)] group-hover:translate-x-1 motion-reduce:transform-none motion-reduce:transition-none"
     >
       <path d="M3 8h10M9 4l4 4-4 4" />
     </svg>
@@ -150,7 +150,7 @@ export default function ForAllocators() {
               <Link
                 key={n.href}
                 href={n.href}
-                className="fa-item group flex min-h-14 flex-col justify-center gap-2 py-6 transition-colors duration-150 hover:bg-white/5 md:px-8 md:py-10"
+                className="fa-item group flex min-h-14 flex-col justify-center gap-2 py-6 transition-colors duration-[var(--dur-fast)] hover:bg-white/5 md:px-8 md:py-10"
               >
                 <span className="t-h3">{q}</span>
                 <span className="t-body max-w-[34ch]">{a}</span>

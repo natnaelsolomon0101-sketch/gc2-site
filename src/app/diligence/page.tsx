@@ -398,12 +398,6 @@ export default function Diligence() {
 
   return (
     <>
-      {/* PageHeader.tsx (sec-firm's, not this file's) opens every inner route
-          with 80px of padding-block above the eyebrow. Stacked under a 56px
-          sticky nav on phone, that reads as dead air before the first word.
-          Tightened here, scoped to this route only, since .section-y is not
-          this file's to edit at the source. */}
-      <style dangerouslySetInnerHTML={{ __html: `@media (max-width:767px){ .section-y{ padding-block:32px 40px; } }` }} />
       <PageHeader
         eyebrow="Diligence"
         title="Diligence."
