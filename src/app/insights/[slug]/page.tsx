@@ -3,19 +3,27 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Container from "@/components/Container";
 import Prose from "@/components/Prose";
+import { site, siteUrl } from "@/config/site";
 import { notes, formatDate } from "@/content/notes";
 
 export function generateStaticParams() {
   return notes.map((n) => ({ slug: n.slug }));
 }
 
+/* Round 3 verified: title and description are the note's own title and dek,
+   nothing else — no site-name suffix duplicating the root layout's `%s —
+   ${site.name}` title template, no invented summary. */
 export async function generateMetadata(
   { params }: { params: Promise<{ slug: string }> }
 ): Promise<Metadata> {
   const { slug } = await params;
   const note = notes.find((n) => n.slug === slug);
   if (!note) return {};
-  return { title: note.title, description: note.dek };
+  return {
+    title: note.title,
+    description: note.dek,
+    alternates: { types: { "application/rss+xml": "/feed.xml" } },
+  };
 }
 
 export default async function Note({ params }: { params: Promise<{ slug: string }> }) {
@@ -34,8 +42,34 @@ export default async function Note({ params }: { params: Promise<{ slug: string 
      the shared token. */
   const measure = "max-w-[clamp(20em,90vw,36em)]";
 
+  /* Round 3: Article JSON-LD. author is the Organization, not a person —
+     no author is named anywhere on the site (README/AGENTS.md: never invent
+     a person), so a Person author here would be the one invented fact this
+     whole codebase is built to refuse. publisher.logo points at /logo.png,
+     which sec-motion is adding in this same round; the URL is correct
+     whether or not the file has landed yet in this exact build. */
+  const articleUrl = `${siteUrl}/insights/${note.slug}`;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: note.title,
+    description: note.dek,
+    datePublished: note.date,
+    author: { "@type": "Organization", name: site.name },
+    publisher: {
+      "@type": "Organization",
+      name: site.name,
+      logo: { "@type": "ImageObject", url: `${siteUrl}/logo.png` },
+    },
+    mainEntityOfPage: { "@type": "WebPage", "@id": articleUrl },
+  };
+
   return (
     <article>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Container>
         {/* The baseline shot (docs/v4/shots/baseline/insights_capacity-is-a-
             research-problem--393--fold.png) showed ~180px of dead air between
