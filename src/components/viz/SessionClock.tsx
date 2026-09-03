@@ -196,8 +196,14 @@ export default function SessionClock({
 }
 
 /* Timing reads --dur-fast / --ease, the globals.css mirror of src/lib/motion.ts.
-   The only thing that moves is the dot's colour when a session opens or closes,
-   which is a state change and therefore a --dur-fast transition. */
+   The only thing that moves is the state word's colour when a session opens or
+   closes, which is a state change and therefore a --dur-fast transition.
+
+   Colour is the semantic layer only (LIGHT-PASS.md): ink for the running
+   session's time, ink-2 for its state word, ink-3 for the closed rows and the
+   caveat. Open and closed are told apart by TONE, not by hue — there is no
+   green dot and there never was, which is the version of this that also works
+   for a colour-blind reader and on paper. */
 const css = `
 .sc { container-type: inline-size; }
 /* The three rows share one set of column tracks, so the times line up under
@@ -212,7 +218,7 @@ const css = `
   align-items: baseline;
   column-gap: 20px;
   min-height: 44px;
-  border-bottom: 1px solid rgba(255,255,255,.12);
+  border-bottom: 1px solid var(--color-hairline);
 }
 .sc[data-dense="true"] .sc-row { min-height: 32px; }
 @supports (grid-template-columns: subgrid) {
@@ -222,13 +228,13 @@ const css = `
 .sc-row:last-of-type { border-bottom: 0; }
 .sc-time { font-variant-numeric: tabular-nums; letter-spacing: .12em; text-align: right; }
 .sc-state { text-align: left; }
-.sc-row[data-open="true"] .sc-time { color: var(--color-pure); }
-.sc-state { color: var(--color-fog); transition: color var(--dur-fast) var(--ease); }
-.sc-row[data-open="true"] .sc-state { color: var(--color-ash); }
+.sc-row[data-open="true"] .sc-time { color: var(--color-ink); }
+.sc-state { color: var(--color-ink-3); transition: color var(--dur-fast) var(--ease); }
+.sc-row[data-open="true"] .sc-state { color: var(--color-ink-2); }
 /* hyphens: none, not inherited. §7 rule 9 turns on hyphens: auto for prose,
    which at 393 broke this line as "EX-CHANGE" — a hyphen inside an uppercase
    mono caption reads as a typo, not as typesetting. */
-.sc-note { display: block; margin: 10px 0 0; color: var(--color-fog);
+.sc-note { display: block; margin: 10px 0 0; color: var(--color-ink-3);
            hyphens: none; overflow-wrap: normal; }
 
 /* Phones: the running session only. Container width, not viewport, so the strip

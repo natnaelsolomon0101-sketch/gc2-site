@@ -13,17 +13,20 @@ import { asOf } from "./treasury";
  * satisfies by printing the rates as published and citing the ECB by name).
  *
  * ACHROMATIC, DELIBERATELY. Every FX grid in the world paints the ups green and
- * the downs red. DESIGN.md principle 2 confines colour to the strategy tiles,
- * and APPENDIX-A says a data component gets no gradient and no fill — so
+ * the downs red. DESIGN.md principle 2 rations colour to one accent per
+ * section, and APPENDIX-A gives a data component no gradient and no fill — so
  * direction is carried by the sign, which is what the number already says, and
- * by nothing else. It also happens to be the only version of this grid that
- * works for a red-green colour-blind reader without a second cue.
+ * by nothing else. It is also the only version of this grid that works for a
+ * red-green colour-blind reader without a second cue, and the only one that
+ * survives being printed. On paper the rate is ink, the change is ink-2 and
+ * the rules are hairlines; the accents are not spent here.
  *
- * Rows reveal on first visibility through <Reveal/>, on the shared
- * .fade-1 … .fade-8 stagger scale, which is a scroll-driven CSS timeline with a
- * load fallback and no client JavaScript. §8.2's "data components draw in
- * (once, on first visibility)" — the curve draws its line, this arrives in
- * order.
+ * Rows reveal ONCE, on load, through <Reveal/> on the shared .fade-1 … .fade-8
+ * stagger scale — no client JavaScript. It used to be a scroll-driven
+ * `animation-timeline: view()`, which is scroll-LINKED: scrolling back up ran
+ * it backwards and the rows faded out again. §8.2 allows a first reveal "once
+ * per page load, not on scroll-back", and forbids scroll-linked storytelling
+ * outright, so the timeline is gone from Reveal entirely.
  */
 export default async function ECBGrid({ className = "" }: { className?: string }) {
   const data = await fetchEcbRates();
@@ -42,6 +45,7 @@ export default async function ECBGrid({ className = "" }: { className?: string }
         {data.pairs.map((p, i) => (
           <Reveal
             as="li"
+            mode="load"
             key={p.pair}
             /* Tier 8 is the last on the shared scale; six rows never reach it,
                but the clamp means adding a currency cannot silently invent a
@@ -79,7 +83,7 @@ const css = `
   align-items: baseline;
   column-gap: 24px;
   min-height: 44px;
-  border-bottom: 1px solid rgba(255,255,255,.12);
+  border-bottom: 1px solid var(--color-hairline);
 }
 /* Shared column tracks, so six rates line up on one edge instead of six.
    Same reason as SessionClock; same fallback where subgrid is missing. */
@@ -87,9 +91,9 @@ const css = `
   .eg-row { grid-template-columns: subgrid; }
 }
 .eg-row:last-of-type { border-bottom: 0; }
-.eg-rate { color: var(--color-pure); font-variant-numeric: tabular-nums;
+.eg-rate { color: var(--color-ink); font-variant-numeric: tabular-nums;
            text-align: right; }
-.eg-chg { color: var(--color-ash); font-variant-numeric: tabular-nums;
+.eg-chg { color: var(--color-ink-2); font-variant-numeric: tabular-nums;
           text-align: right; min-width: 7ch; }
 .eg-source { display: block; margin-top: 12px; hyphens: none; }
 

@@ -17,6 +17,13 @@ import {
  * labels, the source, the date. No y scale, so it states a shape and not a
  * level; no fund data of any kind, per §1 and the 506(b) list.
  *
+ * ONE 1px INK HAIRLINE ON PAPER. The rule never changed — one hairline, no
+ * fill, no gradient — only which end of the scale it sits at: it is now
+ * `--color-ink` on `--color-ground` (LIGHT-PASS.md). Nothing else about the drawing changes: no fill, no
+ * gradient, no second colour, and the accents stay out of it — a data
+ * component is the one place DESIGN.md's "one accent per section" ration is
+ * spent on nothing at all.
+ *
  * preserveAspectRatio="none", DELIBERATELY, with vector-effect="non-scaling-
  * stroke" on the path. The alternative, "xMidYMid meet", scales the drawing
  * uniformly: at 320 the hairline thins below a pixel and at 3440 it fattens to
@@ -81,7 +88,7 @@ export default async function YieldCurve({ className = "", card = false }: Yield
             className="yc-line"
             d={d}
             fill="none"
-            stroke="var(--color-pure)"
+            stroke="var(--color-ink)"
             strokeWidth={1}
             strokeLinejoin="round"
             vectorEffect="non-scaling-stroke"
@@ -168,7 +175,7 @@ const css = `
    counsel asked for — and the plot takes its own aspect from the viewBox rather
    than a forced height, which is what removes the stretch. */
 .yc-title { margin: 0 0 22px; }
-.yc-note { display: block; margin: 2px 0 0; color: var(--color-fog); hyphens: none; }
+.yc-note { display: block; margin: 2px 0 0; color: var(--color-ink-3); hyphens: none; }
 .yc[data-card="true"] .yc-svg { height: auto; }
 
 /* Below ~430px of CONTAINER width — not viewport: the component has to survive

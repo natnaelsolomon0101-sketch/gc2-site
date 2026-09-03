@@ -1,13 +1,11 @@
 /*
  * Reveal — CSS only. No IntersectionObserver, no scroll listener, no
  * framer-motion, no `use client`, no hydration cost. Every 21st reveal entry
- * (18675, 18654, 19240) ships a JS observer plus a motion library; the same
- * effect is a scroll-driven animation timeline, which the compositor runs off
- * the main thread and which degrades to a plain load fade where it is not
- * supported.
+ * (18675, 18654, 19240) ships a JS observer plus a motion library; this is one
+ * keyframe on the compositor.
  *
  * Content is never hidden by JS and never hidden without an animation running
- * to reveal it, so a no-JS or unsupported client always sees the text.
+ * to reveal it, so a no-JS client always sees the text.
  */
 
 @keyframes uiReveal {
@@ -21,8 +19,7 @@
   }
 }
 
-/* Baseline: a load reveal. Also the fallback for `scroll` mode on engines
-   without scroll-driven animations (Safari, Firefox as of writing). */
+/* The reveal. One keyframe, once, on load. */
 .reveal {
   animation: uiReveal var(--dur-base) var(--ease) both;
 }
@@ -40,49 +37,24 @@
 .d7 { animation-delay: calc(var(--stagger) * 6); }
 .d8 { animation-delay: calc(var(--stagger) * 7); }
 
-/* Scroll mode. `both` fill plus a view() timeline means the element is at the
-   start of the animation until it enters the viewport, then plays as it comes
-   in. Progress is tied to scroll position, so it cannot stall content: at rest
-   inside the viewport it is always fully revealed. */
-@supports (animation-timeline: view()) {
-  .scroll {
-    animation-name: uiReveal;
-    animation-duration: auto; /* the timeline range is the duration */
-    animation-timeline: view();
-    animation-range: entry 10% cover 26%;
-    animation-fill-mode: both;
-    animation-delay: 0s;
-  }
-  /* animation-delay is meaningless on a timeline; stagger by shifting range
-     instead. The shift stops widening after tier 4: past that the later items
-     would still be at zero opacity with the first already settled, which is the
-     stall DESIGN.md principle 5 forbids ("motion never gates content becoming
-     visible"). Tiers 5-8 share tier 4's range and simply arrive together. */
-  .scroll.d1 { animation-range: entry 10% cover 26%; }
-  .scroll.d2 { animation-range: entry 4% cover 22%; }
-  .scroll.d3 { animation-range: entry 0% cover 28%; }
-  .scroll.d4, .scroll.d5, .scroll.d6, .scroll.d7, .scroll.d8 {
-    animation-range: entry 0% cover 34%;
-  }
-}
+/* There is no scroll mode any more. It was `animation-timeline: view()`, which
+   is scroll-LINKED, not scroll-triggered: the element's progress tracks the
+   scroll position, so scrolling back up played the reveal backwards and the
+   content faded out again. EVERY-SCREEN.md §8.2 allows a first reveal "once per
+   page load, not on scroll-back" and forbids scroll-linked storytelling in the
+   same breath, so the timeline is gone rather than tuned.
+
+   What is left is a load reveal on the shared stagger, which is what §8.2
+   actually describes. Content below the fold finishes revealing before the
+   reader arrives, which is correct: DESIGN.md principle 5 says motion never
+   gates content becoming visible. */
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal,
-  .scroll {
-    animation: none;
-    opacity: 1;
-    transform: none;
-  }
+  .reveal { animation: none; opacity: 1; transform: none; }
 }
 
-/* A scroll timeline has no notion of "in view" on paper. Without this, printing
-   or exporting a full-page capture drops every below-the-fold reveal to zero
-   opacity. */
+/* Paper has no load event and no fold. A full-page capture or a print must
+   never catch a reveal at zero opacity. */
 @media print {
-  .reveal,
-  .scroll {
-    animation: none;
-    opacity: 1;
-    transform: none;
-  }
+  .reveal { animation: none; opacity: 1; transform: none; }
 }

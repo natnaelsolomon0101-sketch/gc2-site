@@ -2,13 +2,15 @@ import * as React from "react";
 import styles from "./Reveal.module.css";
 
 /**
- * Reveal — a load or scroll reveal with no JavaScript at all.
+ * Reveal — a once-only load reveal with no JavaScript at all.
  *
- * `mode="scroll"` uses a scroll-driven animation timeline (`animation-timeline:
- * view()`), so progress is bound to the element's position in the viewport and
- * runs off the main thread. Where that is unsupported, the `@supports` guard
- * falls through to the same keyframes played once on load, so nothing is ever
- * left invisible waiting for a feature or a script that is not there.
+ * There is no scroll mode. It was `animation-timeline: view()`, which is
+ * scroll-LINKED rather than scroll-triggered: progress tracked scroll position,
+ * so scrolling back up played the reveal backwards and the content faded out
+ * again. EVERY-SCREEN.md §8.2 allows a first reveal "once per page load, not on
+ * scroll-back" and forbids scroll-linked storytelling in the same breath, so
+ * the timeline is gone rather than tuned. `mode` is kept as an argument so a
+ * caller can say which it means, but both values now play once on load.
  *
  * `prefers-reduced-motion: reduce` removes the animation entirely rather than
  * shortening it: content is present, opaque and untransformed on first paint.
@@ -46,12 +48,12 @@ export default function Reveal({
   children,
   ...rest
 }: RevealProps) {
-  const cls = [
-    styles.reveal,
-    mode === "scroll" ? styles.scroll : undefined,
-    DELAY[delay],
-    className,
-  ]
+  /* `mode` no longer changes the CSS — both values are the same once-only load
+     reveal (see Reveal.module.css). It is kept in the API because a caller
+     saying `mode="load"` is saying something true about its intent, and because
+     removing it would silently change every call site's meaning. */
+  void mode;
+  const cls = [styles.reveal, DELAY[delay], className]
     .filter(Boolean)
     .join(" ");
 

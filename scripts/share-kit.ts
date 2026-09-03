@@ -25,7 +25,7 @@
 import { chromium, type Page } from "playwright";
 import { renderToStaticMarkup } from "react-dom/server";
 import type { ReactElement } from "react";
-import { mkdir, readFile } from "node:fs/promises";
+import { mkdir, readFile, rm } from "node:fs/promises";
 import { join } from "node:path";
 import YieldCurve from "../src/components/viz/YieldCurve";
 import { site } from "../src/config/site";
@@ -83,7 +83,7 @@ const CARDS: Card[] = [
     /* Headline in the upper third, the hero's own lead beneath it at the
        site's 30em measure, the day's curve across the lower half, wordmark
        bottom-left — the home OG card's arrangement, at portrait. The first
-       version was the headline alone and two thirds obsidian. */
+       version was the headline alone and two thirds empty ground. */
     curve: "foot",
     frame:
       ".sk-body { justify-content: flex-start; }" +
@@ -130,7 +130,10 @@ const CARDS: Card[] = [
        own vertical padding is zeroed because the card supplies the air. */
     frame:
       ".sk-body div.rule-t { padding-top: 0 !important; padding-bottom: 0 !important; }" +
-      '.sk-body p.t-small.text-fog::before { content: "\\2014\\00a0"; }',
+      /* Structural, not by class: the attribution is the second <p> in the
+         Statement wrapper, and its colour utility changes with the light pass
+         while its position does not. */
+      '.sk-body div.rule-t > p + p::before { content: "\\2014\\00a0"; }',
   },
   {
     name: "strategies",
@@ -207,12 +210,14 @@ async function fontCss(): Promise<string> {
 
 /* ------------------------------------------------------------------ frame */
 
-/* Tokens are read off the site, not written here: --color-obsidian and the type
+/* Tokens are read off the site, not written here: --color-ground and the type
    classes arrive with the stylesheet. The only literals are the frame's own
-   geometry. */
+   geometry. The cards moved to paper with the site (LIGHT-PASS.md) by changing
+   one declaration, because the ground was already a token and the lifted markup
+   carries the site's own colours. */
 const FRAME = `
   html, body { margin: 0; padding: 0; }
-  body { background: var(--color-obsidian); overflow: hidden; }
+  body { background: var(--color-ground); overflow: hidden; }
   .sk {
     box-sizing: border-box;
     display: flex; flex-direction: column; justify-content: space-between;
@@ -224,8 +229,14 @@ const FRAME = `
   .sk-curve { margin-bottom: 44px; }
   /* Counsel finding 2: every card, not just the ones carrying data. The frame
      line sits above the wordmark so the mark still closes the composition. */
-  .sk-legal { display: block; margin: 0 0 16px; color: var(--color-fog);
+  .sk-legal { display: block; margin: 0 0 16px; color: var(--color-ink-3);
               hyphens: none; }
+  /* The wordmark is the frame's own element, not lifted content, so the frame
+     is entitled to state its colour. Wordmark.tsx still carries the dark
+     build's white utility while sec-chrome's light pass is in flight, which
+     rendered the mark invisible on paper — a card is a fixed composition and
+     the frame owns its legibility. */
+  .sk-mark a { color: var(--color-ink); }
   /* Nothing on a card is a link, a button, or a control. Whatever the source
      element carried, it is a still image here. */
   .sk a { text-decoration: none; pointer-events: none; }
@@ -240,6 +251,49 @@ const FRAME = `
     opacity: 1 !important; transform: none !important;
   }
 `;
+
+/* Passed to page.evaluate as SOURCE, not as a function: tsx compiles a named
+   inner function into a `__name(...)` call that does not exist in the page, so
+   an evaluate body cannot declare helpers. A string is compiled by the browser.
+
+   What it asks: is anything on this card invisible? A card is a composition the
+   site never renders, assembled from pieces migrating between two grounds. When
+   Wordmark.tsx still carried the dark build's white utility, the mark vanished
+   into the paper and the kit reported five clean cards. Type that is not there
+   is caught by no word list, no font check and no overflow check.
+
+   Every element holding visible text is compared against the first opaque
+   background above it; under 3:1 fails the card. 3:1 is the "can a person see
+   it at all" bar, not the reading bar — the reading bar belongs to the section
+   that owns the words. */
+const CONTRAST_PROBE = `(() => {
+  const rgb = (v) => { const m = v.match(/[\\d.]+/g);
+    return m && m.length >= 3 ? [+m[0], +m[1], +m[2], m[3] === undefined ? 1 : +m[3]] : null; };
+  const lum = (c) => { const f = c.slice(0, 3).map((v) => { const x = v / 255;
+      return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); });
+    return 0.2126 * f[0] + 0.7152 * f[1] + 0.0722 * f[2]; };
+  const out = [];
+  for (const el of Array.from(document.querySelectorAll(".sk *"))) {
+    const text = Array.from(el.childNodes).filter((n) => n.nodeType === 3)
+      .map((n) => n.textContent || "").join("").trim();
+    if (!text) continue;
+    const cs = getComputedStyle(el);
+    if (cs.visibility === "hidden" || cs.display === "none" || +cs.opacity === 0) continue;
+    const r = el.getBoundingClientRect();
+    if (r.width < 2 || r.height < 2) continue;
+    const fg = rgb(cs.color);
+    if (!fg || fg[3] === 0) continue;
+    let node = el, bg = null;
+    while (node) { const c = rgb(getComputedStyle(node).backgroundColor);
+      if (c && c[3] > 0.5) { bg = c; break; } node = node.parentElement; }
+    if (!bg) continue;
+    const l = [lum(fg), lum(bg)].sort((x, y) => y - x);
+    const ratio = (l[0] + 0.05) / (l[1] + 0.05);
+    if (ratio < 3) out.push(el.tagName.toLowerCase() + " \\"" + text.slice(0, 34) +
+      "\\" " + cs.color + " on rgb(" + bg.slice(0, 3).join(",") + ") = " + ratio.toFixed(2) + ":1");
+  }
+  return out.slice(0, 6);
+})()`;
 
 type Chrome = { styles: string[]; inline: string[]; wordmark: string };
 
@@ -484,6 +538,34 @@ async function main() {
       );
     } else if (Math.abs(zoom - 1) > 0.01) {
       console.log(`  ${card.name}: fitted at zoom ${zoom.toFixed(2)}`);
+    }
+
+    /* Is anything on this card invisible?
+     *
+     * A card is a composition the site never renders, assembled out of pieces
+     * that are migrating between two grounds. When Wordmark.tsx still carried
+     * the dark build's white utility, the mark vanished into the paper and the
+     * kit reported five clean cards. Type that is not there is not caught by a
+     * word list, a font check, or an overflow check.
+     *
+     * So: every element holding visible text is compared against the first
+     * opaque background above it, and anything under 3:1 fails the card. 3:1
+     * is the "can a person see it at all" bar rather than the reading bar —
+     * the reading bar belongs to the section that owns the words. */
+    const invisible = (await page.evaluate(CONTRAST_PROBE)) as string[];
+    if (invisible.length) {
+      fails.push(
+        `${card.name}: ${invisible.length} element(s) under 3:1 on this ground — ` +
+          invisible.join(" | ")
+      );
+      /* Delete any card already on disk for this name. A previous run's file is
+         not a fallback: it is the same composition rendered before the fault
+         was detectable, and leaving it is how a card with invisible type gets
+         posted. Better an absent card than a wrong one — the same rule the data
+         components follow. */
+      await rm(join(OUT, `${card.name}--${card.width}x${card.height}.png`), { force: true });
+      await ctx.close();
+      continue;
     }
 
     const file = join(OUT, `${card.name}--${card.width}x${card.height}.png`);
