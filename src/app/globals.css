@@ -88,20 +88,33 @@
      ceiling past the old desktop value, so display type is still visibly
      larger at 3440 than at 1920 instead of going flat at the old cap.
      Line-height tightens as size grows, same technique, negative slope. */
+  /* Foundation r1, addendum: line-height on these tiers was a fluid
+     `clamp(N, calc(N - N*vw), N)` ramp. That calc() mixes a bare <number>
+     with a <vw> length inside the same subtraction, which is invalid at
+     computed-value time — the whole `line-height` declaration was dropped,
+     and every DM Serif tier silently inherited body's `line-height: 1.5`
+     instead (measured on /questions, /contact and /firm: computed
+     line-height was exactly 1.5x font-size on .t-h1, not the ~1.0 the
+     clamp() was written to produce). These must hold their target
+     line-height at EVERY size, so each is now a constant, not a calc():
+     0.9 for .t-display, 1.0 for .t-h1/.t-display-sm/.t-heading-lg/
+     .t-nav-mobile, 1.05 for .t-h2/.t-article-title, 1.1 for .t-heading-sm,
+     1.2 for .t-h3, 1.5 for .t-lead/.t-sub. font-size clamps are unaffected
+     (px + vw is a valid length + length sum) and stay fluid. Also adding
+     `text-wrap: balance` on every display/heading tier so a headline like
+     "Capacity is a research problem" stops leaving a single word on its
+     last line. */
   .t-display    { font-family: var(--font-display); font-weight: 400;
                   font-size: clamp(52px, calc(20.57px + 9.82vw), 96px);
-                  line-height: clamp(.9, calc(.9857 - .01116vw), .95);
-                  hyphens: manual;
+                  line-height: .9; hyphens: manual; text-wrap: balance;
                   letter-spacing: -0.022em; color: var(--color-pure); }
   .t-display-sm { font-family: var(--font-display); font-weight: 400;
                   font-size: clamp(40px, calc(11.43px + 8.93vw), 80px);
-                  line-height: clamp(.95, calc(1.0357 - .01116vw), 1);
-                  hyphens: manual;
+                  line-height: 1; hyphens: manual; text-wrap: balance;
                   letter-spacing: -0.02em; color: var(--color-pure); }
   .t-heading-lg { font-family: var(--font-display); font-weight: 400;
                   font-size: clamp(32px, calc(27.71px + 1.34vw), 38px);
-                  line-height: clamp(.9, calc(1.0714 - .02232vw), 1);
-                  hyphens: manual;
+                  line-height: 1; hyphens: manual; text-wrap: balance;
                   letter-spacing: -0.018em; }
   /* §7.6: above 1920 the container may widen and type ceilings rise with it.
      Only the tiers the brief names (display up to 128px, h1 up to 96px)
@@ -109,24 +122,22 @@
      matching the pre-fluid baseline at 1920 and 3440 exactly. */
   /* Foundation r1, deliverable 2: .t-display-sm and .t-h2 read pixel-identical
      to their 1920 size all the way out to 3440 without a ceiling rise of
-     their own — added here alongside .t-display's existing one. */
+     their own — added here alongside .t-display's existing one. Line-height
+     is the constant set above and does not need a rise rule of its own. */
   @media (min-width: 1920px) {
-    .t-display    { font-size: clamp(96px, calc(55.58px + 2.11vw), 128px);
-                 line-height: clamp(.85, calc(.9632 - .00329vw), .9); }
-    .t-display-sm { font-size: clamp(80px, calc(49.68px + 1.58vw), 104px);
-                 line-height: clamp(.9, calc(1.01316 - .00329vw), .95); }
+    .t-display    { font-size: clamp(96px, calc(55.58px + 2.11vw), 128px); }
+    .t-display-sm { font-size: clamp(80px, calc(49.68px + 1.58vw), 104px); }
   }
 
   /* Card-title tier. The scale jumped 38px -> 16px with nothing between, so
      card headings were being patched with inline font-size overrides. */
   .t-heading-sm { font-family: var(--font-display); font-weight: 400;
                   font-size: clamp(24px, calc(22.57px + .45vw), 26px);
-                  line-height: clamp(1.1, calc(1.1857 - .01116vw), 1.15);
-                  hyphens: manual; }
+                  line-height: 1.1; hyphens: manual; text-wrap: balance; }
   /* Fluid, floors at 15px per §7.1 ("lead floors at 15px at 320"); .t-sub
      gets the same treatment since it is the other half of this tier. */
   .t-sub   { font-size: clamp(15px, calc(11.57px + 1.07vw), 18px);
-             line-height: clamp(1.5, calc(1.6071 - .01786vw), 1.55); font-weight: 300;
+             line-height: 1.5; font-weight: 300;
              hyphens: manual; }
   /* Body stays 16px on every viewport — §7.1 says so explicitly. */
   .t-body  { font-size: 16px; line-height: 1.5; color: var(--color-ash); overflow-wrap: anywhere; }
@@ -191,27 +202,22 @@
      stopping at 96px per the brief. */
   .t-h1   { font-family: var(--font-display); font-weight:400;
             font-size: clamp(44px, calc(18.34px + 8.02vw), 80px);
-            line-height: clamp(.95, calc(1.03564 - .011136vw), 1);
-            hyphens: manual;
+            line-height: 1; hyphens: manual; text-wrap: balance;
             letter-spacing:-0.02em; color: var(--color-pure); }
   .t-h2   { font-family: var(--font-display); font-weight:400;
             font-size: clamp(32px, calc(27.72px + 1.34vw), 38px);
-            line-height: clamp(1, calc(1.0856 - .011136vw), 1.05);
-            hyphens: manual;
+            line-height: 1.05; hyphens: manual; text-wrap: balance;
             letter-spacing:-0.018em; color: var(--color-pure); }
   .t-h3   { font-family: var(--font-display); font-weight:400;
             font-size: clamp(24px, calc(21.15px + .89vw), 28px);
-            line-height: clamp(1.15, calc(1.2356 - .011136vw), 1.2);
-            hyphens: manual;
+            line-height: 1.2; hyphens: manual; text-wrap: balance;
             color: var(--color-cloud); }
   @media (min-width: 1920px) {
-    .t-h1 { font-size: clamp(80px, calc(59.79px + 1.05vw), 96px);
-            line-height: clamp(.92, calc(.9879 - .0019737vw), .95); }
-    .t-h2 { font-size: clamp(38px, calc(30.42px + .39vw), 44px);
-            line-height: clamp(.97, calc(1.03789 - .0019737vw), 1); }
+    .t-h1 { font-size: clamp(80px, calc(59.79px + 1.05vw), 96px); }
+    .t-h2 { font-size: clamp(38px, calc(30.42px + .39vw), 44px); }
   }
   .t-lead    { font-size: clamp(15px, calc(11.57px + 1.07vw), 18px);
-               line-height: clamp(1.5, calc(1.6071 - .01786vw), 1.55);
+               line-height: 1.5;
                font-weight:300; color: var(--color-ash); overflow-wrap: anywhere;
                hyphens: manual; }
   /* Same §6.3 floor as .t-mono/.t-mono-xs above: 12px -> 13px. */
@@ -238,12 +244,10 @@
               font-size:clamp(22px, calc(20.57px + .45vw), 24px);line-height:1;}
   .t-nav-mobile{font-family:var(--font-display);font-weight:400;
                 font-size:clamp(34px, calc(27.14px + 2.14vw), 40px);
-                line-height:clamp(1, calc(1.1071 - .017857vw), 1.05);
-                hyphens: manual;}
+                line-height:1; hyphens: manual;}
   .t-article-title{font-family:var(--font-display);font-weight:400;
                    font-size:clamp(40px, calc(28.57px + 3.57vw), 56px);
-                   line-height:clamp(1.05, calc(1.1357 - .011161vw), 1.1);
-                   hyphens: manual;
+                   line-height:1.05; hyphens: manual; text-wrap: balance;
                    letter-spacing:-0.02em;color:var(--color-pure);}
   /* Conductor amendment, first matrix run: safe-area-bottom warned on every
      iPhone descriptor because nothing referenced env(safe-area-inset-*) at
