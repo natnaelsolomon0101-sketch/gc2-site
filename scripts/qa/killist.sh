@@ -126,9 +126,9 @@ BASELINE = {
     "src/components/sections/Insights.tsx":      (0, "sec-insights"),
     "src/components/sections/MarketsBand.tsx":   (5, "sec-hero"),
     "src/components/sections/SiteNav.tsx":       (8, "sec-chrome"),
-    "src/components/sections/Strategies.tsx":    (2, "sec-strategies"),
-    "src/components/ui/Button.tsx":              (0, "Conductor"),
-    "src/components/ui/Card.tsx":                (0, "Conductor"),
+    "src/components/sections/Strategies.tsx":        (0, "sec-strategies"),
+    "src/components/ui/Button.tsx":                  (0, "Conductor"),
+    "src/components/ui/Card.tsx":                    (0, "Conductor"),
     # Dead code: neither is imported by any route, and §8.2 forbids a marquee
     # outright. Pinned rather than fixed because it is not sec-motion's to
     # delete; reported to the Conductor.

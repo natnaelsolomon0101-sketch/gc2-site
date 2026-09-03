@@ -338,7 +338,7 @@ export default function Strategies() {
      scroll off with the page. */
   .stx-layout { display: grid; grid-template-columns: 220px 1fr; column-gap: 56px; }
   .stx-rail { position: sticky; top: calc(var(--nav-h) + 32px); }
-  .stx-rail ul { display: flex; flex-direction: column; gap: 4px; }
+  .stx-rail ul { display: flex; flex-direction: column; gap: 8px; }
 }
 .stx-rail a {
   display: flex; align-items: center; min-height: 44px;
