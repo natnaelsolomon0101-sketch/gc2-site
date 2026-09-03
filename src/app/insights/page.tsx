@@ -36,14 +36,14 @@ export default function Insights() {
                    (7.20:1 — visible, but a different ring from every other
                    control on the site). Pinning it to pure keeps it 19.05:1 and
                    identical to the nav and the prose links. */
-                className="rule-b group block px-2 py-7 transition-colors duration-150 hover:bg-abyss focus-visible:outline-pure"
+                className="rule-b group block px-2 py-7 transition-colors duration-[var(--dur-fast)] hover:bg-abyss focus-visible:outline-pure"
               >
                 <div className="grid-gc2 items-baseline">
                   <span className="t-small col-span-4 text-fog md:col-span-2">
                     {formatDate(n.date)}
                   </span>
                   <span className="col-span-4 md:col-span-8">
-                    <span className="t-h3 block transition-colors duration-150 group-hover:text-pure">
+                    <span className="t-h3 block transition-colors duration-[var(--dur-fast)] group-hover:text-pure">
                       {n.title}
                     </span>
                     <span className="t-body measure-body mt-2 block">{n.dek}</span>
