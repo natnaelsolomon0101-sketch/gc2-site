@@ -236,7 +236,9 @@
   .rule-t-black { border-top:1px solid rgba(255,255,255,.12); }
   .measure-body{max-width:34em;} .measure-lead{max-width:30em;} .measure-prose{max-width:680px;}
   .measure-hero{max-width:11em;} .measure-head{max-width:16em;} .measure-head-sm{max-width:14em;}
-  .measure-statement{max-width:22em;} .measure-legal{max-width:60em; hyphens:auto;}
+  /* min(60em, 80ch): 60em alone rendered ~93ch on the legal pages, past the
+     80ch measure gate. */
+  .measure-statement{max-width:22em;} .measure-legal{max-width:min(60em, 80ch); hyphens:auto;}
   /* The mark stays a mark: floor is 2px below ceiling on purpose, not a
      mistake in the interpolation — a brand wordmark shouldn't visibly
      shrink the way reading type does. */
