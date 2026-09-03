@@ -314,37 +314,121 @@ export default function Strategies() {
   ];
 
   return (
-    <>
+    <div id="strategies-page">
+      {/* Scoped to this page only — PageHeader (sec-firm) ships a global 80px
+          `.section-y` top padding meant to clear a *sticky* nav that only
+          takes 56–72px of flow height, which reads as dead air before the h1
+          on phones. This does not edit PageHeader.tsx: it raises specificity
+          from within the one route that needs it tightened, and only the
+          top half of the padding — the 80px bottom half is what separates
+          the standfirst from the rail/strip below it and stays. */}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+#strategies-page > section:first-of-type .section-y { padding-block-start: 32px; }
+@media (min-width: 768px) {
+  #strategies-page > section:first-of-type .section-y { padding-block-start: 48px; }
+}
+@media (min-width: 1280px) {
+  /* align-items stays at its default (stretch) on purpose: the rail's
+     containing block (.stx-rail-wrap) has to span the full row height,
+     matching .stx-rows, the tall column, for position:sticky on the nav
+     inside it to have any room to stick within. align-items:start here
+     would cap that box at the nav's own height and the rail would just
+     scroll off with the page. */
+  .stx-layout { display: grid; grid-template-columns: 220px 1fr; column-gap: 56px; }
+  .stx-rail { position: sticky; top: calc(var(--nav-h) + 32px); }
+  .stx-rail ul { display: flex; flex-direction: column; gap: 4px; }
+}
+.stx-rail a {
+  display: flex; align-items: center; min-height: 44px;
+  color: var(--color-ash); text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+  animation: stxRailIn var(--dur-base) var(--ease) both;
+  animation-delay: calc(var(--stx-i, 0) * var(--stagger));
+}
+@media (hover: hover) and (pointer: fine) {
+  .stx-rail a:hover { color: var(--color-cloud); }
+}
+.stx-rail a:active { color: var(--color-cloud); }
+.stx-rail a:focus-visible {
+  outline: 2px solid var(--color-pure); outline-offset: 2px; border-radius: 4px;
+}
+@keyframes stxRailIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .stx-rail a { animation: none; } }
+
+/* Below 1280: the rail becomes the one horizontal-scroll strip the site
+   permits (APPENDIX-A, §7 rule: "no horizontal scroll except the one
+   /strategies strip"). scroll-snap-type + no trailing inline padding so the
+   last link is cut by the viewport edge at rest rather than sitting flush —
+   that cut is the "there is more" affordance instead of a scrollbar. */
+@media (max-width: 1279px) {
+  .stx-rail-wrap { padding-block: 16px; border-top: 1px solid rgba(255,255,255,.12); border-bottom: 1px solid rgba(255,255,255,.12); }
+  .stx-rail { margin-inline: -24px; }
+  .stx-rail ul {
+    display: flex; gap: 28px; overflow-x: auto; scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    padding-inline-start: 24px; padding-inline-end: 4px;
+  }
+  .stx-rail ul::-webkit-scrollbar { display: none; }
+  .stx-rail li { flex: none; scroll-snap-align: start; }
+  .stx-rail a { white-space: nowrap; }
+}
+`,
+        }}
+      />
       <PageHeader
         title="Six strategies. One risk framework."
         standfirst="Six books run independently and are underwritten against the same limits. One framework governs them because correlated risk does not respect a mandate boundary."
       />
-      {strategies.map((s) => (
-        <section key={s.slug} id={s.slug} className="scroll-mt-24 bg-obsidian">
-          <Container>
-            <div className="grid-gc2 rule-t py-16 md:py-24">
-              <div className="col-span-4 md:col-span-5">
-                <h2 className="t-h2 text-pure">{s.name}</h2>
-                <dl className="mt-8">
-                  <div className="rule-t flex justify-between gap-6 py-3">
-                    <dt className="t-small text-fog">Markets</dt>
-                    <dd className="t-body text-right text-ash">{s.markets}</dd>
-                  </div>
-                  <div className="rule-t rule-b flex justify-between gap-6 py-3">
-                    <dt className="t-small text-fog">Instruments</dt>
-                    <dd className="t-body text-right text-ash">{s.instruments}</dd>
-                  </div>
-                </dl>
-              </div>
-              <div className="col-span-4 md:col-span-6 md:col-start-7">
-                {s.body.map((t, i) => (
-                  <p key={i} className={`t-body measure-body text-ash ${i ? "mt-6" : ""}`}>{t}</p>
-                ))}
-              </div>
+
+      <section className="scroll-mt-24 bg-obsidian">
+        <Container>
+          {/* One nav, two CSS layouts: `.stx-layout` is a plain flow at
+              ≤1279 (the rail, first in source, reads as the horizontal
+              strip under the page header) and a 220px + content grid at
+              ≥1280 (the same rail becomes the sticky left column). Nothing
+              is duplicated in the DOM and nothing picks the layout in JS. */}
+          <div className="stx-layout">
+            <div className="stx-rail-wrap">
+              <nav className="stx-rail" aria-label="Jump to a strategy">
+                <ul>
+                  {strategies.map((s, k) => (
+                    <li key={s.slug} style={{ ["--stx-i" as string]: k }}>
+                      <a href={`#${s.slug}`} className="t-small">{s.name}</a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
             </div>
-          </Container>
-        </section>
-      ))}
+            <div className="stx-rows">
+              {strategies.map((s) => (
+                <div key={s.slug} id={s.slug} className="grid-gc2 rule-t py-16 md:py-24 scroll-mt-24">
+                  <div className="col-span-4 md:col-span-5">
+                    <h2 className="t-h2 text-pure">{s.name}</h2>
+                    <dl className="mt-8">
+                      <div className="rule-t flex justify-between gap-6 py-3">
+                        <dt className="t-small text-fog">Markets</dt>
+                        <dd className="t-body text-right text-ash">{s.markets}</dd>
+                      </div>
+                      <div className="rule-t rule-b flex justify-between gap-6 py-3">
+                        <dt className="t-small text-fog">Instruments</dt>
+                        <dd className="t-body text-right text-ash">{s.instruments}</dd>
+                      </div>
+                    </dl>
+                  </div>
+                  <div className="col-span-4 md:col-span-6 md:col-start-7">
+                    {s.body.map((t, i) => (
+                      <p key={i} className={`t-body measure-body text-ash ${i ? "mt-6" : ""}`}>{t}</p>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Container>
+      </section>
 
       {bands.map((b, i) => (
         <section
@@ -363,6 +447,6 @@ export default function Strategies() {
           </Container>
         </section>
       ))}
-    </>
+    </div>
   );
 }
