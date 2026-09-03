@@ -93,36 +93,48 @@ import SessionClock from "@/components/viz/SessionClock";
 import YieldCurve from "@/components/viz/YieldCurve";
 
 /* -- grain ---------------------------------------------------------------
-   Turbulence pushed into the alpha channel over a fixed pale fill: sparse
-   light speckle, which is what actually reads as grain on a near-black
-   ground (grey noise under `overlay` is invisible down here) and which
-   dithers away the banding any dark gradient would otherwise show. Static —
-   no animation, so it costs exactly one paint, ever. */
+   Turbulence pushed into the alpha channel over a fixed fill. On the dark
+   build the fill was a pale speckle, because light specks are what read on
+   near-black. On paper the same mechanism has to invert its material: the
+   specks are INK, sparse and weak, and what they produce is the tooth of a
+   sheet rather than film grain. Same reason as before — it keeps a flat field
+   from reading as a screen fill, and it dithers away any banding in the wash.
+   Static: one paint, ever. */
 const GRAIN =
   "<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'>" +
   "<filter id='g' x='0' y='0' width='100%' height='100%'>" +
   "<feTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='3' stitchTiles='stitch' result='t'/>" +
-  "<feColorMatrix in='t' type='matrix' values='0 0 0 0 .88 0 0 0 0 .86 0 0 0 0 1 .55 .55 .55 0 -.74'/>" +
+  "<feColorMatrix in='t' type='matrix' values='0 0 0 0 .078 0 0 0 0 .075 0 0 0 0 .067 .42 .42 .42 0 -.60'/>" +
   "</filter><rect width='140' height='140' filter='url(#g)'/></svg>";
 const GRAIN_URL = `url("data:image/svg+xml,${encodeURIComponent(GRAIN)}")`;
 
-/** The step wedge, dimmest strip first. The five strips divide the field from
+/** The step wedge, quietest strip first. The five strips divide the field from
  *  the column-9 line to the viewport edge equally. `o` is the strip's share of
- *  the light; `pitch` is its louvre period in px — one 1px rule every `pitch`,
- *  so a tighter pitch swallows more light. Value and line density step
- *  together, which is what makes it read as a measured wedge. */
+ *  the tint; `pitch` is its louvre period in px — one 1px ink rule every
+ *  `pitch`, so a tighter pitch lays down more ink. Tint and line density step
+ *  together, which is what makes it read as a measured wedge.
+ *
+ *  The floor is 0.42 and not the dark build's 0.26. On the old ground a 26%
+ *  strip was still clearly light against black; on paper a 26% tint of pale-iris over
+ *  #f7f5f0 is 1.03:1 — it is not there. The step has to be compressed into the
+ *  range paper can actually hold, or the wedge loses its two dimmest steps and
+ *  becomes three. */
 const WEDGE: { o: number; pitch: number }[] = [
-  { o: 0.26, pitch: 4 },
-  { o: 0.44, pitch: 5 },
-  { o: 0.66, pitch: 7 },
-  { o: 0.86, pitch: 9 },
-  { o: 1, pitch: 12 }, // the brightest step, running out to the viewport edge
+  { o: 0.42, pitch: 4 },
+  { o: 0.56, pitch: 5 },
+  { o: 0.7, pitch: 7 },
+  { o: 0.85, pitch: 9 },
+  { o: 1, pitch: 12 }, // the fullest step, running out to the viewport edge
 ];
 
+/* The louvre inverts with the ground: on the dark build it was near-black
+   rules eating light, on paper it is ink rules laid onto a tint. Same job — the field
+   is dithered into structure so it can never go hazy — and the alpha is low
+   because on paper a hard 84% rule at a 4px pitch is a barcode, not a texture. */
 const louvre = (pitch: number) =>
   `repeating-linear-gradient(180deg,` +
-  ` rgba(9,10,11,0) 0px, rgba(9,10,11,0) ${pitch - 1}px,` +
-  ` rgba(9,10,11,.84) ${pitch - 1}px, rgba(9,10,11,.84) ${pitch}px)`;
+  ` rgba(20,19,17,0) 0px, rgba(20,19,17,0) ${pitch - 1}px,` +
+  ` rgba(20,19,17,.16) ${pitch - 1}px, rgba(20,19,17,.16) ${pitch}px)`;
 
 const CSS = `
 .hv2{
@@ -152,7 +164,7 @@ const CSS = `
   position:relative; isolation:isolate; overflow:hidden;
   min-height:min(calc(100vh - var(--nav-h, 72px)), 900px);
   display:flex; flex-direction:column;
-  background:#0f1011;
+  background:var(--color-ground);
 }
 @supports (height: 100dvh){
   .hv2{min-height:min(calc(100dvh - var(--nav-h, 72px)), 900px);}
@@ -162,8 +174,11 @@ const CSS = `
 .hv2-bg{position:absolute;inset:0;pointer-events:none;contain:layout paint style;}
 .hv2-ground{position:absolute;inset:0;
   background:
-    radial-gradient(120% 78% at 84% 4%, rgba(75,73,170,.22) 0%, rgba(75,73,170,.06) 46%, rgba(9,10,11,0) 72%),
-    linear-gradient(180deg, #0f1011 0%, #090a0b 100%);}
+    radial-gradient(120% 78% at 84% 4%,
+      rgba(209,201,255,.30) 0%, rgba(209,201,255,.10) 44%, rgba(247,245,240,0) 72%),
+    radial-gradient(150% 100% at 86% 0%,
+      rgba(20,19,17,.055) 0%, rgba(20,19,17,.018) 48%, rgba(20,19,17,0) 74%),
+    var(--color-ground);}
 
 /* the lit field: from the column-9 line of the measure out to the viewport
    edge. Its left edge lands on the same line the reading column stops on;
@@ -183,18 +198,27 @@ const CSS = `
    photographic step wedge, and every boundary in it is a hard edge the grid
    already explains. The source reads as off-frame right. */
 .hv2-strip{position:relative;overflow:hidden;transform-origin:50% 0;flex:1 1 0;}
-/* Deliberately EVEN light. The value modelling is done by the wedge and the
+/* Deliberately EVEN tint. The value modelling is done by the wedge and the
    louvre, not by the gradient — a gradient left to do its own falloff is how
-   the last three attempts turned to haze. */
+   the dark build's first three attempts turned to haze, and on paper it is how
+   a tint turns into a smear.
+   Orchid is out of the ramp. It was two of the six stops on the dark ground,
+   where a pink at 50% over black is a warm violet; on paper the same stop is
+   pink,
+   and pink on warm paper is exactly the bruise this pass is told to avoid.
+   What is left runs pale-iris -> iris-gleam -> periwinkle -> deep-iris: one
+   family, cool against a warm ground, anchored by the one accent that is dark
+   enough to hold an edge. Peak alpha .50, measured: the fullest strip
+   composites to about 1.16:1 against ground, a shade past the ground->ground-2
+   step, which is a swatch and not a slab. */
 .hv2-strip-light{position:absolute;left:0;right:0;top:-14%;bottom:-14%;
   background:
     linear-gradient(191deg,
-      rgba(209,201,255,.62) 0%,
-      rgba(132,125,255,.60) 22%,
-      rgba(221,144,216,.56) 47%,
-      rgba(221,144,216,.48) 63%,
-      rgba(144,184,240,.40) 84%,
-      rgba(75,73,170,.30) 100%);}
+      rgba(209,201,255,.50) 0%,
+      rgba(132,125,255,.40) 26%,
+      rgba(132,125,255,.34) 52%,
+      rgba(144,184,240,.34) 78%,
+      rgba(75,73,170,.26) 100%);}
 /* THE LOUVRE — an ordered dither, not a gradient. Each strip is cut by a
    repeating hard-stop rule pattern; the pitch opens up as the strips brighten,
    so value and line density step together. */
@@ -231,7 +255,8 @@ const CSS = `
 .hv2-mast::before{content:"";position:absolute;z-index:-1;
   top:calc(-1 * var(--hv2-pt));bottom:0;
   left:calc(-1 * var(--hv2-bleed-l));right:calc(-1 * var(--hv2-bleed-r));
-  background:rgba(9,10,11,.94);}
+  background:var(--color-ground-2);
+  border-bottom:1px solid var(--color-hairline);}
 .hv2-mast > *{grid-row:1;}
 .hv2-m1{grid-column:1 / span 3;}
 .hv2-m2{grid-column:4 / span 3;}
@@ -245,16 +270,16 @@ const CSS = `
    never hidden while the strip is painted; it wraps to two lines at this width
    and that is why the masthead aligns to start rather than to a baseline. */
 .hv2-clock{grid-column:10 / span 3;}
-/* The session row is 44px tall in the component, which is nav and menu
-   density: in a masthead it opens a blank line between the row and its own
-   caption. Here the row is not a tap target -- three spans, no link -- so it
-   collapses to the mono line box the facts beside it use, and the band reads
-   as one set of rules rather than as a control. Reaching into another
-   section's component to say so; reported to the Conductor. */
-.hv2-clock .sc-row{min-height:0;}
-/* .t-mono carries the family, the 13px §6.3 floor, the tracking and the case;
-   only the colour variant is local. */
-.hv2-mono-lit{color:#cacaca;}          /* anything sitting over the aperture */
+/* Density and the caption are the component's own props now — dense,
+   caption={false}, rows="open" — passed at the call site below. The three
+   local overrides that stood in for them -- a zeroed row height, a compressed
+   mono line-height, and nothing at all for the two-line caption, which simply
+   sat in the band -- are gone. */
+/* .t-mono carries the family, the 13px §6.3 floor, the tracking and the case.
+   .hv2-mono-lit is gone with the ground it existed for: it was the brighter
+   grey for a fact sitting over the aperture, and the masthead bar is an opaque
+   ground-2 strip now. Emphasis on paper is ink against .t-mono's ink-2. */
+.hv2-mono-strong{color:var(--color-ink);}
 
 /* The free space is split ABOVE and BELOW the message, never inside it. Both
    spacers sit outside the headline / record / lead / actions group, so that
@@ -287,30 +312,26 @@ const CSS = `
    a webfont swap, a metric change or a rounding error can no longer break
    "Evidence first." across two lines and silently halve the headline. */
 .hv2-l > span{display:block;white-space:nowrap;}
-.hv2-l2{color:#d1c9ff;}
+/* deep-iris, 6.80:1 on ground — the only one of the six that may be set as
+   text on paper. On the dark ground this line was pale-iris, which measures
+   1.43:1 here and would have been the single worst thing on the page. */
+.hv2-l2{color:var(--color-accent-deep-iris);}
 
 /* two explicit rows on the left, the curve on the right, so the reading path
    runs down-left and then out to the object that closes the frame */
 .hv2-foot{padding-top:0;align-items:start;row-gap:26px;}
 .hv2-lead{grid-row:1;grid-column:1 / span 5;font-size:18px;line-height:1.55;
-  font-weight:300;color:#9f9fa0;max-width:30em;hyphens:manual;padding-top:20px;}
+  font-weight:300;color:var(--color-ink-2);max-width:30em;hyphens:manual;padding-top:20px;}
 /* the actions sit on the column-1 line, under the sentence they close, so the
    masthead, the headline, the lead and the buttons all share one left edge. */
 .hv2-cta{grid-row:2;grid-column:1 / span 5;display:flex;flex-wrap:wrap;gap:12px;
   justify-content:flex-start;}
-.hv2-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;
-  min-height:48px;padding:12px 22px;border-radius:8px;font-size:16px;
-  background:#fff;color:#000;border:1px solid #fff;
-  transition:background var(--dur-fast) var(--ease),
-              border-color var(--dur-fast) var(--ease),
-              color var(--dur-fast) var(--ease);}
-.hv2-btn-ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.42);}
-@media (hover: hover) and (pointer: fine){
-  .hv2-btn:hover{background:#f5f5f7;border-color:#f5f5f7;}
-  .hv2-btn-ghost:hover{background:rgba(255,255,255,.08);border-color:#fff;}
-}
-.hv2-btn:active{background:#cacaca;border-color:#cacaca;}
-.hv2-btn-ghost:active{background:rgba(255,255,255,.14);border-color:#fff;}
+/* Colour comes from globals' .btn / .btn-ghost — the one black button, ink
+   fill on ground, and its outline twin. The hero's own rule now carries only
+   what is about THIS layout: the 48px tap height and the centred label. The
+   dark build painted its own white fill here, which on paper would have been
+   an invisible button. */
+.hv2-btn{justify-content:center;min-height:48px;padding:12px 22px;}
 
 /* ---- the curve slot ----------------------------------------------------
    Columns 6-12, hanging from the rule the striped field stops on, running off
@@ -324,7 +345,7 @@ const CSS = `
    reach the edge. */
 .hv2-curve{position:relative;grid-row:1 / span 2;grid-column:6 / span 7;
   margin-right:calc(-1 * var(--hv2-bleed-r));padding:20px 24px 0 0;
-  align-self:start;border-top:1px solid rgba(255,255,255,.12);}
+  align-self:start;border-top:1px solid var(--color-hairline);}
 
 /* ---- narrow ----------------------------------------------------------- */
 @media (max-width:767px){
@@ -342,11 +363,14 @@ const CSS = `
      gone too: on the poster the curve is the object, and the ground's bloom
      carries the atmosphere. */
   .hv2-measure{display:none;}
-  /* The bloom is worth more on a phone, where it is the only light in the
-     frame — same token, same two stops, a wider throw. */
+  /* The wash is worth more on a phone, where the field is off and it is the
+     only atmosphere in the frame — same two tokens, a wider throw. */
   .hv2-ground{background:
-    radial-gradient(150% 62% at 88% 3%, rgba(75,73,170,.26) 0%, rgba(75,73,170,.07) 48%, rgba(9,10,11,0) 76%),
-    linear-gradient(180deg, #0f1011 0%, #090a0b 100%);}
+    radial-gradient(160% 52% at 88% 2%,
+      rgba(209,201,255,.34) 0%, rgba(209,201,255,.11) 46%, rgba(247,245,240,0) 76%),
+    radial-gradient(170% 70% at 90% 0%,
+      rgba(20,19,17,.05) 0%, rgba(20,19,17,.015) 50%, rgba(20,19,17,0) 76%),
+    var(--color-ground);}
 
   .hv2-row{grid-template-columns:repeat(4,minmax(0,1fr));column-gap:20px;}
   /* The masthead is a wrapping flex row, not four grid cells: at 13px (the
@@ -360,9 +384,10 @@ const CSS = `
      tap away on /firm, and the alternative is an action below the fold). */
   .hv2-mast{display:flex;flex-wrap:wrap;align-items:baseline;
     column-gap:12px;row-gap:0;}
-  /* 1.75 rather than the tier's 2: five mono lines at 26px is 130px of a
-     795px poster, and these are labels, not reading copy. */
-  .hv2-mast .t-mono,.hv2-clock .t-caption{line-height:1.75;}
+  /* 1.75 rather than the tier's 2: four mono lines at 26px is 104px of a
+     795px poster, and these are labels, not reading copy. The clock is not in
+     this rule any more -- dense is its own answer to the same question. */
+  .hv2-mast .t-mono{line-height:1.75;}
   /* CSS order, and not source order: the two standing facts are full-width flex
      items, so in DOM order they sit BETWEEN the city and the clock and push
      the clock onto a fourth line (measured at 360x740 before this). City and
@@ -389,7 +414,7 @@ const CSS = `
           font-size:clamp(2.5rem, calc(15.318vw - 7.83px), 96px);
           letter-spacing:-.03em;margin-block:16px 0;}
   .hv2-lead{grid-row:1;grid-column:1 / -1;font-size:15px;line-height:1.5;
-    color:#7c7d7d;max-width:none;}
+    color:var(--color-ink-2);max-width:none;}
   /* On a phone the poster wants its block high and its air at the foot, not a
      hole under the masthead: 38% of the slack above, 62% below. */
   .hv2-gap{flex:.6 1 0;min-height:16px;}
@@ -477,9 +502,11 @@ const CSS = `
    at 1280 it was 181px of a 750px hero and pushed the actions past the fold. */
 @media (min-width:1024px) and (max-height:820px){
   .hv2{--hv2-pt:20px;--hv2-pb:28px;}
-  /* the plot is the one block in the frame with a free height, so it is what
-     gives when a 720p laptop has 647px of hero to spend. */
-  .hv2-curve .yc-svg{height:132px;}
+  /* The plot is the one block in the frame with a free height, so it is what
+     gives when a 720p laptop has 647px of hero to spend. --yc-h is the
+     component's own knob for exactly this; the round-1 version reached inside
+     for .yc-svg. */
+  .hv2-curve{--yc-h:132px;}
   .hv2-h1{margin-block:20px 16px;}
   .hv2-gap{min-height:16px;}
   .hv2-gap-b{min-height:12px;}
@@ -506,6 +533,14 @@ const CSS = `
   .hv2{--hv2-side: calc((1920px - var(--page-max)) / 2 + 24px);}
   .hv2-fg{margin-inline: calc((1920px - var(--page-max)) / 2) auto;}
   .hv2-h1{margin-block:24px 20px;}
+  /* The field still bleeds to the right edge; it just stops starting so far
+     left. Unclamped it is 1352px at 2560 and 2232px at 3440, and on paper that
+     is not "light arriving from off-frame", it is five large pale rectangles
+     that read as unloaded images. 980px keeps the same proportion the frame
+     has at 1920 (712px of a 1920 viewport), and the cap does not bite there:
+     min() leaves 1920 exactly as it was. */
+  .hv2-measure{left:auto;
+    width:min(calc(100vw - var(--hv2-side) - var(--hv2-c9)), 980px);}
 }
 
 /* ---- landscape phones: a letterbox, composed as one (§7 rule 8) --------
@@ -519,6 +554,13 @@ const CSS = `
    Last in the file on purpose: a landscape phone matches the phone, tablet and
    desktop width rules too, and this has to win over all of them. */
 @media (max-height:500px) and (orientation:landscape){
+  /* The 12-column grid, restated. Playwright's own landscape descriptors are
+     734x393 and 852x393 -- browser chrome comes off the 852 -- so a landscape
+     phone can be NARROWER than 767px and pick up the phone block's 4-column
+     grid. Every span below is written against 12: on a 4-column grid "span 6"
+     runs into implicit tracks and takes the whole width, which is how the lead
+     ended up printed across the striped field at 734. */
+  .hv2-row{grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px;}
   .hv2{--hv2-pt:16px;--hv2-pb:20px;min-height:calc(100vh - var(--nav-h, 48px));}
   @supports (height: 100dvh){
     .hv2{min-height:calc(100dvh - var(--nav-h, 48px));}
@@ -539,8 +581,13 @@ const CSS = `
   .hv2-gap{min-height:8px;}
   .hv2-gap-b{min-height:8px;}
   .hv2-foot{padding-top:12px;row-gap:12px;}
-  .hv2-lead{grid-row:1;grid-column:1 / span 6;font-size:15px;line-height:1.45;}
-  .hv2-cta{grid-row:2;grid-column:1 / span 6;gap:10px;}
+  /* Eight columns, not six, and the same eight the headline takes: at 734 a
+     six-column lead is 331px and wraps to three lines, which is the 13px that
+     put the actions under the fold. Eight is 450px there and stops 23px short
+     of the column-9 line the field starts on, so it gains a line back without
+     ever running into the light. */
+  .hv2-lead{grid-row:1;grid-column:1 / span 8;font-size:15px;line-height:1.45;}
+  .hv2-cta{grid-row:2;grid-column:1 / span 8;gap:10px;}
   .hv2-btn{min-height:44px;padding:10px 16px;font-size:15px;}
   /* The wedge stays — it is the only light in a letterbox — but it starts at
      the column-9 line of a very wide, very short frame, so it reads as a band
@@ -549,6 +596,17 @@ const CSS = `
      light two thirds of the way down for no reason — there is no curve here
      for it to stop on. Negative bottom, clipped by .hv2's overflow. */
   .hv2-measure{display:flex;gap:16px;bottom:-100vh;}
+}
+
+/* ---- print --------------------------------------------------------------
+   globals' print block hides .hv2-bg and .hv2-grain, but the striped field
+   moved into the foreground in round 1 and the masthead bar is a ::before —
+   neither is reached by "background-color: transparent" on divs. On paper
+   there is no field and no band, only ink. */
+@media print{
+  .hv2-measure{display:none !important;}
+  .hv2-mast::before{background:none !important;border-bottom-color:var(--color-hairline-strong) !important;}
+  .hv2{min-height:0 !important;}
 }
 
 /* ---- motion ------------------------------------------------------------
@@ -588,17 +646,18 @@ const CSS = `
   .hv2-strip[data-s="2"]{animation-delay:calc(var(--stagger) * 2);}
   .hv2-strip[data-s="3"]{animation-delay:calc(var(--stagger) * 3);}
   .hv2-strip[data-s="4"]{animation-delay:calc(var(--stagger) * 4);}
-  /* The one continuous movement in the frame: the light sliding behind the
-     fixed louvre. One composited transform per strip, all in lockstep, so it
-     reads as a single source moving rather than five things drifting. 44 x
-     --dur-base is the 22s cycle; the curve was its own ease-in-out and is now
-     the house curve, which under alternate runs out on the way down and in on
-     the way back — a slower turnaround than before, which is the right
-     direction for something meant to read as atmosphere. */
-  .hv2-strip-light{animation:hv2Drift calc(var(--dur-base) * 44) var(--ease) infinite alternate both;}
+  /* The 22s drift is gone with the dark ground. It existed to make ONE LIGHT
+     SOURCE feel alive behind a fixed louvre, which is a thing light does and a
+     thing a printed swatch does not; on paper the field is a tinted, ruled
+     block and a block that breathes reads as a bug. It was also never on
+     §8.2's list of what moves, and — the part that forced the decision — an
+     infinite alternate animation makes the page a different picture on every
+     load, so §6.2's "the dark-scheme render must be pixel-identical to the
+     light one" could not pass on the hero for a reason that had nothing to do
+     with the theme. Measured: light-vs-light differed as much as light-vs-dark
+     while it ran; with it gone all three hash the same. */
 }
 @keyframes hv2Wipe{from{transform:scaleY(0)}to{transform:none}}
-@keyframes hv2Drift{from{transform:translate3d(0,-7%,0)}to{transform:translate3d(0,7%,0)}}
 `;
 
 export default function HeroV2() {
@@ -627,13 +686,18 @@ export default function HeroV2() {
           <div className="hv2-row hv2-mast">
             <span className="t-mono hv2-m1">{site.city}</span>
             <span className="t-mono hv2-m2">{site.structure}</span>
-            <span className="t-mono hv2-m3 hv2-mono-lit">{site.mandate}</span>
+            <span className="t-mono hv2-m3 hv2-mono-strong">{site.mandate}</span>
             {/* Cross-section object (OWNERSHIP.md): sec-motion builds it,
                 sec-chrome places it in the nav and the footer, the hero shows
                 it where its own local clock used to be. It renders nothing
                 until it hydrates, so the server HTML carries no time-shaped
                 placeholder — STATE.md §0.2 item 6. */}
-            <SessionClock className="hv2-clock" />
+            <SessionClock
+              className="hv2-clock"
+              caption={false}
+              rows="open"
+              dense
+            />
           </div>
 
           <div className="hv2-gap" />
@@ -657,10 +721,10 @@ export default function HeroV2() {
             the desk.
           </p>
           <div className="hv2-cta">
-            <Link href="/firm" className="hv2-btn">
+            <Link href="/firm" className="btn hv2-btn">
               Our approach
             </Link>
-            <Link href="/contact" className="hv2-btn hv2-btn-ghost">
+            <Link href="/contact" className="btn btn-ghost hv2-btn">
               Investor inquiries
             </Link>
           </div>
