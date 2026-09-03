@@ -264,11 +264,12 @@
      Hover and active step the fill UP the ink scale rather than down, so the
      press reads as the button lightening under the finger; ground-on-ink-2 is
      7.55 and ground-on-ink-3 is 5.61, both still past 4.5. */
-  .btn { display:inline-flex; align-items:center; gap:10px; border-radius: 8px;
+  .btn { display:inline-flex; align-items:center; min-height: 48px; gap:10px; border-radius: 8px;
          padding: 12px 18px; font-size: 16px; font-weight: 400;
          background: var(--color-ink); color: var(--color-ground);
          transition: background var(--dur-fast) var(--ease), opacity var(--dur-fast) var(--ease); }
-  .btn-ghost { background: transparent; color: var(--color-ink);
+  .btn-ghost { display:inline-flex; align-items:center; min-height: 48px;
+               background: transparent; color: var(--color-ink);
                border: 1px solid var(--color-ink); }
 
   .nav-glass { min-height: 44px; background: rgba(20,19,17,.05); border: 1px solid var(--color-hairline-strong);
