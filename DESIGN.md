@@ -90,7 +90,7 @@ rather than `.t-display`/`.t-display-sm`), paired with `.container-gc2` and
 | `t-article-title` | 56px | Insight note title |
 | `t-nav-mobile` | 40px | Mobile nav item |
 | `t-lead` | 18px | Inner-route lead paragraph |
-| `t-prose` | 18px | Long-form body, 1.7 line-height |
+| `t-prose` | 17 / 18px | Long-form body, 1.65 / 1.7 line-height |
 | `t-caption` | 12px | Inner-route mono caption |
 
 Second numbers are at `min-width: 769px`. Both systems are live; the home page
@@ -147,3 +147,6 @@ rule and a description.
   `Stat`, `Rule`, `Reveal`) and the `BloomField`, `MarketsBand`, `HeroTicker`
   and `PinnedStrategies` sections are not imported by any route. They are
   documented in `docs/21st/HARVEST.md` but do not describe what renders.
+- **`t-prose` tier change (foundation r1).** Was a flat 18px/1.7 on every
+  viewport. Now a phone variant: 17px/1.65 below 768, 18px/1.7 at and
+  above, ramped with a clamp() over that range rather than a hard step.
