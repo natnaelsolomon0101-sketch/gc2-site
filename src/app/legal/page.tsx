@@ -48,13 +48,13 @@ const CSS = `
   .t-mono, .t-mono-xs { font-size: 8pt !important; }
   a, .link { border-bottom: 0 !important; text-decoration: underline !important; }
   .rule-t { border-color: #cccccc !important; }
-  .measure-legal, .measure-lead, .measure-head, .measure-prose { max-width: none !important; }
+  .measure-body, .measure-lead, .measure-head, .measure-prose { max-width: none !important; }
   .grid-gc2 { display: block !important; }
   .section-y { padding-block: 0 12pt !important; }
   .lg-row { break-inside: avoid; page-break-inside: avoid; padding: 10pt 0 !important; }
   .lg-band { break-inside: avoid; page-break-inside: avoid; }
 }
-.lg-row{ transition: opacity .2s ease; }
+.lg-row{ transition: opacity var(--dur-fast) var(--ease); }
 @media (hover:hover){ .lg-row:hover .lg-row-title{ opacity:.72; } }
 `;
 
@@ -108,14 +108,18 @@ export default function Legal() {
                     <div className="col-span-4 md:col-span-4">
                       <h2 className="lg-row-title t-h3 text-pure">{d.title}</h2>
                     </div>
-                    {/* max-w-[80ch]: these are list rows, not the 60em prose
-                        measure the three document pages use — the matrix
-                        measures the widest rendered li/p line, and at
-                        landscape-phone/tablet widths this column was wide
-                        enough that the blurb's own line ran ~114ch. Capped
-                        directly rather than reusing `measure-legal`, which
-                        is the wider 60em prose tier and not this row's job. */}
-                    <div className="col-span-4 max-w-[80ch] md:col-span-7 md:col-start-6">
+                    {/* measure-body (34em): round 1 capped this at
+                        `max-w-[80ch]`, which still rendered ~84-102 real
+                        characters per line — Inter's `1ch` (the "0" glyph)
+                        is measurably wider than this typeface's average
+                        prose character, so CSS `ch` overshoots real
+                        character count by roughly 1.4x. Verified by walking
+                        every character of the rendered text with `Range`
+                        and grouping by line `top`, not by the `ch` unit:
+                        34em is the widest value that keeps every row's
+                        widest real line at or under 80 characters, with a
+                        few characters of margin. */}
+                    <div className="col-span-4 measure-body md:col-span-7 md:col-start-6">
                       <p className="t-body">{d.blurb}</p>
                       <p className="t-small mt-4 text-fog">{d.note}</p>
                     </div>
@@ -136,25 +140,25 @@ export default function Legal() {
               <h2 className="t-h2">What these pages are not</h2>
             </div>
             <div className="col-span-4 md:col-span-7 md:col-start-6">
-              <p className="t-body measure-legal">
+              <p className="t-body measure-body">
                 These three documents describe a website. None of them describes an
                 investment, states a term, or creates an obligation on either side.
                 Nothing on this website is an offer to sell or a solicitation of an
                 offer to buy any security.
               </p>
-              <p className="t-body measure-legal mt-6">
+              <p className="t-body measure-body mt-6">
                 What governs the partnership is its offering documents. Those
                 documents are definitive, they govern in all respects, and where
                 anything on this website reads differently from them, they win.
               </p>
-              <p className="t-body measure-legal mt-6">
+              <p className="t-body measure-body mt-6">
                 This section was written to describe {site.name}&rsquo;s website as it
                 actually is rather than assembled from a template, and it leaves out
                 the clauses a template would supply that are not true of it. It has
                 not yet been reviewed by counsel, and it carries no effective date for
                 that reason.
               </p>
-              <p className="t-body measure-legal mt-6">
+              <p className="t-body measure-body mt-6">
                 Questions about any of it may be sent to{" "}
                 <TextLink href={`mailto:${site.emails.investors}`}>
                   {site.emails.investors}
