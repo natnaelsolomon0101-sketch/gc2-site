@@ -190,7 +190,7 @@ html{ scroll-padding-top: var(--nav-h); }
 .sn-drawer-link[data-cta="true"]:hover{ color:var(--color-pale-iris); }
 
 .sn-meta-link{
-  display:inline-flex; align-items:center; min-height:44px;
+  display:inline-flex; align-items:center; min-height:44px; padding-block:4px;
   color:var(--color-ash); transition:color var(--dur-fast) var(--ease);
   word-break:break-all;
 }

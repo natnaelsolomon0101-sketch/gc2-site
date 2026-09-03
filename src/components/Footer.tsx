@@ -52,14 +52,24 @@ const CSS = `
    (~300-350px there), so this is a no-op at >=1024. */
 .gc2-ftr-col{ max-width:24em; }
 .gc2-ftr-col-head{ padding-block:14px; }
-/* The row IS the target (§7 rule 11), and adjacent rows sharing a hairline
-   with zero gap between them fails the matrix's <8px-to-another-target
-   check even though the shared border reads fine to the eye. 4px padding
-   top and bottom on every row = 8px between one row's link box and the
-   next's, with the hairline sitting in the middle of that gap instead of
-   flush against the text -- reads calmer, not just compliant. */
-.gc2-ftr-row{ border-top:1px solid var(--color-steel); padding-block:4px; }
-.gc2-ftr-link{ transition:color var(--dur-fast) var(--ease); min-height:44px; }
+/* Round 2 put the row's padding on the <li> (.gc2-ftr-row) and left the
+   <a> sized to its own min-height -- the matrix still measured the <a>
+   itself at 20px on the built site (round 3, Conductor), i.e. the target
+   an assistive-tech user's rect actually is was never the padded row, it
+   was the text's own line box. THE ANCHOR HAS TO BE THE ROW: min-height
+   and the padding both live on .gc2-ftr-link now, explicit here rather
+   than via Tailwind's flex/min-h-11/w-full utilities, so there is exactly
+   one place this rule is declared. Adjacent rows now touch at a shared
+   hairline with no gap at all, which is fine -- matrix.ts's own tap-
+   target-gap check exempts stacked, >=80%-width, touching targets (a
+   hairline list is the pattern it names), so "no gap" only reads as
+   "hairline table," never as a violation. */
+.gc2-ftr-row{ border-top:1px solid var(--color-steel); }
+.gc2-ftr-link{
+  display:flex; align-items:center; width:100%;
+  min-height:44px; padding-block:4px;
+  transition:color var(--dur-fast) var(--ease);
+}
 .gc2-ftr-link:hover{ color:var(--color-cloud); }
 
 .gc2-ftr-disclosure{ margin-top:64px; max-width:80ch; }
@@ -104,10 +114,7 @@ export default function Footer() {
               <ul>
                 {g.items.map((n) => (
                   <li key={n.href} className="gc2-ftr-row">
-                    <Link
-                      href={n.href}
-                      className="gc2-ftr-link t-small flex min-h-11 w-full items-center text-ash"
-                    >
+                    <Link href={n.href} className="gc2-ftr-link t-small text-ash">
                       {n.label}
                     </Link>
                   </li>
@@ -121,8 +128,9 @@ export default function Footer() {
           {site.name} is a private investment partnership. This website is for
           informational purposes only and does not constitute an offer to sell or a
           solicitation of an offer to buy any security. Past performance is not
-          indicative of future results. Access to the fund is limited to qualified
-          investors.
+          indicative of future results. Interests in the fund are offered only to
+          investors who meet the eligibility requirements set out in the offering
+          documents.
         </p>
 
         <div className="t-small gc2-ftr-meta flex flex-wrap justify-between gap-3 text-fog">
