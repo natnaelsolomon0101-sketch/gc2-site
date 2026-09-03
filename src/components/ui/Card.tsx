@@ -1,22 +1,21 @@
 import * as React from "react";
 
 /**
- * Card — the graphite surface.
+ * Card — the surface card.
  *
- * Depth on this project is a surface step (obsidian -> graphite) plus radius.
+ * Depth on this project is a ground step (ground -> surface) plus radius.
  * There is no shadow. `box-shadow` is on the banned list, so the elevation cue
  * every 21st card entry reaches for (`shadow-sm`, `shadow-lg`, inset bevels) is
- * replaced by the 0x0f -> 0x2e ground step, which reads at 1.99:1 against the
- * page and needs no blur to be legible.
+ * replaced by the ground -> surface step (measured 1.21:1 in DESIGN.md) and
+ * needs no blur to be legible.
  *
- * Contrast on graphite #2e2e2e (WCAG 2.1, sRGB):
- *   cloud  #f5f5f7 .... 12.47:1
- *   silver #cacaca ....  7.19:1
- *   ash    #9f9fa0 ....  5.14:1
- *   fog    #7c7d7d ....  3.29:1  <- below 4.5, do not use fog on a Card
+ * Contrast on surface (WCAG 2.1, sRGB; see DESIGN.md "Measured — ink on
+ * every ground"):
+ *   ink   .... 14.12:1
+ *   ink-2 .....6.25:1
+ *   ink-3 .....4.65:1  <- the floor; still clears 4.5
  *
- * `bordered` adds a steel hairline. Steel on graphite is 1.31:1: that is a
- * decorative edge, not a control boundary, and nothing depends on seeing it.
+ * `bordered` adds a hairline-strong edge: a control border, not decoration.
  */
 export type CardPadding = "none" | "sm" | "md" | "lg";
 
@@ -31,12 +30,12 @@ export type CardProps = {
   /** Element to render. Sections and list items are common. */
   as?: "div" | "section" | "article" | "li";
   padding?: CardPadding;
-  /** Adds a steel hairline edge. Decorative. */
+  /** Adds a hairline-strong edge. Decorative. */
   bordered?: boolean;
   /**
    * Hover affordance for a card that is itself a link target. Shifts the
-   * hairline steel -> ash rather than lifting the card, because there is no
-   * shadow to lift with.
+   * hairline hairline-strong -> ink-2 rather than lifting the card, because
+   * there is no shadow to lift with.
    */
   interactive?: boolean;
   className?: string;
@@ -53,11 +52,11 @@ export default function Card({
   ...rest
 }: CardProps) {
   const cls = [
-    "bg-graphite rounded-card",
+    "bg-surface rounded-card",
     PADDING[padding],
-    bordered || interactive ? "border border-steel" : "",
+    bordered || interactive ? "border border-hairline-strong" : "",
     interactive
-      ? "transition-colors duration-[var(--dur-fast)] ease-[var(--ease)] hover:border-ash focus-within:border-ash"
+      ? "transition-colors duration-[var(--dur-fast)] ease-[var(--ease)] hover:border-ink-2 focus-within:border-ink-2"
       : "",
     className,
   ]
