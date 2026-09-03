@@ -103,8 +103,38 @@ function read(now: Date): Reading[] {
   });
 }
 
-export default function SessionClock({ className = "" }: { className?: string }) {
-  const [rows, setRows] = useState<Reading[] | null>(null);
+export type SessionClockProps = {
+  className?: string;
+  /**
+   * `false` moves the "Scheduled cash sessions · exchange holidays not shown"
+   * note to `sr-only` instead of removing it. It is NOT dropped: it is the
+   * component's source line, `scripts/qa/sources.ts` reads it off the
+   * `[data-source]` element to prove the caveat shipped, and a screen-reader
+   * user has the same right to the caveat as a sighted one. Set it false where
+   * a surrounding section already says what the strip is — the hero masthead,
+   * where two 13px lines above the headline are noise.
+   */
+  caption?: boolean;
+  /**
+   * `"open"` shows only the session that is running, at every width, rather
+   * than only on phones. The masthead wants one line; the menu and the footer
+   * want all three. Every row stays in the DOM either way and CSS chooses
+   * (§7 rule 14), so this changes no layout by JavaScript.
+   */
+  rows?: "all" | "open";
+  /** 32px rows instead of 44. The nav is chrome, not a tap-target list; the
+   *  rows are not interactive, so the 44px floor is a rhythm choice there and
+   *  not an accessibility one. */
+  dense?: boolean;
+};
+
+export default function SessionClock({
+  className = "",
+  caption = true,
+  rows: show = "all",
+  dense = false,
+}: SessionClockProps) {
+  const [readings, setRows] = useState<Reading[] | null>(null);
 
   useEffect(() => {
     const tick = () => setRows(read(new Date()));
@@ -120,19 +150,24 @@ export default function SessionClock({ className = "" }: { className?: string })
     return () => { clearTimeout(start); clearInterval(id); };
   }, []);
 
-  if (!rows) return null;
+  if (!readings) return null;
 
   /* The phone shows the session that is running, or — outside every session —
      Tokyo, the next one to open on the clock's own order. CSS does the hiding,
      not JavaScript (§7 rule 14): every row is in the DOM at every width, and a
      container query decides which are painted. */
-  const lead = rows.find((r) => r.open) ?? rows[0];
+  const lead = readings.find((r) => r.open) ?? readings[0];
 
   return (
-    <div className={`sc ${className}`} data-source={SESSION_SOURCE}>
+    <div
+      className={`sc ${className}`}
+      data-rows={show}
+      data-dense={dense ? "true" : undefined}
+      data-source={SESSION_SOURCE}
+    >
       <style>{css}</style>
       <ul className="sc-rows">
-        {rows.map((r) => (
+        {readings.map((r) => (
           <li
             key={r.city}
             className="sc-row"
@@ -149,7 +184,11 @@ export default function SessionClock({ className = "" }: { className?: string })
           </li>
         ))}
       </ul>
-      <p className="t-caption sc-note">
+      {/* Always rendered. `caption={false}` hides it visually and leaves it to
+          assistive technology and to scripts/qa/sources.ts, which checks that
+          the [data-source] element's TEXT still carries the caveat. A caveat
+          that can be switched off is not a caveat. */}
+      <p className={caption ? "t-caption sc-note" : "sr-only"}>
         Scheduled cash sessions · exchange holidays not shown
       </p>
     </div>
@@ -175,6 +214,7 @@ const css = `
   min-height: 44px;
   border-bottom: 1px solid rgba(255,255,255,.12);
 }
+.sc[data-dense="true"] .sc-row { min-height: 32px; }
 @supports (grid-template-columns: subgrid) {
   .sc-rows { display: grid; grid-template-columns: 1fr auto auto; }
   .sc-row { grid-column: 1 / -1; grid-template-columns: subgrid; }
@@ -197,4 +237,8 @@ const css = `
   .sc-row[data-lead="false"] { display: none; }
   .sc-row { border-bottom: 0; }
 }
+/* rows="open": the same collapse, at every width. Every row is still in the
+   DOM; CSS decides which is painted. */
+.sc[data-rows="open"] .sc-row[data-lead="false"] { display: none; }
+.sc[data-rows="open"] .sc-row { border-bottom: 0; }
 `;

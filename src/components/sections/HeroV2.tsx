@@ -506,22 +506,6 @@ const CSS = `
   .hv2{--hv2-side: calc((1920px - var(--page-max)) / 2 + 24px);}
   .hv2-fg{margin-inline: calc((1920px - var(--page-max)) / 2) auto;}
   .hv2-h1{margin-block:24px 20px;}
-  /* DEFENSIVE OVERRIDE, and a bug in src/components/viz/YieldCurve.tsx that is
-     sec-motion's to fix. That path carries pathLength=1 with
-     stroke-dasharray:1 -- "one dash the length of the whole path" -- AND
-     vector-effect=non-scaling-stroke. The dash pattern is then measured in
-     SCREEN px while pathLength normalises USER units, so the two agree only
-     while one user unit is one screen px, i.e. while the plot is no wider than
-     the path's own 1036 user units. Past that the dash is short and the tail
-     of the curve is simply not painted: measured, the plot is 1042px at 1920
-     (fine), 1682px at 2560 -- where the line STOPS just past 1Y and 10Y and
-     30Y are missing -- and 2562px at 3440, where it draws, breaks, and
-     resumes. A Treasury curve that ends at 1Y is a false statement, which is
-     worse than no curve. Dropping the dash paints the whole path; the cost is
-     that the draw-in does not run above 1920 (ycDraw animates dashoffset, which
-     now has nothing to offset). Below 1920 the component is untouched and
-     draws in normally. Remove this the day the component stops needing it. */
-  .hv2-curve .yc-line{stroke-dasharray:none;}
 }
 
 /* ---- landscape phones: a letterbox, composed as one (§7 rule 8) --------

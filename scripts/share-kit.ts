@@ -28,6 +28,7 @@ import type { ReactElement } from "react";
 import { mkdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import YieldCurve from "../src/components/viz/YieldCurve";
+import { site } from "../src/config/site";
 import { PROHIBITED_506B } from "./qa/regime";
 
 const OUT = join(process.cwd(), "public", "share");
@@ -43,10 +44,12 @@ const FLOOR = 0.55;
 
 /** And the largest it may grow one. A card is a poster: a section that occupies
  *  a third of a 1080 square at its page size is a page fragment, not a poster,
- *  and the site's own fixed tiers (.ft-quote is a flat 34px, .stx-name a flat
- *  26px) do not grow with the frame the way the clamp() tiers do. The ceiling
- *  stops it turning a paragraph into a billboard. */
-const CEIL = 2.2;
+ *  and the site's own fixed tiers (.stx-name is a flat 26px, .t-caption 13px)
+ *  do not grow with the frame the way the clamp() tiers do. The ceiling stops
+ *  it turning a paragraph into a billboard; it was 2.2 until the curve card
+ *  took its natural aspect and stopped being able to fill the square by
+ *  stretching, which is the trade counsel asked for. */
+const CEIL = 2.8;
 
 /** A selector, and whether every match is wanted or only the first. The
  *  approach eyebrow selector matches five elements on the page and one on the
@@ -89,8 +92,7 @@ const CARDS: Card[] = [
          headline and lead — so it carries its own. Without it the tenor labels
          and the source line render at their page size, 13px on a 1080 poster,
          which is a caption on a page and not on a card. */
-      ".sk-curve { zoom: 1.5; margin-bottom: 30px; }" +
-      ".sk-curve .yc-svg { height: 250px; }",
+      ".sk-curve { zoom: 1.35; margin-bottom: 26px; }",
   },
   {
     name: "four-stages",
@@ -99,7 +101,12 @@ const CARDS: Card[] = [
     selectors: [
       { sel: "#approach p.t-mono", first: true },   // the eyebrow, not the five stage labels
       "#approach h2",
-      "#approach ol",                                // the four stages, and nothing after them
+      "#approach ol",
+      /* Counsel finding 4: the block that applies to all four stages — the tail
+         overlay is permanent, not discretionary — was being cut off with the
+         selector. A card showing four gates and omitting the standing one
+         misdescribes the process. */
+      "#approach ol + div",
     ],
     /* Round 0 had to hide the stage prose to make this fit a 1920 story — the
        fitter was down at 0.21, which is a screenshot of a page, not a poster.
@@ -113,10 +120,17 @@ const CARDS: Card[] = [
     name: "risk-framework",
     width: 1200, height: 630,            // open graph
     route: "/",
-    /* sec-framework moved the statement into Statement.tsx during round 1;
-       it is the only <p> on the display tier inside the framework section
-       (the section's own h2 is the other .t-display-sm and is an h2). */
-    selectors: [{ sel: "section.ft p.t-display-sm", first: true }],
+    /* The whole Statement object, not just its sentence: counsel finding 3 —
+       the card was dropping the attribution the live page carries. Lifting the
+       wrapper takes the sentence and the byline together and cannot fall out of
+       step with the page again. */
+    selectors: [{ sel: "section.ft div.rule-t.rule-b", first: true }],
+    /* The em rule is the card's typographic treatment of a byline, not new
+       copy: the word is the page's "Investment Committee". The section band's
+       own vertical padding is zeroed because the card supplies the air. */
+    frame:
+      ".sk-body div.rule-t { padding-top: 0 !important; padding-bottom: 0 !important; }" +
+      '.sk-body p.t-small.text-fog::before { content: "\\2014\\00a0"; }',
   },
   {
     name: "strategies",
@@ -136,7 +150,10 @@ const CARDS: Card[] = [
        see curveMarkup(). Nothing is lifted off the route for this one. */
     selectors: [],
     curve: "body",
-    frame: ".sk-body { justify-content: center; } .sk-body .yc-svg { height: 360px; }",
+    /* No height override: card mode gives the plot the viewBox's own aspect
+       (counsel finding 1), and forcing a height here would put the stretch
+       straight back. */
+    frame: ".sk-body { justify-content: center; }",
   },
 ];
 
@@ -205,6 +222,10 @@ const FRAME = `
   .sk-body { display: flex; flex-direction: column; min-height: 0; }
   .sk-foot { display: flex; flex-direction: column; }
   .sk-curve { margin-bottom: 44px; }
+  /* Counsel finding 2: every card, not just the ones carrying data. The frame
+     line sits above the wordmark so the mark still closes the composition. */
+  .sk-legal { display: block; margin: 0 0 16px; color: var(--color-fog);
+              hyphens: none; }
   /* Nothing on a card is a link, a button, or a control. Whatever the source
      element carried, it is a still image here. */
   .sk a { text-decoration: none; pointer-events: none; }
@@ -271,7 +292,10 @@ async function lift(page: Page, picks: Pick[]): Promise<string[]> {
  * line that is not the data.
  */
 async function curveMarkup(): Promise<string | null> {
-  const el = (await YieldCurve({})) as ReactElement | null;
+  /* card: true — counsel finding 1. The component names the plot in type, adds
+     "Public market data. Not fund performance." under the source line, and
+     renders the viewBox's own aspect instead of being stretched to a height. */
+  const el = (await YieldCurve({ card: true })) as ReactElement | null;
   if (!el) return null;
   return renderToStaticMarkup(el);
 }
@@ -296,7 +320,14 @@ async function main() {
   const made: string[] = [];
 
   for (const card of CARDS) {
-    const res = await src.goto(base + card.route, { waitUntil: "networkidle" });
+    /* "load", not "networkidle". The kit navigates the same source page five
+       times and each card holds ~700KB of inlined font data; once a few of
+       those contexts were alive, networkidle stopped settling inside its 30s
+       and the run died on the first goto. Nothing here needs the network quiet
+       — it needs the DOM built — so wait for load and give the sections a beat
+       to lay out. */
+    const res = await src.goto(base + card.route, { waitUntil: "load" });
+    await src.waitForTimeout(400);
     if (!res || res.status() !== 200) {
       fails.push(`${card.name}: ${card.route} returned ${res?.status()}`);
       continue;
@@ -322,11 +353,12 @@ async function main() {
       else curve = drawn;
     }
 
-    const page = await (await browser.newContext({
+    const ctx = await browser.newContext({
       viewport: { width: card.width, height: card.height },
       deviceScaleFactor: 1,
       reducedMotion: "reduce",
-    })).newPage();
+    });
+    const page = await ctx.newPage();
 
     await page.setContent(
       /* No hashed next/font class on <html>: those classes only name the font
@@ -342,9 +374,12 @@ async function main() {
         `<div class="sk"><div class="sk-body">${parts.join("")}</div>` +
         `<div class="sk-foot">` +
         (curve ? `<div class="sk-curve">${curve}</div>` : "") +
+        /* site.domain, not a literal: the domain has one home and it is
+           src/config/site.ts. */
+        `<p class="t-caption sk-legal">Informational only. Not an offer. ${site.domain}</p>` +
         `<div class="sk-mark">${c.wordmark}</div></div></div>` +
         `</body></html>`,
-      { waitUntil: "networkidle" }
+      { waitUntil: "load" }
     );
     /* Load the three faces explicitly and then ASSERT they resolved. A font
        fallback never throws — the first version of this kit rendered every
@@ -371,7 +406,7 @@ async function main() {
     });
     if (missing.length) {
       fails.push(`${card.name}: font did not load, would render in a fallback: ${missing.join(", ")}`);
-      await page.close();
+      await ctx.close();
       continue;
     }
 
@@ -465,7 +500,10 @@ async function main() {
     }
 
     made.push(`${card.name}  ${card.width}x${card.height}`);
-    await page.close();
+    /* Close the CONTEXT, not just the page: each one is holding the inlined
+       font data, and five of them alive at once is what stalled the source
+       page's navigation. */
+    await ctx.close();
   }
   await browser.close();
 

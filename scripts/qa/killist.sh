@@ -112,23 +112,6 @@ DEFS = "src/app/globals.css"
 
 # Pinned pre-existing drift: path -> (count, owning section).
 BASELINE = {
-    "src/app/globals.css":                           (0, "foundation"),
-    "src/app/insights/page.tsx":                     (0, "sec-insights"),
-    "src/app/legal/page.tsx":                        (0, "sec-legal"),
-    "src/app/questions/page.tsx":                    (0, "sec-allocators"),
-    "src/components/HairlineList.tsx":               (0, "sec-allocators"),
-    "src/components/PinnedStrategies.tsx":           (2, "sec-strategies"),
-    "src/components/sections/Atmosphere.tsx":        (4, "sec-hero"),
-    "src/components/sections/ContactBand.tsx":       (0, "sec-firm"),
-    "src/components/sections/Feature.tsx":           (0, "sec-framework"),
-    "src/components/sections/ForAllocators.tsx":     (0, "sec-allocators"),
-    "src/components/sections/HeroV2.tsx":            (0, "sec-hero"),
-    "src/components/sections/Insights.tsx":          (0, "sec-insights"),
-    "src/components/sections/MarketsBand.tsx":       (5, "sec-hero"),
-    "src/components/sections/SiteNav.tsx":           (0, "sec-chrome"),
-    "src/components/sections/Strategies.tsx":        (0, "sec-strategies"),
-    "src/components/ui/Button.tsx":                  (0, "Conductor"),
-    "src/components/ui/Card.tsx":                    (0, "Conductor"),
     # Dead code: neither is imported by any route, and §8.2 forbids a marquee
     # outright. Pinned rather than fixed because it is not sec-motion's to
     # delete; reported to the Conductor.
