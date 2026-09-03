@@ -4,6 +4,9 @@ import PageHeader from "@/components/PageHeader";
 import TextLink from "@/components/TextLink";
 import { fund } from "@/config/fund";
 import { strategies } from "@/content/strategies";
+import StrategiesRail from "./StrategiesRail";
+import { tileAccents } from "@/components/tileAccents";
+import ECBGrid from "@/components/viz/ECBGrid";
 
 /**
  * /strategies — the six books, then the two questions the six raise.
@@ -43,8 +46,11 @@ import { strategies } from "@/content/strategies";
 
 export const metadata: Metadata = {
   title: "Strategies",
+  // <=155 chars (Google presence audit: 167 truncated in results). Same
+  // sentence, condensed — "what constrains their capacity" -> "what
+  // constrains capacity", "the conditions under which" -> "when".
   description:
-    "Six strategies across liquid global markets, governed by one risk framework — what constrains their capacity, and the conditions under which we would stop running one.",
+    "Six strategies across liquid global markets, governed by one risk framework — what constrains capacity, and when we would stop running one.",
 };
 
 /* Two-digit ordinals, computed from position in the array that actually
@@ -363,6 +369,10 @@ export default function Strategies() {
 .stx-rail a:focus-visible {
   outline: 2px solid var(--color-ink); outline-offset: 2px; border-radius: 4px;
 }
+/* The section currently in view (see StrategiesRail.tsx's IntersectionObserver) —
+   same ink + hairline-strong underline hover/active already read as, so it
+   is not a new visual language, just a persistent version of it. */
+.stx-rail a[aria-current] { color: var(--color-ink); border-color: var(--color-ink); }
 @keyframes stxRailIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .stx-rail a { animation: none; } }
 
@@ -395,6 +405,36 @@ export default function Strategies() {
   .stx-rail a { white-space: nowrap; }
 }
 
+/* ---- the six chapters ------------------------------------------------
+   Each chapter's header IS that book's home-deck tile (tileAccents.ts,
+   the same array PinnedStrategies.tsx reads, so the fill and the paired
+   -fg text can never drift between the two) as a wide band, not a rounded
+   card: no radius, no shadow, full width of whatever column it sits in
+   (the content column, same width the rest of the page reads at — full
+   viewport bleed would either collide with the sticky rail at >=1280 or
+   need a second, width-dependent bleed rule, for a "wide band" that reads
+   the same either way without either). */
+.stx-chapter-tile {
+  padding: 32px 24px;
+  animation: stxChapterIn var(--dur-base) var(--ease) both;
+  animation-delay: calc(var(--stx-i, 0) * var(--stagger));
+}
+.stx-chapter-tile .t-h1 { color: inherit; }
+@keyframes stxChapterIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stx-chapter-tile { animation: none; }
+}
+/* One-liner / Markets / Instruments / capacity stacked on phones, two
+   columns >=1024 specifically (not grid-gc2's 768, which the rest of this
+   page uses -- the brief calls this breakpoint out by name). */
+.stx-chapter-body { display: grid; gap: 32px; }
+@media (min-width: 1024px) {
+  .stx-chapter-body { grid-template-columns: 5fr 6fr; gap: 56px; }
+}
+
 /* Print: paper does not scroll, so the horizontal-scroll strip — the one
    exception APPENDIX-A grants on screen — is not one on a printed page.
    Chromium's print viewport (816px) falls inside the same <1280px range that
@@ -412,6 +452,13 @@ export default function Strategies() {
   }
   .stx-rail li { scroll-snap-align: none; }
   .stx-rail a { white-space: normal; }
+  /* The chapter tile's background is dropped like every other background
+     under PAPER mode (globals.css's frozen print block); its own text is
+     already ink or ground per the pairing, and the deep-iris (ground-fg)
+     chapter needs the same class-selector-can't-catch-an-inline-style fix
+     PinnedStrategies.tsx's print block already documents for the same
+     token, applied here with the same data-tone attribute. */
+  .stx-chapter-tile[data-tone="dark"] { color: var(--color-ink) !important; }
 }
 `,
         }}
@@ -430,39 +477,55 @@ export default function Strategies() {
               is duplicated in the DOM and nothing picks the layout in JS. */}
           <div className="stx-layout">
             <div className="stx-rail-wrap">
-              <nav className="stx-rail" aria-label="Jump to a strategy">
-                <ul>
-                  {strategies.map((s, k) => (
-                    <li key={s.slug} style={{ ["--stx-i" as string]: k }}>
-                      <a href={`#${s.slug}`} className="t-small">{s.name}</a>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
+              <StrategiesRail items={strategies} />
             </div>
             <div className="stx-rows">
-              {strategies.map((s) => (
-                <div key={s.slug} id={s.slug} className="grid-gc2 rule-t py-16 md:py-24 scroll-mt-24">
-                  <div className="col-span-4 md:col-span-5">
-                    <h2 className="t-h2 text-ink">{s.name}</h2>
-                    <dl className="mt-8">
-                      <div className="rule-t flex justify-between gap-6 py-3">
-                        <dt className="t-small text-ink-3">Markets</dt>
-                        <dd className="t-body text-right text-ink-2">{s.markets}</dd>
+              {strategies.map((s, k) => {
+                const t = tileAccents[k];
+                const constraint = capacityConstraint[s.slug];
+                return (
+                  <div
+                    key={s.slug}
+                    id={s.slug}
+                    className={`stx-chapter ${k ? "rule-t" : ""} scroll-mt-24`}
+                    style={{ ["--stx-i" as string]: k }}
+                  >
+                    <div
+                      className="stx-chapter-tile"
+                      data-tone={t.dark ? "dark" : "light"}
+                      style={{ background: t.bg, color: t.fg }}
+                    >
+                      <h2 className="t-h1">{s.name}</h2>
+                    </div>
+                    <div className="stx-chapter-body py-12 md:py-16">
+                      <div>
+                        <p className="t-lead measure-lead">{s.oneLiner}</p>
+                        <dl className="mt-8">
+                          <div className="rule-t flex justify-between gap-6 py-3">
+                            <dt className="t-small text-ink-3">Markets</dt>
+                            <dd className="t-body text-right text-ink-2">{s.markets}</dd>
+                          </div>
+                          <div className="rule-t rule-b flex justify-between gap-6 py-3">
+                            <dt className="t-small text-ink-3">Instruments</dt>
+                            <dd className="t-body text-right text-ink-2">{s.instruments}</dd>
+                          </div>
+                        </dl>
                       </div>
-                      <div className="rule-t rule-b flex justify-between gap-6 py-3">
-                        <dt className="t-small text-ink-3">Instruments</dt>
-                        <dd className="t-body text-right text-ink-2">{s.instruments}</dd>
+                      <div>
+                        {s.body.map((p, i) => (
+                          <p key={i} className={`t-body measure-body text-ink-2 ${i ? "mt-6" : ""}`}>{p}</p>
+                        ))}
+                        {constraint && (
+                          <div className="rule-t mt-8 pt-6">
+                            <p className="t-mono-xs text-ink-3">Capacity</p>
+                            <p className="t-body measure-body mt-2 text-ink-2">{constraint}</p>
+                          </div>
+                        )}
                       </div>
-                    </dl>
+                    </div>
                   </div>
-                  <div className="col-span-4 md:col-span-6 md:col-start-7">
-                    {s.body.map((t, i) => (
-                      <p key={i} className={`t-body measure-body text-ink-2 ${i ? "mt-6" : ""}`}>{t}</p>
-                    ))}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </Container>
@@ -485,6 +548,17 @@ export default function Strategies() {
           </Container>
         </section>
       ))}
+
+      <section className="bg-ground">
+        <Container>
+          <div className="py-16 md:py-24">
+            <p className="t-caption text-ink-3">Reference rates</p>
+            <div className="mt-6">
+              <ECBGrid />
+            </div>
+          </div>
+        </Container>
+      </section>
     </div>
   );
 }

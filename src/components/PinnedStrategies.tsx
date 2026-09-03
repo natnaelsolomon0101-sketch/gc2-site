@@ -1,7 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import type { KeyboardEvent } from "react";
 import type { Strategy } from "@/content/strategies";
+import { tileAccents } from "./tileAccents";
 
 /* ===========================================================================
    PinnedStrategies — the sliding/fanning tile deck, back by owner's request.
@@ -58,21 +60,10 @@ import type { Strategy } from "@/content/strategies";
    motion-allowed, tall-enough client upgrades to.
    ========================================================================= */
 
-/** `dark` marks the one tile (deep-iris) whose fill is dark enough that its
-    paired foreground is `ground`, not `ink` — see the print handling below. */
-type Tile = { bg: string; fg: string; dark?: boolean };
-
-/** Index-matched to `strategies`. Reads the paired accent/-fg tokens
-    DESIGN.md defines and Tile.tsx already asserts >=4.5:1 for — no hex here,
-    so there is nothing for this file to drift out of sync with that table. */
-const tiles: Tile[] = [
-  { bg: "var(--color-accent-iris-gleam)", fg: "var(--color-accent-iris-gleam-fg)" },
-  { bg: "var(--color-accent-cyan-signal)", fg: "var(--color-accent-cyan-signal-fg)" },
-  { bg: "var(--color-accent-pale-iris)", fg: "var(--color-accent-pale-iris-fg)" },
-  { bg: "var(--color-accent-deep-iris)", fg: "var(--color-accent-deep-iris-fg)", dark: true },
-  { bg: "var(--color-accent-orchid-bloom)", fg: "var(--color-accent-orchid-bloom-fg)" },
-  { bg: "var(--color-accent-periwinkle)", fg: "var(--color-accent-periwinkle-fg)" },
-];
+/* Fills live in tileAccents.ts now, shared with /strategies' chapter
+   headers (round 8: they use "the same chromatic fill and -fg text as the
+   home deck," which means one array, not two hand-kept copies). */
+const tiles = tileAccents;
 
 type Mode = "static" | "pinned";
 
@@ -122,7 +113,16 @@ const css = `
   .stx-pin { --tile-h: 80px; --step: 66px; --pad-x: 32px; }
 }
 
-.stx-track { position: relative; }
+/* contain:layout paint scopes layout and paint invalidation to the track
+   itself -- the browser does not have to check ancestors/siblings when the
+   deck's own height changes (every tile switch) or repaint outside this
+   box, which is most of what the scroll handler's per-frame state update
+   triggers. Left off content/size (not "strict") on purpose: the track's
+   own height is intrinsic (deck height + spacer) and has to keep affecting
+   normal document flow for the sticky panel and the page below it to sit
+   where they should -- this is a paint/layout-invalidation boundary, not a
+   fixed-size box. */
+.stx-track { position: relative; contain: layout paint; }
 /* No height rule on the panel. It is exactly as tall as .stx-deck, which is
    exactly as tall as (N-1) steps plus one expanded tile -- content decides,
    not a vh guess. The spacer below supplies scroll travel. */
@@ -162,6 +162,16 @@ const css = `
   position: absolute; inset-inline: 0; top: 0; height: var(--tile-h);
   transition: transform var(--dur-base) var(--ease), height var(--dur-base) var(--ease);
 }
+/* will-change is set here, not as a blanket rule on .stx-tile: a first pass
+   did that and measured WORSE under CPU throttling (TBT went from ~15ms to
+   ~120ms) -- six chromatic tiles permanently promoted to their own
+   compositor layer for as long as the deck is pinned costs more than it
+   saves, since most of that time nothing is moving. The JS below toggles
+   this class for the duration of an actual transform transition only
+   (transitionrun -> transitionend/transitioncancel on the transform
+   property specifically), via the browser's own transition events rather
+   than a timer guessing at 500ms. */
+.stx-transforming { will-change: transform; }
 .stx--pinned .stx-tile[data-active="true"] { height: calc(var(--tile-h) + var(--body-h)); }
 
 .stx-head {
@@ -203,7 +213,13 @@ button.stx-head:focus-visible {
 .stx-meta dd { margin: 0; }
 .stx-tile .t-mono-xs, .stx-tile .t-small, .stx-tile .t-sub, .stx-tile .t-heading-sm,
 .stx-tile dt, .stx-tile dd { color: inherit; }
-.stx-muted { opacity: .82; }
+/* No opacity here. It used to be .82, diluting the tile's own paired -fg
+   token toward the fill colour to read as "muted" -- axe caught what that
+   actually does: on iris-gleam (the lowest-contrast pairing of the six at
+   5.62:1 full-strength) it measured 4.43:1, under the 4.5 floor. dt/dd
+   already read as label/value from .t-mono-xs's tracking and size alone;
+   full -fg strength for every tile text node, always, is the rule now. */
+.stx-muted { opacity: 1; }
 
 /* ---- static: reduced motion, no JS, and the server render --------------- */
 .stx--static .stx-deck { display: grid; gap: 16px; grid-template-columns: 1fr; }
@@ -244,6 +260,12 @@ export default function PinnedStrategies({ strategies }: { strategies: Strategy[
   const uid = useId();
   const trackRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
+  /* The scroll handler used to call panel.getBoundingClientRect() on every
+     frame just to read a height that only ever changes on resize or when
+     the open tile's content height changes -- a layout read the hot path
+     does not need. Cached here instead, refreshed by the effect below. */
+  const panelHRef = useRef(0);
+  const deckRef = useRef<HTMLDivElement>(null);
   const [mode, setMode] = useState<Mode>("static");
   const [i, setI] = useState(0);
   const [bodyH, setBodyH] = useState(0);
@@ -270,6 +292,52 @@ export default function PinnedStrategies({ strategies }: { strategies: Strategy[
     return () => window.removeEventListener("resize", measure);
   }, [mode, i, strategies]);
 
+  /* Refreshes the cached panel height the scroll handler reads instead of
+     measuring. Depends on bodyH, not just mode: the panel's real height
+     only settles to its new value once the active tile's height CSS has
+     actually updated to match a freshly-measured --body-h, which is this
+     same state one render later than the effect above. */
+  useLayoutEffect(() => {
+    if (mode !== "pinned") return;
+    const measure = () => {
+      const panel = trackRef.current?.firstElementChild as HTMLElement | null;
+      if (panel) panelHRef.current = panel.getBoundingClientRect().height;
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [mode, bodyH]);
+
+  /* will-change:transform lives on a class, .stx-transforming, added to a
+     tile only while its own transform is actually mid-transition and
+     removed the instant it ends -- transitionrun/transitionend/
+     transitioncancel on the transform property, delegated from the deck so
+     one listener covers all six tiles. See the CSS comment above
+     .stx-transforming for why this replaced a blanket always-on rule. */
+  useEffect(() => {
+    if (mode !== "pinned") return;
+    const deck = deckRef.current;
+    if (!deck) return;
+    const onRun = (e: TransitionEvent) => {
+      if (e.propertyName === "transform" && e.target instanceof HTMLElement) {
+        e.target.classList.add("stx-transforming");
+      }
+    };
+    const onDone = (e: TransitionEvent) => {
+      if (e.propertyName === "transform" && e.target instanceof HTMLElement) {
+        e.target.classList.remove("stx-transforming");
+      }
+    };
+    deck.addEventListener("transitionrun", onRun);
+    deck.addEventListener("transitionend", onDone);
+    deck.addEventListener("transitioncancel", onDone);
+    return () => {
+      deck.removeEventListener("transitionrun", onRun);
+      deck.removeEventListener("transitionend", onDone);
+      deck.removeEventListener("transitioncancel", onDone);
+    };
+  }, [mode]);
+
   /* Mode is resolved after mount so the server render -- and any client with
      JS off -- gets the fully readable static grid rather than a dead pin.
      Two conditions force the static grid: reduced motion, and a short
@@ -290,7 +358,11 @@ export default function PinnedStrategies({ strategies }: { strategies: Strategy[
     };
   }, []);
 
-  /* One rAF-throttled passive scroll listener, only while pinned. */
+  /* One rAF-throttled passive scroll listener, only while pinned. The only
+     layout read on the hot path is el.getBoundingClientRect() -- the one
+     number (the track's position) that can only ever come from a fresh
+     read on a scroll event; the panel height it also needs comes from the
+     cache above instead of a second per-frame measurement. */
   useEffect(() => {
     if (mode !== "pinned") return;
     let frame = 0;
@@ -299,8 +371,7 @@ export default function PinnedStrategies({ strategies }: { strategies: Strategy[
       const el = trackRef.current;
       if (!el) return;
       const r = el.getBoundingClientRect();
-      const panel = el.firstElementChild as HTMLElement | null;
-      const panelH = panel?.getBoundingClientRect().height || window.innerHeight;
+      const panelH = panelHRef.current || window.innerHeight;
       const total = r.height - panelH;
       if (total <= 0) return;
       const p = Math.min(Math.max(-r.top / total, 0), 0.9999);
@@ -320,20 +391,42 @@ export default function PinnedStrategies({ strategies }: { strategies: Strategy[
     };
   }, [mode, N]);
 
-  /* Clicking a tile drives the page to that tile's slice of the track, so
-     the pin and the click never disagree about which strategy is open. */
+  /* Clicking (or arrow-keying to, see the keydown handler below) a tile
+     drives the page to that tile's slice of the track, so the pin and the
+     selection never disagree about which strategy is open. */
   const select = useCallback((k: number) => {
     setI(k);
     if (mode !== "pinned") return;
     const el = trackRef.current;
     if (!el) return;
-    const panel = el.firstElementChild as HTMLElement | null;
-    const panelH = panel?.getBoundingClientRect().height || window.innerHeight;
+    const panelH = panelHRef.current || window.innerHeight;
     const total = el.getBoundingClientRect().height - panelH;
     if (total <= 0) return;
     const top = el.getBoundingClientRect().top + window.scrollY;
     window.scrollTo({ top: Math.round(top + total * ((k + 0.5) / N)), behavior: "smooth" });
   }, [mode, N]);
+
+  /* Six headers behave as one arrow-key-navigable group, the same pattern
+     as a tablist: Up/Left move to and open the previous tile, Down/Right
+     the next, Home/End jump to the first/last, all wrapping. Only these
+     four keys are handled -- everything else (Tab, Space/Enter activating
+     the focused button, Space/PageDown/PageUp scrolling the page) is left
+     to the browser's own default behaviour, which is exactly what keeps
+     the pinned track from ever trapping keyboard scroll: nothing here
+     calls preventDefault on a scroll key, only on the arrows, which do not
+     scroll the page from a focused button in any browser to begin with. */
+  const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const onHeadKeyDown = useCallback((k: number, e: KeyboardEvent<HTMLButtonElement>) => {
+    let next = -1;
+    if (e.key === "ArrowDown" || e.key === "ArrowRight") next = (k + 1) % N;
+    else if (e.key === "ArrowUp" || e.key === "ArrowLeft") next = (k - 1 + N) % N;
+    else if (e.key === "Home") next = 0;
+    else if (e.key === "End") next = N - 1;
+    if (next === -1) return;
+    e.preventDefault();
+    select(next);
+    buttonRefs.current[next]?.focus();
+  }, [N, select]);
 
   const stacked = mode === "pinned";
 
@@ -350,7 +443,7 @@ export default function PinnedStrategies({ strategies }: { strategies: Strategy[
       <style dangerouslySetInnerHTML={{ __html: css }} />
       <div ref={trackRef} className="stx-track">
         <div className="stx-panel">
-          <div className="stx-deck">
+          <div className="stx-deck" ref={deckRef}>
             {strategies.map((s, k) => {
               const t = tiles[k];
               const active = stacked ? k === i : true;
@@ -377,8 +470,10 @@ export default function PinnedStrategies({ strategies }: { strategies: Strategy[
                   {stacked ? (
                     <button
                       type="button"
+                      ref={(el) => { buttonRefs.current[k] = el; }}
                       className="stx-head"
                       onClick={() => select(k)}
+                      onKeyDown={(e) => onHeadKeyDown(k, e)}
                       aria-expanded={active}
                       aria-controls={pid}
                     >
