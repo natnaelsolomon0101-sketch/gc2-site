@@ -103,11 +103,17 @@ export default function Firm() {
         <section key={s.h} className={si % 2 ? "bg-abyss" : ""}>
           <Container>
             <div className={`grid-gc2 py-16 md:py-24 ${si === 0 ? "rule-t" : ""}`}>
-              <div className="col-span-4 md:col-span-5">
+              {/* h2 left / prose right is a 5/7 split of the 12-col grid, but
+                  only at ≥1024: `grid-gc2` is already 12 columns at ≥768, so
+                  without the `md:col-span-12` bridge this pair would go
+                  side-by-side at tablet width too, which the spec reserves
+                  for ≥1024. `break-after-avoid` keeps the h2 from ever being
+                  the last line visible on a screen with none of its prose. */}
+              <div className="col-span-4 md:col-span-12 lg:col-span-5 break-after-avoid">
                 <p className="t-mono-xs text-fog">{String(si + 1).padStart(2, "0")}</p>
                 <h2 className="t-h2 mt-3">{s.h}</h2>
               </div>
-              <div className="col-span-4 md:col-span-6 md:col-start-7">
+              <div className="col-span-4 md:col-span-12 lg:col-span-7 lg:col-start-6">
                 {s.p.map((t, i) => (
                   <p key={i} className={`t-body measure-body ${i ? "mt-6" : ""}`}>{t}</p>
                 ))}

@@ -62,8 +62,11 @@ export default function ContactBand() {
         className="wrap pt-[72px] pb-20 md:pt-28 md:pb-28"
       >
         <div className="grid gap-12 md:grid-cols-12 md:gap-10">
-          {/* The ask */}
-          <div className="md:col-span-6 lg:col-span-4">
+          {/* The ask. `order-2` on mobile puts this BELOW the ledger: the
+              investors address is the thing a thumb needs first when this
+              band scrolls into view, not the two lines of scene-setting
+              above it. md+ reverts to the left/right column order. */}
+          <div className="order-2 md:order-1 md:col-span-6 lg:col-span-4">
             <p className="t-mono">Contact</p>
             <h2 id="inquiries-heading" className="t-display-sm mt-5">
               Inquiries
@@ -75,7 +78,7 @@ export default function ContactBand() {
           </div>
 
           {/* The ledger. Two addresses, one office. */}
-          <div className="md:col-span-6 md:col-start-7 lg:col-span-6 lg:col-start-7">
+          <div className="order-1 md:order-2 md:col-span-6 md:col-start-7 lg:col-span-6 lg:col-start-7">
             <div className="border-t border-white/12">
               {channels.map((c) => (
                 <div key={c.email} className="border-b border-white/12">
@@ -85,10 +88,12 @@ export default function ContactBand() {
                   >
                     {/* Label sits above the address until lg. Side by side at
                         768 the address column is ~230px and the serif broke
-                        "investors@gc2.fun / d" across two lines. */}
+                        "investors@gc2.fun / d" across two lines. `break-all`
+                        (not `break-words`) per §7 rule 9: email addresses use
+                        word-break: break-all inside their link. */}
                     <span className="flex flex-1 flex-col gap-2 lg:flex-row lg:items-baseline lg:gap-8">
                       <span className="t-mono-xs shrink-0 lg:w-[104px]">{c.label}</span>
-                      <span className="t-heading-sm break-words text-pure">{c.email}</span>
+                      <span className="t-heading-sm break-all text-pure">{c.email}</span>
                     </span>
                     <Arrow />
                   </a>
