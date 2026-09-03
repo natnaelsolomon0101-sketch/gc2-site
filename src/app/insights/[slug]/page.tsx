@@ -1,13 +1,43 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import fs from "node:fs/promises";
+import path from "node:path";
 import Container from "@/components/Container";
 import Prose from "@/components/Prose";
+import RevealLines from "@/components/ui/RevealLines";
+import { css } from "@/lib/css";
 import { site, siteUrl } from "@/config/site";
 import { notes, formatDate } from "@/content/notes";
 
+/* RevealLines' mask assumes one authored, non-wrapping line per entry (its
+   own doc comment: "each line sits in an overflow-hidden mask"). A note
+   title is prose from src/content/notes.ts, not hand-split into lines, and
+   it wraps across two or three lines inside the article's own narrow
+   measure at every width this route ships — the mask's one-line box would
+   clip everything past the first. The clip is turned off for the title
+   specifically; it still fades and rises in, it just no longer crops
+   while doing it. */
+const TITLE_CSS = css`
+.note-title span[class*="mask"]{overflow:visible;padding-bottom:0;margin-bottom:0;}
+`;
+
 export function generateStaticParams() {
   return notes.map((n) => ({ slug: n.slug }));
+}
+
+/* Reading time for the caption line. Derived, not authored: it reads the
+   note's own .mdx source (the same file the body import below compiles),
+   strips markup and counts words at 200wpm. No number here is invented — it
+   is arithmetic on the words already on the page — and a note that changes
+   length changes its own reading time on the next build with no one having
+   to remember to update a byline. */
+async function readingMinutes(slug: string): Promise<number> {
+  const file = path.join(process.cwd(), "src", "content", "notes", `${slug}.mdx`);
+  const raw = await fs.readFile(file, "utf8");
+  const text = raw.replace(/<[^>]*>/g, " ").replace(/[#>*`_[\]()-]/g, " ");
+  const words = text.split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(words / 200));
 }
 
 /* Round 3 verified: title and description are the note's own title and dek,
@@ -41,6 +71,7 @@ export default async function Note({ params }: { params: Promise<{ slug: string 
   const next = notes[idx - 1];
 
   const { default: Body } = await import(`@/content/notes/${slug}.mdx`);
+  const minutes = await readingMinutes(slug);
 
   /* Article measure per §5.6: clamp(20em, 90vw, 36em), not the site-wide
      680px .measure-prose (shared with the legal/disclosures pages this
@@ -76,6 +107,7 @@ export default async function Note({ params }: { params: Promise<{ slug: string 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      <style>{TITLE_CSS}</style>
       <Container>
         {/* The baseline shot (docs/v4/shots/baseline/insights_capacity-is-a-
             research-problem--393--fold.png) showed ~180px of dead air between
@@ -90,10 +122,12 @@ export default async function Note({ params }: { params: Promise<{ slug: string 
             <p className="t-mono text-ink-3">
               {note.category}
             </p>
-            <h1 className="t-article-title mt-6">
-              {note.title}
-            </h1>
-            <p className="t-small mt-6 text-ink-3">{formatDate(note.date)}</p>
+            <RevealLines as="h1" className="t-article-title mt-6 note-title" lines={[note.title]} />
+            <p className="t-caption mt-6 text-ink-3">
+              <time dateTime={note.date}>{formatDate(note.date)}</time>
+              <span aria-hidden="true"> · </span>
+              {minutes} min read
+            </p>
           </div>
 
           <div className="mt-12">

@@ -1,20 +1,31 @@
 import Link from "next/link";
 import Statement from "@/components/Statement";
+import Glass from "@/components/ui/Glass";
+import Tilt from "@/components/ui/Tilt";
+import RevealLines from "@/components/ui/RevealLines";
+import { css } from "@/lib/css";
 import { notes, formatDate } from "@/content/notes";
 
 /**
- * INSIGHTS — an editorial index, not a card grid.
+ * INSIGHTS — the home section as a frame (TRANSFORM rule 1): min-height 80vh
+ * on desktop, its two objects — the latest note and the pull quote — held at
+ * the optical centre by a flex column on `justify-content:center` rather than
+ * stacked from the top. Phones keep natural height (no min-height below
+ * 1024px), so the frame never forces empty scroll on a short viewport.
  *
- * Shape: one lead note given the full width (serif title, category, date, dek),
- * then its pull-quote set through the shared Statement object (round-1 fix: the
- * quote previously lived on a violet chromatic tile with quotation marks and
- * centered text — a second emphasis object the brief forbids, since Statement
- * is the one way this site emphasizes a sentence). The note row sits above
- * Statement, inside the section's own wrap/band; Statement is full-bleed below
- * it, same placement Feature.tsx uses for its own Statement instance.
+ * The lead note used to be a plain full-width text block; it is now a
+ * <Glass> pane in a <Tilt> wrapper (rule 4: "objects float"), the same
+ * object language HeroV2's other floating pieces use. The pull-quote keeps
+ * setting through the shared <Statement> object (Cross-section objects,
+ * OWNERSHIP.md) — sec-insights imports it, does not fork it — full-bleed
+ * below the card, both centred together inside the one frame.
  *
- * Quotes below are verbatim from the note bodies. Source file and line noted on
- * each. Nothing here is invented: no read times, no authors, no metrics.
+ * The ground is the pale-iris wash, the same radial the hero draws
+ * (TRANSFORM rule 3), at a lower peak alpha since this frame's copy sits on
+ * a much smaller canvas than the hero's.
+ *
+ * Quotes below are verbatim from the note bodies. Source file and line noted
+ * on each. Nothing here is invented: no read times, no authors, no metrics.
  */
 const QUOTES: Record<string, string> = {
   // src/content/notes/capacity-is-a-research-problem.mdx, lines 16–17
@@ -48,101 +59,50 @@ function Arrow() {
   );
 }
 
+const CSS = css`
+.ins-frame{position:relative;isolation:isolate;overflow:hidden;
+  display:flex;flex-direction:column;justify-content:center;
+  background:var(--color-ground);}
+@media (min-width:1024px){ .ins-frame{min-height:80vh;} }
+/* .wrap carries container-type:inline-size (globals.css); as a flex item of
+   this column flex frame that collapses to its padding alone under
+   align-items:stretch (content-driven sizing under containment fighting the
+   stretch pass) rather than filling the frame's width. width:100% forces
+   the fill explicitly rather than relying on stretch through containment. */
+.ins-frame > .wrap{width:100%;}
+.ins-bg{position:absolute;inset:0;pointer-events:none;}
+.ins-wash{position:absolute;inset:0;
+  background:radial-gradient(65% 55% at 82% 22%,
+    rgba(209,201,255,.26) 0%, rgba(209,201,255,.09) 45%, rgba(247,245,240,0) 72%);}
+.ins-head em{font-style:italic;color:var(--color-accent-deep-iris);}
+/* RevealLines' mask assumes one authored, non-wrapping line per entry; a
+   wrapped second line at a narrow width would sit past the mask's one-line
+   box and clip, so the clip is turned off for this headline specifically —
+   it still fades and rises, it just no longer crops while doing it. */
+.ins-head span[class*="mask"]{overflow:visible;padding-bottom:0;margin-bottom:0;}
+`;
+
 export default function Insights() {
-  const [lead, ...rest] = notes;
+  const [lead] = notes;
 
   return (
-    <section id="insights">
-      <div className="wrap band">
-        {/* masthead */}
+    <section id="insights" className="ins-frame">
+      <style>{CSS}</style>
+
+      <div className="ins-bg" aria-hidden="true">
+        <div className="ins-wash" />
+      </div>
+
+      <div className="wrap band relative">
         <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-6">
           <div>
             <p className="t-mono">Insights</p>
-            <h2 className="t-display-sm mt-6">Notes from the desk.</h2>
+            <RevealLines
+              as="h2"
+              className="t-display-sm ins-head mt-6"
+              lines={["Notes from", <>the <em>desk</em>.</>]}
+            />
           </div>
-          <p className="t-mono-xs max-w-xs text-ink-3">
-            {notes.length === 1
-              ? "One note. It argues a position we actually hold."
-              : `${notes.length} notes. Each one argues a position we actually hold.`}
-          </p>
-        </div>
-
-        {/* ---- lead note: full width. The pull-quote used to live here too,
-             on a violet chromatic tile with quotation marks and centered text
-             — a second "emphasize a sentence" object next to Statement, which
-             the brief forbids. It now sets through <Statement> below, full-
-             bleed, the same object Feature.tsx uses for its own quote.
-
-             Light pass: the eyebrow row's hover used to shift to iris-gleam
-             (a chromatic accent). On paper that measures 3.03:1 as text —
-             DESIGN.md: "will not pass as text and no amount of weight or
-             size fixes them" — so hover now steps ink-3 -> ink, the same
-             de-emphasized-to-full-contrast jump every other hover state on
-             this page uses instead. Row titles already render at .t-h3-
-             equivalent full ink weight at rest (no lighter "cloud" tier to
-             lift from any more), so their hover colour transition is gone
-             too — the row's background/eyebrow/arrow already carry the
-             hover cue. ---- */}
-        <Link
-          href={`/insights/${lead.slug}`}
-          className="group mt-14 block rule-t pt-10 md:mt-20 md:pt-14"
-        >
-          <p className="t-mono-xs text-ink-3 transition-colors duration-[var(--dur-fast)] group-hover:text-ink motion-reduce:transition-none">
-            {lead.category}
-            <span aria-hidden="true" className="px-3 text-ink-3">
-              /
-            </span>
-            <time dateTime={lead.date}>{formatDate(lead.date)}</time>
-          </p>
-
-          <h3 className="mt-6 max-w-2xl font-display text-4xl leading-none tracking-tight text-ink md:text-6xl">
-            {lead.title}
-          </h3>
-
-          <p className="t-sub mt-7 max-w-md text-ink-2">{lead.dek}</p>
-
-          <span className="t-mono-xs mt-8 inline-flex min-h-11 items-center gap-3 text-ink">
-            Read the note
-            <Arrow />
-          </span>
-        </Link>
-
-        {/* ---- the rest: type-led hairline rows. Absent, not empty, when the
-             index is a single note — an empty bordered box reads as a note that
-             failed to load. Quotes stay inline here (not promoted to Statement
-             — one emphasized sentence per section, not one per note). ---- */}
-        {rest.length ? (
-        <div className="mt-12 md:mt-16">
-          {rest.map((n) => (
-            <Link
-              key={n.slug}
-              href={`/insights/${n.slug}`}
-              className="group grid gap-x-12 gap-y-5 rule-t py-9 lg:grid-cols-12 lg:py-11"
-            >
-              <p className="t-mono-xs text-ink-3 transition-colors duration-[var(--dur-fast)] group-hover:text-ink lg:col-span-3 motion-reduce:transition-none">
-                {n.category}
-                <span className="block pt-1">
-                  <time dateTime={n.date}>{formatDate(n.date)}</time>
-                </span>
-              </p>
-
-              <div className="lg:col-span-5">
-                <h3 className="font-display text-2xl leading-tight tracking-tight text-ink md:text-3xl">
-                  {n.title}
-                </h3>
-                <p className="t-small mt-3 max-w-md">{n.dek}</p>
-              </div>
-
-              <blockquote className="border-l border-iris-gleam pl-5 font-display text-lg leading-snug text-ink-2 lg:col-span-4">
-                &ldquo;{QUOTES[n.slug]}&rdquo;
-              </blockquote>
-            </Link>
-          ))}
-        </div>
-        ) : null}
-
-        {/* closing rule + index link */}
-        <div className={`flex justify-end rule-t ${rest.length ? "pt-6" : "mt-12 pt-6 md:mt-16"}`}>
           <Link
             href="/insights"
             className="t-mono-xs group inline-flex min-h-11 items-center gap-3 text-ink"
@@ -151,6 +111,31 @@ export default function Insights() {
             <Arrow />
           </Link>
         </div>
+
+        <Tilt max={4} as="div" className="mt-14 block max-w-3xl md:mt-16">
+          <Glass as="article" radius={20} className="p-8 md:p-12">
+            <Link href={`/insights/${lead.slug}`} className="group block">
+              <p className="t-mono-xs text-ink-3 transition-colors duration-[var(--dur-fast)] group-hover:text-ink motion-reduce:transition-none">
+                {lead.category}
+                <span aria-hidden="true" className="px-3 text-ink-3">
+                  /
+                </span>
+                <time dateTime={lead.date}>{formatDate(lead.date)}</time>
+              </p>
+
+              <h3 className="mt-6 font-display text-3xl leading-none tracking-tight text-ink md:text-5xl">
+                {lead.title}
+              </h3>
+
+              <p className="t-sub mt-6 max-w-md text-ink-2">{lead.dek}</p>
+
+              <span className="t-mono-xs mt-8 inline-flex min-h-11 items-center gap-3 text-ink">
+                Read the note
+                <Arrow />
+              </span>
+            </Link>
+          </Glass>
+        </Tilt>
       </div>
 
       <Statement attribution="From the note">{QUOTES[lead.slug]}</Statement>
