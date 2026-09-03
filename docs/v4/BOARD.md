@@ -13,4 +13,4 @@
 | sec-allocators | 1 | MERGED r0 (4b1c47d) — reviewed: grid, questions rows, tables pass by eye | hyphenation + h1 line-height are foundation r1 | lock after r0-a matrix + r1 tokens |
 | sec-firm | 1 | MERGED r0 (d0c47b6) — reviewed: PageHeader fixed; contact address on first screen | hyphenation + h1 line-height are foundation r1 | lock after r0-a matrix + r1 tokens |
 | sec-legal | 1 | MERGED r0 (ab18de2) — reviewed: 404 poster ok; tearsheet 6–7 pages (content-bound) | hyphenation + h1 line-height are foundation r1 | lock after r0-a matrix + r1 tokens |
-| sec-motion | 0 | RUNNING (worktree ~/gc2-wt/motion, port 3110) | — | round-0 brief sent |
+| sec-motion | 1 | MERGED r0 (2117d1f): 18 OG cards, YieldCurve (Treasury, terms verified), SessionClock, ECBGrid, sources.ts, share kit, motion gate in killist | share kit renders in fallback serif | r1: @font-face in share page, card composition, counsel read |
