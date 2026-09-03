@@ -2,7 +2,30 @@ import type { Metadata } from "next";
 import Container from "@/components/Container";
 import PageHeader from "@/components/PageHeader";
 import TextLink from "@/components/TextLink";
+import Glass from "@/components/ui/Glass";
+import Tilt from "@/components/ui/Tilt";
+import RevealLines from "@/components/ui/RevealLines";
+import { css } from "@/lib/css";
 import { site, siteUrl } from "@/config/site";
+
+/* Section frame, matching /firm and /team (sec-firm owns all three): a
+   block becomes a frame — min-height 80vh at lg+, copy at the optical
+   centre, an iris-haze wash, a foot caption of the same standing facts the
+   home hero closes on. Phones keep natural height. */
+const CSS = css`
+.cn-frame{position:relative;isolation:isolate;overflow:hidden;
+  display:flex;flex-direction:column;padding-block:16px;}
+.cn-wash{position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(55% 60% at 92% 12%, rgba(209,201,255,.16) 0%, rgba(209,201,255,.05) 45%, transparent 75%);}
+.cn-content{position:relative;z-index:1;flex:1;display:flex;align-items:center;}
+.cn-content > .grid-gc2{width:100%;}
+.cn-foot{position:relative;z-index:1;margin-top:40px;}
+@media (min-width:1024px){ .cn-frame{min-height:80vh;padding-block:24px;} }
+.cn-fact{padding:20px 22px;}
+.cn-content h2 em{font-style:italic;color:var(--color-accent-deep-iris);}
+`;
+
+const standingFacts = `${site.city} · ${site.structure} · ${site.mandate}`;
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -130,11 +153,18 @@ const blocks: Block[] = [
           before anyone acts on them. That is true of every firm, and it is true
           of this one.
         </p>
-        <p className="t-body mt-8">
-          <TextLink standalone href={`mailto:${site.emails.investors}`}>
-            <span className="break-all">{site.emails.investors}</span>
-          </TextLink>
-        </p>
+        <div className="mt-8">
+          <Tilt max={4} as="div">
+            <Glass as="div" radius={18} className="cn-fact">
+              <p className="t-mono-xs text-ink-3">Existing investors</p>
+              <p className="t-heading-sm mt-2">
+                <TextLink standalone href={`mailto:${site.emails.investors}`}>
+                  <span className="break-all">{site.emails.investors}</span>
+                </TextLink>
+              </p>
+            </Glass>
+          </Tilt>
+        </div>
       </>
     ),
   },
@@ -161,11 +191,18 @@ const blocks: Block[] = [
           Naming one would be the first invented fact on a site built to avoid
           them.
         </p>
-        <p className="t-body mt-8">
-          <TextLink standalone href={`mailto:${site.emails.press}`}>
-            <span className="break-all">{site.emails.press}</span>
-          </TextLink>
-        </p>
+        <div className="mt-8">
+          <Tilt max={4} as="div">
+            <Glass as="div" radius={18} className="cn-fact">
+              <p className="t-mono-xs text-ink-3">Press</p>
+              <p className="t-heading-sm mt-2">
+                <TextLink standalone href={`mailto:${site.emails.press}`}>
+                  <span className="break-all">{site.emails.press}</span>
+                </TextLink>
+              </p>
+            </Glass>
+          </Tilt>
+        </div>
       </>
     ),
   },
@@ -221,18 +258,23 @@ const blocks: Block[] = [
    "before the intro paragraph" there rather than just near it. This repeats
    nothing but that block's own title and address (no new copy). */
 const investorsQuickLink = (
-  <a
-    href={`mailto:${site.emails.investors}`}
-    className="rule-t flex min-h-11 flex-col gap-2 py-5"
-  >
-    <span className="t-mono-xs text-ink-3">Existing investors</span>
-    <span className="t-h3 break-all text-ink">{site.emails.investors}</span>
-  </a>
+  <Tilt max={4} as="div">
+    <Glass as="div" radius={18} className="cn-fact">
+      <a
+        href={`mailto:${site.emails.investors}`}
+        className="flex min-h-11 flex-col gap-2"
+      >
+        <span className="t-mono-xs text-ink-3">Existing investors</span>
+        <span className="t-h3 break-all text-ink">{site.emails.investors}</span>
+      </a>
+    </Glass>
+  </Tilt>
 );
 
 export default function Contact() {
   return (
     <>
+      <style>{CSS}</style>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -252,18 +294,35 @@ export default function Contact() {
           are four audiences, not four steps, and the preamble's numerals
           rule ("no numerals on things that are not sequences") applies —
           removed. Heading ink 17.04:1 / 15.47:1, body ink-2 7.55:1 / 6.85:1. */}
-      {blocks.map((b, i) => (
-        <section key={b.id} id={b.id} className={`scroll-mt-24 ${i % 2 ? "bg-ground-2" : ""}`}>
-          <Container>
-            <div className="grid-gc2 py-16 md:py-24 rule-t">
+      {blocks.map((b, i) => {
+        const words = b.title.split(" ");
+        return (
+        <section key={b.id} id={b.id} className={`cn-frame scroll-mt-24 ${i % 2 ? "bg-ground-2" : ""}`}>
+          <div className="cn-wash" aria-hidden="true" />
+          <Container className="cn-content">
+            <div className="grid-gc2 rule-t">
               <div className="col-span-4 md:col-span-4">
-                <h2 className="t-h2">{b.title}</h2>
+                <RevealLines
+                  as="h2"
+                  className="t-h2"
+                  lines={[
+                    <>
+                      {words.slice(0, -1).join(" ")}
+                      {words.length > 1 ? " " : ""}
+                      <em>{words[words.length - 1]}</em>
+                    </>,
+                  ]}
+                />
               </div>
               <div className="col-span-4 md:col-span-7 md:col-start-6">{b.node}</div>
             </div>
           </Container>
+          <Container>
+            <p className="t-caption text-ink-3 cn-foot">{standingFacts}</p>
+          </Container>
         </section>
-      ))}
+        );
+      })}
 
       {/* Closing strip. Not a third mailto ledger — the addresses are already
           linked in the two blocks that own them. This is the inventory: what
@@ -271,18 +330,24 @@ export default function Contact() {
           checked against it. `site.address` and `site.phone` are null and are
           deliberately absent rather than substituted for. Alternation continues
           off blocks.length: four blocks end on ground-2, so this lands on
-          ground. */}
-      <section className={blocks.length % 2 ? "bg-ground-2" : ""}>
-        <Container>
-          <div className="rule-t py-16 md:py-24">
-            <p className="t-mono-xs text-ink-3">The published addresses</p>
-            <p className="t-body measure-body mt-6">
-              Two, and there is not a third: {site.emails.investors} and{" "}
-              {site.emails.press}. No telephone line is published on this site,
-              there is no form on any page of it, and there is no portal behind
-              any of it. Anything presenting itself as another route into the
-              firm did not come from here.
-            </p>
+          ground. Rendered as one <Glass> fact pane (TRANSFORM.md rule 4): the
+          whole strip states facts and nothing else. */}
+      <section className={`cn-frame ${blocks.length % 2 ? "bg-ground-2" : ""}`}>
+        <div className="cn-wash" aria-hidden="true" />
+        <Container className="cn-content">
+          <div className="w-full">
+            <Tilt max={3} as="div">
+              <Glass as="div" radius={20} className="cn-fact">
+                <p className="t-mono-xs text-ink-3">The published addresses</p>
+                <p className="t-body measure-body mt-6">
+                  Two, and there is not a third: {site.emails.investors} and{" "}
+                  {site.emails.press}. No telephone line is published on this site,
+                  there is no form on any page of it, and there is no portal behind
+                  any of it. Anything presenting itself as another route into the
+                  firm did not come from here.
+                </p>
+              </Glass>
+            </Tilt>
           </div>
         </Container>
       </section>

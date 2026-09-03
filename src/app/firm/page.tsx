@@ -2,8 +2,36 @@ import type { Metadata } from "next";
 import Container from "@/components/Container";
 import PageHeader from "@/components/PageHeader";
 import TextLink from "@/components/TextLink";
+import Glass from "@/components/ui/Glass";
+import Tilt from "@/components/ui/Tilt";
+import RevealLines from "@/components/ui/RevealLines";
+import { css } from "@/lib/css";
 import { fund } from "@/config/fund";
 import { site, siteUrl } from "@/config/site";
+
+/* Section frame (TRANSFORM.md rule 1 / rule 3 / rule 6): a section becomes a
+   frame — min-height 80vh at lg+ with its content at the optical centre, an
+   iris-haze wash under it, and one `.t-caption` foot line carrying the same
+   standing facts HeroV2's own foot carries (`site.city` / `site.structure`
+   / `site.mandate` — nothing invented, nothing this page did not already
+   have a source for). Phones keep natural height per the rule; the frame is
+   a flex column so the foot sits at the frame's own bottom rather than
+   immediately under the last paragraph, without needing a second flex
+   parent per section. */
+const CSS = css`
+.firm-frame{position:relative;isolation:isolate;overflow:hidden;
+  display:flex;flex-direction:column;padding-block:16px;}
+.firm-wash{position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(55% 60% at 92% 12%, rgba(209,201,255,.16) 0%, rgba(209,201,255,.05) 45%, transparent 75%);}
+.firm-content{position:relative;z-index:1;flex:1;display:flex;align-items:center;}
+.firm-content > .grid-gc2{width:100%;}
+.firm-foot{position:relative;z-index:1;margin-top:40px;}
+@media (min-width:1024px){ .firm-frame{min-height:80vh;padding-block:24px;} }
+.firm-fact{padding:22px 24px;}
+.firm-content h2 em{font-style:italic;color:var(--color-accent-deep-iris);}
+`;
+
+const standingFacts = `${site.city} · ${site.structure} · ${site.mandate}`;
 
 export const metadata: Metadata = {
   title: "The firm",
@@ -47,18 +75,24 @@ const jsonLd = {
    populated `fund.people` adds a list and never a number. */
 const people = fund.people ?? [];
 
+/* Each named seat is a fact, so it renders as a <Glass> pane that tilts
+   (TRANSFORM.md rule 4), one per named person, inside a `<dl>` — HTML5
+   permits a `<div>` wrapping one dt/dd group inside a `<dl>`, so the
+   semantics survive the glass treatment. */
 const seats =
   people.length > 0 ? (
-    <dl className="mt-10">
+    <dl className="mt-10 grid gap-5 sm:grid-cols-2">
       {people.map((p) => (
-        <div key={p.name} className="rule-t py-8">
-          <dt className="t-mono-xs text-ink-3">{p.role}</dt>
-          <dd className="t-h3 mt-2">{p.name}</dd>
-          <dd className="t-body measure-body mt-3">{p.bio}</dd>
-          {p.priorFirms.length > 0 && (
-            <dd className="t-small mt-3 text-ink-3">Previously {p.priorFirms.join(", ")}</dd>
-          )}
-        </div>
+        <Tilt key={p.name} max={5} as="div">
+          <Glass as="div" radius={18} className="firm-fact">
+            <dt className="t-mono-xs text-ink-3">{p.role}</dt>
+            <dd className="t-h3 mt-2">{p.name}</dd>
+            <dd className="t-body measure-body mt-3">{p.bio}</dd>
+            {p.priorFirms.length > 0 && (
+              <dd className="t-small mt-3 text-ink-3">Previously {p.priorFirms.join(", ")}</dd>
+            )}
+          </Glass>
+        </Tilt>
       ))}
     </dl>
   ) : null;
@@ -116,6 +150,7 @@ export default function Firm() {
         standfirst="We are a small partnership. The work is research; trading is how the research is expressed."
         caption={`The firm was formed in ${site.foundedLabel}. What is described here is the policy the firm operates under, not a record of periods it has run.`}
       />
+      <style>{CSS}</style>
       {/* Bands alternate ground / ground-2 rather than every section sitting on
           one flat ground, so the page has rhythm the way the home page does.
           On the light canvas the ground->ground-2 step is 1.10 — DESIGN.md:
@@ -124,11 +159,18 @@ export default function Firm() {
           top hairline (previously only the first one did, closing the page
           header, on the dark build's theory that a colour change was rule
           enough on its own). Heading ink 17.04:1 (ground) / 15.47:1
-          (ground-2); body ink-2 7.55:1 / 6.85:1; ordinal ink-3 5.61:1 / 5.09:1. */}
-      {sections.map((s, si) => (
-        <section key={s.h} className={si % 2 ? "bg-ground-2" : ""}>
-          <Container>
-            <div className="grid-gc2 py-16 md:py-24 rule-t">
+          (ground-2); body ink-2 7.55:1 / 6.85:1; ordinal ink-3 5.61:1 / 5.09:1.
+
+          Each band is now also a FRAME (TRANSFORM.md rule 1): 80vh at lg+
+          with the copy at the optical centre, an iris-haze wash, and a foot
+          caption of the same standing facts the home hero closes on. */}
+      {sections.map((s, si) => {
+        const words = s.h.split(" ");
+        return (
+        <section key={s.h} className={`firm-frame ${si % 2 ? "bg-ground-2" : ""}`}>
+          <div className="firm-wash" aria-hidden="true" />
+          <Container className="firm-content">
+            <div className="grid-gc2 rule-t">
               {/* h2 left / prose right is a 5/7 split of the 12-col grid, but
                   only at ≥1024: `grid-gc2` is already 12 columns at ≥768, so
                   without the `md:col-span-12` bridge this pair would go
@@ -137,7 +179,17 @@ export default function Firm() {
                   the last line visible on a screen with none of its prose. */}
               <div className="col-span-4 md:col-span-12 lg:col-span-5 break-after-avoid">
                 <p className="t-mono-xs text-ink-3">{String(si + 1).padStart(2, "0")}</p>
-                <h2 className="t-h2 mt-3">{s.h}</h2>
+                <RevealLines
+                  as="h2"
+                  className="t-h2 mt-3"
+                  lines={[
+                    <>
+                      {words.slice(0, -1).join(" ")}
+                      {words.length > 1 ? " " : ""}
+                      <em>{words[words.length - 1]}</em>
+                    </>,
+                  ]}
+                />
               </div>
               <div className="col-span-4 md:col-span-12 lg:col-span-7 lg:col-start-6">
                 {s.p.map((t, i) => (
@@ -150,8 +202,12 @@ export default function Firm() {
               </div>
             </div>
           </Container>
+          <Container>
+            <p className="t-caption text-ink-3 firm-foot">{standingFacts}</p>
+          </Container>
         </section>
-      ))}
+        );
+      })}
     </>
   );
 }

@@ -2,8 +2,42 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Container from "@/components/Container";
 import PageHeader from "@/components/PageHeader";
+import Glass from "@/components/ui/Glass";
+import Tilt from "@/components/ui/Tilt";
+import RevealLines from "@/components/ui/RevealLines";
+import { css } from "@/lib/css";
 import { site, siteUrl } from "@/config/site";
 import { fund } from "@/config/fund";
+
+/* Section frame, matching /firm's (sec-firm owns both): a band becomes a
+   frame — min-height 80vh at lg+, copy at the optical centre, an iris-haze
+   wash, a foot caption of the same standing facts the home hero closes on.
+   Phones keep natural height. */
+const CSS = css`
+.team-frame{position:relative;isolation:isolate;overflow:hidden;
+  display:flex;flex-direction:column;padding-block:16px;}
+.team-wash{position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(55% 60% at 92% 12%, rgba(209,201,255,.16) 0%, rgba(209,201,255,.05) 45%, transparent 75%);}
+.team-content{position:relative;z-index:1;flex:1;display:flex;align-items:center;}
+.team-content > .grid-gc2{width:100%;}
+.team-foot{position:relative;z-index:1;margin-top:40px;}
+@media (min-width:1024px){ .team-frame{min-height:80vh;padding-block:24px;} }
+.team-content h2 em{font-style:italic;color:var(--color-accent-deep-iris);}
+.team-card{padding:22px 24px;}
+`;
+
+const standingFacts = `${site.city} · ${site.structure} · ${site.mandate}`;
+
+function emLast(s: string): React.ReactNode {
+  const words = s.split(" ");
+  return (
+    <>
+      {words.slice(0, -1).join(" ")}
+      {words.length > 1 ? " " : ""}
+      <em>{words[words.length - 1]}</em>
+    </>
+  );
+}
 
 /**
  * TEAM
@@ -123,20 +157,24 @@ function Band({
   ground: boolean;
 }) {
   return (
-    <section className={ground ? "bg-ground-2" : ""}>
-      <Container>
-        <div className="grid-gc2 py-16 md:py-24 rule-t">
+    <section className={`team-frame ${ground ? "bg-ground-2" : ""}`}>
+      <div className="team-wash" aria-hidden="true" />
+      <Container className="team-content">
+        <div className="grid-gc2 rule-t">
           <div className="col-span-4 md:col-span-12 lg:col-span-5 break-after-avoid">
             <p className="t-mono-xs text-ink-3">
               {String(n).padStart(2, "0")}
             </p>
-            <h2 className="t-h2 mt-3">{title}</h2>
+            <RevealLines as="h2" className="t-h2 mt-3" lines={[emLast(title)]} />
             <p className="t-mono-xs mt-5">{label}</p>
           </div>
           <div className="col-span-4 md:col-span-12 lg:col-span-7 lg:col-start-6">
             {children}
           </div>
         </div>
+      </Container>
+      <Container>
+        <p className="t-caption text-ink-3 team-foot">{standingFacts}</p>
       </Container>
     </section>
   );
@@ -163,6 +201,7 @@ export default function TeamPage() {
        breaks landmark navigation and leaves the layout's skip link pointing at
        one of two mains. Every other route file returns a fragment. */
     <>
+      <style>{CSS}</style>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -179,12 +218,14 @@ export default function TeamPage() {
         label="Seats"
         title="What the seats are"
       >
-        <dl className="rule-t">
+        <dl className="grid gap-5 sm:grid-cols-2">
           {SEATS.map((s) => (
-            <div key={s.seat} className="rule-b py-6">
-              <dt className="t-heading-sm text-ink">{s.seat}</dt>
-              <dd className="t-body measure-body mt-3">{s.holds}</dd>
-            </div>
+            <Tilt key={s.seat} max={5} as="div">
+              <Glass as="div" radius={18} className="team-card">
+                <dt className="t-heading-sm text-ink">{s.seat}</dt>
+                <dd className="t-body measure-body mt-3">{s.holds}</dd>
+              </Glass>
+            </Tilt>
           ))}
         </dl>
         <p className="t-small measure-body mt-8">
@@ -206,20 +247,22 @@ export default function TeamPage() {
           label="Roster"
           title="Who holds them"
         >
-          <dl className="rule-t">
+          <dl className="grid gap-5 sm:grid-cols-2">
             {people.map((p) => (
-              <div key={p.name} className="rule-b py-8">
-                <dt>
-                  <span className="t-mono-xs block text-ink-3">{p.role}</span>
-                  <span className="t-h3 mt-2 block text-ink">{p.name}</span>
-                </dt>
-                <dd className="t-body measure-body mt-4">{p.bio}</dd>
-                {p.priorFirms.length ? (
-                  <dd className="t-small mt-3">
-                    Previously {p.priorFirms.join(", ")}.
-                  </dd>
-                ) : null}
-              </div>
+              <Tilt key={p.name} max={5} as="div">
+                <Glass as="div" radius={18} className="team-card">
+                  <dt>
+                    <span className="t-mono-xs block text-ink-3">{p.role}</span>
+                    <span className="t-h3 mt-2 block text-ink">{p.name}</span>
+                  </dt>
+                  <dd className="t-body measure-body mt-4">{p.bio}</dd>
+                  {p.priorFirms.length ? (
+                    <dd className="t-small mt-3">
+                      Previously {p.priorFirms.join(", ")}.
+                    </dd>
+                  ) : null}
+                </Glass>
+              </Tilt>
             ))}
           </dl>
         </Band>
@@ -231,12 +274,14 @@ export default function TeamPage() {
         label="Reading a bio"
         title="What to demand of a name"
       >
-        <dl className="rule-t">
+        <dl className="grid gap-5 sm:grid-cols-2">
           {DEMANDS.map((d) => (
-            <div key={d.q} className="rule-b py-6">
-              <dt className="t-heading-sm text-ink">{d.q}</dt>
-              <dd className="t-body measure-body mt-3">{d.a}</dd>
-            </div>
+            <Tilt key={d.q} max={5} as="div">
+              <Glass as="div" radius={18} className="team-card">
+                <dt className="t-heading-sm text-ink">{d.q}</dt>
+                <dd className="t-body measure-body mt-3">{d.a}</dd>
+              </Glass>
+            </Tilt>
           ))}
         </dl>
       </Band>
