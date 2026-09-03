@@ -26,12 +26,24 @@
       ink now -- the underline still marks "current," it just no longer
       borrows colour to do it.
    7. ROUND 6 (Conductor, MotionSites "Velorah" / "Vibrant Wellness", logged
-      docs/v4/MOTIONSITES.md): on `/` ONLY, the bar becomes two floating
-      liquid-glass pills (links, CTA) plus a glass circle (burger) over the
-      hero, with no bar background until 8px of scroll. Inner routes are
-      untouched -- same bar as before, same code path, gated on
-      `pathname === "/"` rather than forked into a second component. The
-      glass pills are this file's one deliberate exception to "no shadows":
+      docs/v4/MOTIONSITES.md): the bar is two floating liquid-glass pills
+      (links, CTA) plus a glass circle (burger), with no bar background at
+      all until 8px of scroll.
+
+      ROUND 8 (owner, TRANSFORM.md "chrome"): that treatment was gated on
+      `pathname === "/"`, so seventeen of the eighteen routes still got the
+      2024 opaque bar and the site changed its chrome the moment you clicked
+      anything. The gate is GONE. Every route gets the pills, every route is
+      transparent over its own first screen until 8px of scroll, and past
+      that every route gets the same solid ground + hairline. There is one
+      bar now, not two, which also deletes the `.sn-rule` divider and the
+      inline `.btn` CTA that only the inner-route branch ever rendered.
+
+      Nothing about the drawer changed: the burger, the focus return, the
+      trap, the Escape handler, the route-change close and the SessionClock
+      placement are the audited versions, untouched.
+
+      The glass pills are this file's one deliberate exception to "no shadows":
       `box-shadow: inset 0 1px 1px rgba(255,255,255,.4)` is the prompt's own
       value, standing in for the light catching a glass edge, not a card
       drop-shadow -- APPENDIX-A's shadow ban is about depth-via-shadow on
@@ -65,28 +77,22 @@ const CSS = `
    editing the frozen html{} block in globals.css. */
 html{ scroll-padding-top: var(--nav-h); }
 
+/* No bar at all until the page has moved -- on EVERY route, not just the
+   home hero (round 8). The pills float directly on whatever the route's own
+   first screen draws. Scrolling past 8px hands the bar its ground colour
+   and the hairline together. The border is a constant 1px whose COLOUR
+   animates: a border that appears from nothing adds 1px to the header box
+   and shifts the whole page down mid-scroll (note 1). */
 .sn-header{
   position:sticky; top:0; z-index:50;
-  background-color:color-mix(in srgb, var(--color-ground) 82%, transparent);
-  backdrop-filter:blur(20px) saturate(140%);
-  -webkit-backdrop-filter:blur(20px) saturate(140%);
+  background-color:transparent;
   /* constant 1px. only the colour moves. */
   border-bottom:1px solid transparent;
   transition:border-bottom-color var(--dur-menu) var(--ease), background-color var(--dur-menu) var(--ease);
 }
-.sn-header[data-scrolled="true"]{ border-bottom-color:var(--color-hairline-strong); }
-
-/* Home: no bar at all until the page has moved -- the pills float directly
-   on the hero. Scrolling past 8px hands the bar back its ground colour
-   (solid, not the color-mix wash inner routes use) alongside the same
-   hairline every other route already gets from the rule above. */
-.sn-header[data-home="true"]{
-  background-color:transparent;
-  backdrop-filter:none;
-  -webkit-backdrop-filter:none;
-}
-.sn-header[data-home="true"][data-scrolled="true"]{
+.sn-header[data-scrolled="true"]{
   background-color:var(--color-ground);
+  border-bottom-color:var(--color-hairline-strong);
 }
 
 .sn-header :focus-visible,
@@ -120,11 +126,6 @@ html{ scroll-padding-top: var(--nav-h); }
   text-decoration-skip-ink:none;
 }
 
-.sn-rule{
-  display:block; width:1px; height:20px;
-  background:var(--color-hairline-strong);
-}
-
 .sn-burger{
   display:inline-flex; align-items:center; justify-content:center;
   height:44px; width:44px;
@@ -133,19 +134,23 @@ html{ scroll-padding-top: var(--nav-h); }
 }
 .sn-burger:hover{ color:var(--color-ink-2); }
 
-/* ---- home: the three-track floating bar --------------------------------
-   Wordmark start / pill nav centre / CTA pill + burger end. A grid, not the
-   inner routes' justify-between flex row: with three flex children of
-   different widths, space-between does not put the middle one on the
-   page's true centreline, and "centered rounded-full glass pill" means the
-   centreline. 1fr auto 1fr does, symmetrically, regardless of how wide
-   the pill or the wordmark are. */
-.sn-bar-home{
+/* ---- the three-track floating bar --------------------------------------
+   Wordmark start / pill nav centre / CTA pill + burger end. A grid, not a
+   justify-between flex row: with three flex children of different widths,
+   space-between does not put the middle one on the page's true centreline,
+   and "centered rounded-full glass pill" means the centreline. 1fr auto 1fr
+   does, symmetrically, regardless of how wide the pill or the wordmark are. */
+.sn-bar{
   display:grid; grid-template-columns:1fr auto 1fr; align-items:center; column-gap:16px;
 }
-.sn-bar-home .sn-mark{ justify-self:start; }
-.sn-bar-home .sn-pill-nav{ justify-self:center; }
-.sn-home-right{ justify-self:end; display:flex; align-items:center; gap:12px; }
+/* Explicit column placement, not auto-flow. A display:none child generates no
+   box at all, so with the pill nav hidden below 769px auto-placement slid the
+   burger into the CENTRE track and the bar came out with the hamburger in the
+   middle of the phone (measured at 393: circle centred on 201 of 393). Naming
+   each track is the fix; it also survives any future child being hidden. */
+.sn-bar .sn-mark{ grid-column:1; justify-self:start; }
+.sn-bar .sn-pill-nav{ grid-column:2; justify-self:center; }
+.sn-right{ grid-column:3; justify-self:end; display:flex; align-items:center; gap:12px; }
 
 /* ---- the glass material -------------------------------------------------
    Paper translation of the MotionSites prompt's .liquid-glass: white at low
@@ -156,7 +161,7 @@ html{ scroll-padding-top: var(--nav-h); }
    token list governs. The inset highlight is the prompt's own value,
    standing in for a glass edge catching light -- see file-header note 7 for
    why this is not the shadow ban. */
-.sn-pill-nav, .sn-pill-cta, .sn-burger-glass{
+.sn-pill-nav, .sn-pill-cta, .sn-burger{
   position:relative;
   background:rgba(255,255,255,.35);
   backdrop-filter:blur(6px);
@@ -169,7 +174,7 @@ html{ scroll-padding-top: var(--nav-h); }
    with a three-stop hairline-alpha gradient (strong / transparent / strong)
    rather than a flat line -- the "gradient hairline border" the prompt
    calls for, in the site's own ink-alpha rather than an invented colour. */
-.sn-pill-nav::before, .sn-pill-cta::before, .sn-burger-glass::before{
+.sn-pill-nav::before, .sn-pill-cta::before, .sn-burger::before{
   content:"";
   position:absolute; inset:0;
   border-radius:inherit;
@@ -200,8 +205,6 @@ html{ scroll-padding-top: var(--nav-h); }
 }
 @media (min-width:769px){ .sn-pill-cta{ display:inline-flex; } }
 .sn-pill-cta:hover{ background-color:rgba(255,255,255,.5); }
-
-.sn-burger-glass{ border-radius:9999px; }
 
 /* Desktop bar vs. the drawer trigger, two rules that must never disagree:
    1. THE THRESHOLD IS 769px, matching --nav-h's own max-width:768px tier
@@ -305,7 +308,6 @@ const FOCUSABLE = "a[href], button:not([disabled])";
 
 export default function SiteNav() {
   const pathname = usePathname();
-  const isHome = pathname === "/";
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -389,15 +391,15 @@ export default function SiteNav() {
   }, [open, close]);
 
   /* One burger, one place its aria-expanded/aria-controls/aria-label and its
-     two-glyph SVG are declared, whichever bar it renders inside of -- the
-     home bar just adds the glass-circle class, per round 6's own note 3
-     (keep every a11y property already verified: the attributes below are
-     unchanged from the audited version). */
+     two-glyph SVG are declared. Round 8 folded the glass-circle class into
+     `.sn-burger` itself, since there is no longer a second bar for it to
+     look different in (keep every a11y property already verified: the
+     attributes below are unchanged from the audited version). */
   const burgerButton = (
     <button
       ref={triggerRef}
       type="button"
-      className={`sn-burger -mr-2${isHome ? " sn-burger-glass" : ""}`}
+      className="sn-burger -mr-2"
       aria-expanded={open}
       aria-controls="site-nav-drawer"
       aria-label={open ? "Close menu" : "Open menu"}
@@ -425,24 +427,17 @@ export default function SiteNav() {
     <>
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
 
-      <header
-        className="sn-header"
-        data-scrolled={scrolled ? "true" : "false"}
-        data-home={isHome ? "true" : "false"}
-      >
-        <div className={`wrap nav-frame flex items-center${isHome ? " sn-bar-home" : " justify-between"}`}>
+      <header className="sn-header" data-scrolled={scrolled ? "true" : "false"}>
+        <div className="wrap nav-frame sn-bar">
           <Link
             href="/"
-            aria-label={`${site.mark} — home`}
+            aria-label={`${site.mark} home`}
             className="sn-mark t-wordmark inline-flex min-h-11 min-w-11 items-center"
           >
             {site.mark}
           </Link>
 
-          <nav
-            aria-label="Primary"
-            className={`sn-desktop-nav items-center${isHome ? " sn-pill-nav" : " gap-7"}`}
-          >
+          <nav aria-label="Primary" className="sn-desktop-nav items-center sn-pill-nav">
             {nav.map((n) => (
               <Link
                 key={n.href}
@@ -453,26 +448,14 @@ export default function SiteNav() {
                 {n.label}
               </Link>
             ))}
-            {!isHome && (
-              <>
-                <span aria-hidden="true" className="sn-rule" />
-                <Link href={CTA.href} className="btn">
-                  {CTA.label}
-                </Link>
-              </>
-            )}
           </nav>
 
-          {isHome ? (
-            <div className="sn-home-right">
-              <Link href={CTA.href} className="sn-pill-cta">
-                {CTA.label}
-              </Link>
-              {burgerButton}
-            </div>
-          ) : (
-            burgerButton
-          )}
+          <div className="sn-right">
+            <Link href={CTA.href} className="sn-pill-cta">
+              {CTA.label}
+            </Link>
+            {burgerButton}
+          </div>
         </div>
       </header>
 
