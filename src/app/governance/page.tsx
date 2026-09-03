@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Container from "@/components/Container";
-import PageHeader from "@/components/PageHeader";
 import { fund } from "@/config/fund";
 import { StageStrip } from "@/components/sections/Approach";
+import { css } from "@/lib/css";
+import RevealLines from "@/components/ui/RevealLines";
 
 /**
  * /governance — who can say no.
@@ -37,6 +38,69 @@ export const metadata: Metadata = {
   description:
     "Who sets the limits, who can cut a position without asking, whose mark is final, and what happens if someone is not there. Roles, not names.",
 };
+
+/* ------------------------------------------------------------- the header --
+   sec-approach's other file (Approach.tsx) draws its ground as an iris haze
+   over paper plus the hero's grain, and sets its h2 through RevealLines. This
+   page gets "the same header treatment" (its assignment's own words) rather
+   than PageHeader (owned by sec-firm, still the plain pre-transform version
+   in this worktree): the eyebrow/h1/standfirst content PageHeader used to
+   render is unchanged, only wrapped in that same ground and revealed the
+   same way. GRAIN is copied verbatim from HeroV2 / Approach.tsx, same as
+   TRANSFORM.md rule 3 asks every section to do. */
+const GRAIN =
+  "<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'>" +
+  "<filter id='g' x='0' y='0' width='100%' height='100%'>" +
+  "<feTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='3' stitchTiles='stitch' result='t'/>" +
+  "<feColorMatrix in='t' type='matrix' values='0 0 0 0 .078 0 0 0 0 .075 0 0 0 0 .067 .42 .42 .42 0 -.60'/>" +
+  "</filter><rect width='140' height='140' filter='url(#g)'/></svg>";
+const GRAIN_URL = `url("data:image/svg+xml,${encodeURIComponent(GRAIN)}")`;
+
+const HEADER_CSS = css`
+.gov-hd{position:relative;isolation:isolate;overflow:hidden;}
+.gov-hd-bg{position:absolute;inset:0;pointer-events:none;contain:layout paint style;z-index:0;}
+.gov-hd-wash{position:absolute;inset:0;
+  background:
+    radial-gradient(60% 60% at 88% 0%,
+      rgba(209,201,255,.30) 0%, rgba(209,201,255,.10) 45%, rgba(247,245,240,0) 75%),
+    radial-gradient(70% 55% at 6% 100%,
+      rgba(209,201,255,.14) 0%, rgba(247,245,240,0) 70%);}
+.gov-hd-grain{position:absolute;inset:0;background-image:${GRAIN_URL};
+  background-size:140px 140px;opacity:.22;}
+.gov-hd-inner{position:relative;z-index:1;}
+@media print{ .gov-hd-bg{display:none !important;} }
+`;
+
+/* Title is one word ("Governance."), so there is no second word to leave in
+   the roman weight — TRANSFORM.md rule 2's "pick the operative word; do not
+   italicise two per line" assumes a line with more than one candidate. Rather
+   than italicise the whole title (which would read as a font choice, not an
+   emphasis), the ground and the RevealLines reveal carry the treatment here;
+   copy is unchanged either way. */
+function GovernanceHeader() {
+  return (
+    <section className="gov-hd">
+      <style>{HEADER_CSS}</style>
+      <div className="gov-hd-bg" aria-hidden="true">
+        <div className="gov-hd-wash" />
+        <div className="gov-hd-grain" />
+      </div>
+      <Container>
+        <div className="gov-hd-inner flex flex-col pt-6 pb-8 md:pt-12 md:pb-14 lg:pt-20 lg:pb-20">
+          <p className="t-mono text-ink-3">Governance</p>
+          <h1 className="t-h1 measure-head mt-4 md:mt-6 hyphens-none">
+            <RevealLines lines={["Governance."]} />
+          </h1>
+          <p className="t-lead measure-lead mt-6 md:mt-8">
+            The question behind every governance page is what stops one person from blowing
+            this up. This is the answer: who sets the limits, who can cut a position without
+            asking, whose mark is final, and what happens if someone is not there.
+          </p>
+        </div>
+      </Container>
+    </section>
+  );
+}
 
 /* ------------------------------------------------------------------ ledger --
    Real <table>, visually-hidden <caption>, <th scope="row"> on the decision,
@@ -260,11 +324,7 @@ export default function Governance() {
 
   return (
     <>
-      <PageHeader
-        eyebrow="Governance"
-        title="Governance."
-        standfirst="The question behind every governance page is what stops one person from blowing this up. This is the answer: who sets the limits, who can cut a position without asking, whose mark is final, and what happens if someone is not there."
-      />
+      <GovernanceHeader />
 
       {/* Same band rhythm as /firm and /diligence: ground and ground-2 alternate
           so the page has cadence without a rule under every section. Heading
