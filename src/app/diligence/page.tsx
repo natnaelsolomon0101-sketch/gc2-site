@@ -57,11 +57,11 @@ function Ledger({
       <caption className="sr-only">{caption}</caption>
       <thead className="sr-only md:not-sr-only">
         <tr className="block md:table-row">
-          <th scope="col" className="t-mono-xs block pb-3 text-left text-fog md:table-cell md:w-5/12 md:pr-6">
+          <th scope="col" className="t-caption block pb-3 text-left text-fog md:table-cell md:w-5/12 md:pr-6">
             {termHead}
           </th>
           {heads.map((h) => (
-            <th key={h} scope="col" className="t-mono-xs block pb-3 text-left text-fog md:table-cell md:pr-6">
+            <th key={h} scope="col" className="t-caption block pb-3 text-left text-fog md:table-cell md:pr-6">
               {h}
             </th>
           ))}
@@ -69,7 +69,10 @@ function Ledger({
       </thead>
       <tbody>
         {rows.map((r) => (
-          <tr key={r.term} className="rule-t block py-5 md:table-row md:py-0">
+          /* Below md the row becomes its own grid rather than a plain block
+             stack, so the term and each value line up as term-over-value
+             pairs with a consistent gap, per §5.7/§7.10. */
+          <tr key={r.term} className="rule-t grid gap-y-1 py-5 md:table-row md:gap-y-0 md:py-0">
             <th
               scope="row"
               className="t-body block text-left font-normal text-fog md:table-cell md:w-5/12 md:py-6 md:pr-6 md:align-top"
@@ -88,12 +91,12 @@ function Ledger({
                   className={
                     empty
                       ? "hidden md:table-cell md:py-6 md:pr-6 md:align-top"
-                      : "block pt-2 md:table-cell md:py-6 md:pr-6 md:pt-6 md:align-top"
+                      : "block md:table-cell md:py-6 md:pr-6 md:pt-6 md:align-top"
                   }
                 >
                   {!empty && (
                     <>
-                      <span aria-hidden="true" className="t-mono-xs block text-fog md:hidden">
+                      <span aria-hidden="true" className="t-caption block text-fog md:hidden">
                         {heads[i]}
                       </span>
                       <span className="t-body block text-cloud">{c}</span>
@@ -395,6 +398,12 @@ export default function Diligence() {
 
   return (
     <>
+      {/* PageHeader.tsx (sec-firm's, not this file's) opens every inner route
+          with 80px of padding-block above the eyebrow. Stacked under a 56px
+          sticky nav on phone, that reads as dead air before the first word.
+          Tightened here, scoped to this route only, since .section-y is not
+          this file's to edit at the source. */}
+      <style dangerouslySetInnerHTML={{ __html: `@media (max-width:767px){ .section-y{ padding-block:32px 40px; } }` }} />
       <PageHeader
         eyebrow="Diligence"
         title="Diligence."

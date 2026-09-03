@@ -78,11 +78,15 @@ assertRowsMatchNav();
 
 /* The headline counts the rows rather than asserting a number. "Seven pages"
    beside a list of six is the kind of small lie nobody edits out, because the
-   sentence was true when it was written. */
+   sentence was true when it was written. `cap` capitalizes the word in
+   source rather than leaning on a `first-letter:uppercase` CSS mask, so the
+   string is correct sentence case wherever it is read — in the DOM, in a
+   screen reader, in view-source. */
 const WORDS = ["no", "one", "two", "three", "four", "five", "six", "seven",
                "eight", "nine", "ten", "eleven", "twelve"] as const;
-function count(n: number): string {
-  return WORDS[n] ?? String(n);
+function count(n: number, cap = false): string {
+  const w = WORDS[n] ?? String(n);
+  return cap ? w.charAt(0).toUpperCase() + w.slice(1) : w;
 }
 
 function Arrow() {
@@ -103,45 +107,60 @@ function Arrow() {
   );
 }
 
+/* The grid. ≥768 lays the eight rows out as two hairline columns (a 2×4
+   grid); below that it is a single stacked list. Either way the only lines
+   are BETWEEN cells — a rule-t opens the grid, every item closes with a
+   rule-b, and the second column additionally carries a rule-l — so there is
+   never a border on all four sides of anything and nothing reads as a card.
+   Grid items stretch to their row's height by default, which is what keeps
+   the horizontal hairlines aligned across a row even though the two decks
+   are rarely the same length. */
+const CSS = `
+.fa-grid{ border-top:1px solid rgba(255,255,255,.12); }
+@media (min-width:768px){
+  .fa-grid{ display:grid; grid-template-columns:1fr 1fr; }
+}
+.fa-item{ border-bottom:1px solid rgba(255,255,255,.12); }
+@media (min-width:768px){
+  .fa-item:nth-child(even){ border-left:1px solid rgba(255,255,255,.12); }
+}
+`;
+
 export default function ForAllocators() {
   return (
     <section className="bg-abyss" aria-labelledby="allocators-title">
+      <style dangerouslySetInnerHTML={{ __html: CSS }} />
       <div className="wrap band">
-        <div className="grid gap-x-6 gap-y-10 md:grid-cols-12">
-          <div className="md:col-span-5 lg:col-span-4">
-            <p className="t-mono">For allocators</p>
-            <h2 id="allocators-title" className="t-heading-lg mt-5 first-letter:uppercase">
-              {count(allocatorNav.length)} pages, {count(allocatorNav.length)} questions.
-            </h2>
-            <p className="t-sub mt-7 max-w-[34ch] text-ash">
-              Written to be read before a first conversation rather than sent after
-              one. Where a fact is not yet published, the page says so instead of
-              filling the space.
-            </p>
-          </div>
+        <div className="max-w-[46em]">
+          <p className="t-mono">For allocators</p>
+          <h2 id="allocators-title" className="t-heading-lg mt-5">
+            {count(allocatorNav.length, true)} pages, {count(allocatorNav.length)} questions.
+          </h2>
+          <p className="t-sub mt-7 max-w-[34ch] text-ash">
+            Written to be read before a first conversation rather than sent after
+            one. Where a fact is not yet published, the page says so instead of
+            filling the space.
+          </p>
+        </div>
 
-          <div className="md:col-span-7 md:col-start-6">
-            <ul className="border-t border-white/12">
-              {allocatorNav.map((n) => {
-                const { q, a } = COPY[n.href];
-                return (
-                  <li key={n.href} className="border-b border-white/12">
-                    <Link
-                      href={n.href}
-                      className="group flex min-h-[88px] items-center justify-between gap-6 py-6 transition-colors duration-200 hover:bg-white/5"
-                    >
-                      <span className="flex flex-col gap-2">
-                        <span className="t-mono-xs">{n.label}</span>
-                        <span className="t-heading-sm text-pure">{q}</span>
-                        <span className="t-small">{a}</span>
-                      </span>
-                      <Arrow />
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
+        <div className="fa-grid mt-12 md:mt-16">
+          {allocatorNav.map((n) => {
+            const { q, a } = COPY[n.href];
+            return (
+              <Link
+                key={n.href}
+                href={n.href}
+                className="fa-item group flex min-h-14 flex-col justify-center gap-2 py-6 transition-colors duration-150 hover:bg-white/5 md:px-8 md:py-10"
+              >
+                <span className="t-h3">{q}</span>
+                <span className="t-body max-w-[34ch]">{a}</span>
+                <span className="mt-2 inline-flex items-center gap-2 text-fog">
+                  <span className="t-mono-xs">{n.label}</span>
+                  <Arrow />
+                </span>
+              </Link>
+            );
+          })}
         </div>
       </div>
     </section>

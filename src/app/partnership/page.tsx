@@ -40,13 +40,15 @@ const CSS = `
 .pt-door:first-child{ border-top:1px solid rgba(255,255,255,.12); }
 .pt-accent{ display:block; width:40px; height:2px; }
 
-/* Real tables, hairline rows, mono row header, cloud value (17.49:1 on
-   obsidian / 18.17:1 on abyss). Stacks to label-over-value under 640px so a
-   38% column does not crush a date into four lines on a phone. */
+/* Real tables, hairline rows, mono row header (the .t-caption tier: 13px,
+   the §6.3 floor — this table used to set 11px, which failed it), cloud
+   value (17.49:1 on obsidian / 18.17:1 on abyss). Stacks to term-over-value
+   under 768px, with each row set as its own grid so a 38% column does not
+   crush a date into four lines on a phone. */
 .pt-table{ width:100%; border-collapse:collapse; }
 .pt-table th, .pt-table td{ text-align:left; vertical-align:top;
   padding:20px 0; border-top:1px solid rgba(255,255,255,.12); }
-.pt-table th{ font-family:var(--font-mono); font-size:11px; line-height:2;
+.pt-table th{ font-family:var(--font-mono); font-size:13px; line-height:2;
   text-transform:uppercase; letter-spacing:.182em; font-weight:500;
   color:var(--color-ash); padding-right:24px; width:38%; }
 .pt-table td{ font-size:16px; line-height:1.5; color:var(--color-cloud); }
@@ -54,7 +56,8 @@ const CSS = `
    table. Without it the final value hangs off the end of an open box. */
 .pt-table tbody tr:last-child th,
 .pt-table tbody tr:last-child td{ border-bottom:1px solid rgba(255,255,255,.12); }
-@media (max-width:640px){
+@media (max-width:767px){
+  .pt-table tbody tr{ display:grid; row-gap:4px; }
   .pt-table th, .pt-table td{ display:block; width:auto; padding-right:0; }
   .pt-table td{ border-top:0; padding-top:0; padding-bottom:20px; }
   .pt-table th{ padding-bottom:2px; }
@@ -62,6 +65,13 @@ const CSS = `
 }
 
 .pt-step{ border-top:1px solid rgba(255,255,255,.12); }
+
+/* PageHeader.tsx (sec-firm's, not this file's) opens every inner route with
+   80px of padding-block above the eyebrow. Stacked under a 56px sticky nav
+   on phone, that reads as dead air before the first word. Tightened here,
+   scoped to this route only, since .section-y is not this file's to edit at
+   the source. */
+@media (max-width:767px){ .section-y{ padding-block:32px 40px; } }
 `;
 
 const doors = [
