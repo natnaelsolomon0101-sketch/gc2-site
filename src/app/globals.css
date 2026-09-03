@@ -458,32 +458,48 @@
 }
 
 /* ===========================================================================
-   PRINT — the site is dark, paper is not.
+   PRINT — the canvas is already paper, so this block is much smaller.
 
-   Allocators print /diligence, /governance, /questions and /tearsheet. Before
-   this block the site had no global print styles at all, and it failed in both
-   printer modes at once. With background graphics ON, `body` printed a near
-   black ground (#0f1011) across the full page. With them OFF — the default —
-   171 elements printed white ink on white paper: every .t-h1, .t-h2, the GC2
-   wordmark, every text-pure and text-cloud. Each heading on the site vanished.
+   Before the light canvas this block did two jobs: it INVERTED a dark site
+   (ground to white, every light ink value remapped to black) and it released
+   the things a screen hides. The first job is gone. `.t-h1` is ink, `.t-body`
+   is ink-2, a rule is 13% ink — all of that prints correctly with no override,
+   in both printer modes, because the screen design and the paper design are
+   now the same design. What is left is the second job, plus two things paper
+   still needs that a screen does not.
 
-   /questions was the worst case and the most likely page to be printed: its
-   own print rules flipped the INK to black and left the ground dark, so all 25
-   questions and 51 answer paragraphs printed black on #0f1011 — 1.10:1. A page
-   built to be read before a first conversation printed as a solid black
-   rectangle. This inverts ground and ink together rather than one of them.
+   MEASURED IN BOTH PRINTER MODES, which is why the small amount that remains
+   is here at all (scripts/qa/print.ts, checks P1-P6):
+
+     PAINTED — the reader ticked "Background graphics". A full-sheet warm tint
+               is not paper and it drains a cartridge for nothing, so html/body
+               go to true white. Painted accent tiles keep their fill and their
+               ink foreground, which is legible either way.
+     PAPER   — the default. Chromium drops background colours, so an inverted
+               object loses its ground and its ground-coloured text would print
+               white on white. .card-invert / .on-ink are flipped back to ink
+               below; that is the one colour override the light canvas needs.
+
+   BRIDGE, delete when the sections have migrated: the ten sections still carry
+   hard-coded dark utilities (.text-pure, .text-cloud, .text-silver on
+   /tearsheet, .text-fog on /questions and /tearsheet). Those are white and
+   near-white ink values and they print invisibly on paper. They are remapped
+   below, and that rule comes out with the last of them.
+
+   OWNERSHIP: docs/v4/OWNERSHIP.md gives this block to sec-legal. This rewrite
+   was made by foundation under an explicit round-3 instruction from the
+   Conductor, because the block existed only to undo a dark canvas that no
+   longer exists. sec-legal owns it again from here.
    ======================================================================== */
 @media print {
-  :root { color-scheme: light; }
-
   html, body {
     background: #ffffff !important;
-    color: #000000 !important;
+    color: var(--color-ink) !important;
   }
 
-  /* Every painted ground goes to paper white. Backgrounds are set with tokens
-     and with white/N alpha utilities all over the site, so this is deliberately
-     broad: on paper there is no ground, only ink. */
+  /* On paper there is no ground, only ink. Backgrounds are painted with
+     tokens and with alpha utilities all over the site, so this stays
+     deliberately broad. */
   *, *::before, *::after {
     background-image: none !important;
     box-shadow: none !important;
@@ -494,26 +510,48 @@
     background-color: transparent !important;
   }
 
-  /* Ink. The dark palette's light values are all invisible on white, so every
-     one of them is remapped rather than left to chance. */
-  h1, h2, h3, h4, h5, h6,
-  .t-display, .t-display-sm, .t-heading-lg, .t-heading-sm,
-  .t-h1, .t-h2, .t-h3, .t-article-title, .t-wordmark,
-  .text-pure, .text-cloud, .text-silver,
-  blockquote, summary {
-    color: #000000 !important;
+  /* The one colour override the light canvas needs: an inverted object has
+     lost its ink ground (see PAPER above), so its ground-coloured text has to
+     become ink or it prints white on white. deep-iris is the only accent whose
+     foreground is ground rather than ink, so it flips here too. */
+  .btn, .btn *,
+  .card-invert, .card-lite, .on-ink,
+  .card-invert *, .card-lite *, .on-ink *,
+  [class*="accent-deep-iris-fg"], .text-ground {
+    color: var(--color-ink) !important;
   }
-  p, li, dd, dt, td, th, span, a,
-  .t-body, .t-small, .t-sub, .t-lead, .t-prose, .t-caption,
-  .text-ash, .text-fog {
-    color: #1a1a1a !important;
+  /* .btn keeps its shape without its fill, so a call to action still reads as
+     a control on paper rather than as a stray line of body copy. */
+  .btn, .btn-ghost, .chip, .nav-glass {
+    background: transparent !important;
+    border: 1px solid var(--color-hairline-strong) !important;
   }
-  .t-mono, .t-mono-xs { color: #444444 !important; }
 
-  /* Hairlines were white at 10-12% alpha. On paper that is nothing. */
-  [class*="border-white"], .rule-t, .rule-b,
+  /* BRIDGE — white and near-white ink that unmigrated sections still set for
+     themselves. Each line names the files it is holding up; delete the line
+     when its last owner has moved to the semantic tokens, and delete the whole
+     block when they all have. Verified against scripts/qa/print.ts, which
+     fails any of these at 1.00:1 on paper the moment the rule comes out early.
+
+       .text-pure/.text-cloud/.text-silver, .text-ash/.text-fog
+         — the Tailwind utilities, spread across ~40 files; /tearsheet and
+           /questions are the two print routes that carry them.
+       summary
+         — src/app/questions/page.tsx paints `.qa details[open] > summary`
+           pure white at a higher specificity than its own print override.
+       footer a
+         — src/components/Footer.tsx paints `.gc2-ftr-mark` pure white. Footer
+           NAV is hidden on paper; the wordmark is not. */
+  .text-pure, .text-cloud, .text-silver, summary, footer a {
+    color: var(--color-ink) !important;
+  }
+  .text-ash, .text-fog { color: var(--color-ink-2) !important; }
+
+  /* A 13% hairline is right on a lit screen and thin on a laser printer.
+     Rules print at the strong weight so a table keeps its structure. */
+  [class*="border-white"], [class*="border-hairline"], .rule-t, .rule-b, .rule-t-black,
   table, thead, tbody, tr, td, th {
-    border-color: #cccccc !important;
+    border-color: var(--color-hairline-strong) !important;
   }
 
   /* A cross-reference has to stay distinguishable from body copy once colour
@@ -538,14 +576,14 @@
   details { display: block !important; }
   details > *:not(summary) { display: revert !important; }
   details:not([open]) > *:not(summary) { display: revert !important; }
-  /* These three rules named nothing that ships. `[style*="opacity"]` is an
-     attribute match on the inline style STRING, and the strategy tiles set
+  /* These gates are named explicitly. `[style*="opacity"]` is an attribute
+     match on the inline style STRING, and the strategy tiles set
      background/color/transform/zIndex inline but keep opacity in a stylesheet,
      so five of six printed as blank coloured slivers with the fan transform
      still applied. `[class*="sticky"]` matched only four dead components; the
      two elements that are actually sticky are .stx-panel and .sn-header, whose
      class names contain neither word — so a pinned 240vh track printed about
-     two and a half blank sheets. The gates are named explicitly now. */
+     two and a half blank sheets. */
   [style*="opacity"], .fade-in, .stx-tile, .stx-tile * {
     opacity: 1 !important;
     transform: none !important;
