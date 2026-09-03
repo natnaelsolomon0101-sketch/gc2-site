@@ -218,7 +218,13 @@
   .t-caption { font-size:13px; line-height:2; font-family: var(--font-mono);
                text-transform:uppercase; letter-spacing:.182em; color: var(--color-ash);
                hyphens: manual; }
-  .t-prose   { font-size:18px; line-height:1.7; color: var(--color-ash); overflow-wrap: anywhere; hyphens: auto; }
+  /* Foundation r1, deliverable 3: phone variant. 17px/1.65 below 768,
+     18px/1.7 at and above 768 — a clamp ramping over that same range rather
+     than a hard step. DESIGN.md tier change: t-prose was a flat 18px/1.7 on
+     every viewport; logged in DESIGN.md's type table and Known drift. */
+  .t-prose   { font-size: clamp(17px, calc(16.29px + .22vw), 18px);
+               line-height: clamp(1.65, calc(1.61429 + .01116vw), 1.7);
+               color: var(--color-ash); overflow-wrap: anywhere; hyphens: auto; }
   .rule-t { border-top:1px solid rgba(255,255,255,.12); }
   .rule-b { border-bottom:1px solid rgba(255,255,255,.12); }
   .rule-t-black { border-top:1px solid rgba(255,255,255,.12); }
