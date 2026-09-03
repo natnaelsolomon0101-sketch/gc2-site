@@ -36,21 +36,26 @@ import type { Strategy } from "@/content/strategies";
       accordion panel, not a mis-sized card. The tile's own height transition
       still does the visual work of the collapse.
 
-   3. NO PHONE. Below 768px this component is not in the layout at all
-      (Strategies.tsx CSS-hides it and shows hairline rows instead) — the
-      four-viewport phone cost that justified round 0's rewrite in the first
-      place is gone because the deck simply never reaches a phone.
+   3. PHONE, ON OWNER'S LATER INSTRUCTION. Shipped >=768px only at first —
+      the four-viewport phone cost that justified round 0's rewrite never
+      applied there. Nate then asked for the deck on phones too. Phone gets
+      its own (smaller) --tile-h/--step/--expanded tier, tuned so the whole
+      pinned panel — all six tiles, one expanded, name/one-liner/markets/
+      instruments fully readable — fits inside one 393x852 screen under the
+      nav, and the total scroll track stays under ~2.5 viewport heights.
+      Landscape phones (short viewports, no room to pin a panel at all) and
+      `prefers-reduced-motion: reduce` both get the static grid instead —
+      see the mode effect below.
 
    Track height, sticky offset, tile height, expand height and gap are pure
-   CSS custom properties (no vh borrowed from the old file's phone-tuned
-   numbers) — see the block comment above the CSS template below for the
-   exact numbers and why.
+   CSS custom properties — see the block comment above the CSS template
+   below for the exact numbers and why.
 
-   Mode is resolved client-side, same as before: `static` is the SSR/no-JS
-   default and what `prefers-reduced-motion: reduce` always gets — all six
-   tiles simultaneously expanded in a plain two-column grid, nothing pinned,
-   nothing to scroll-jack. `pinned` is what a mounted, motion-allowed client
-   upgrades to.
+   Mode is resolved client-side: `static` is the SSR/no-JS default and what
+   `prefers-reduced-motion: reduce` OR a short (landscape-phone) viewport
+   always get — all six tiles simultaneously expanded in a plain grid,
+   nothing pinned, nothing to scroll-jack. `pinned` is what a mounted,
+   motion-allowed, tall-enough client upgrades to.
    ========================================================================= */
 
 /** `dark` marks the one tile (deep-iris) whose fill is dark enough that its
@@ -75,20 +80,28 @@ const css = `
 .stx-pin {
   /* Collapsed tile height / step between collapsed tiles / active tile
      height / tile inner padding. --overlap is how far the next tile rides
-     up onto the open one's bottom edge -- the fan. --expanded is measured,
-     not guessed: the open tile's body (one-liner, hairline, the two-column
-     Markets/Instruments pair, plus its own bottom padding) needs 134px of
-     content height at the 640px tile width this component holds at every
-     size it ships at (768 and up) -- verified with Playwright by comparing
-     scrollHeight/clientHeight directly, not inherited from the old phone
-     numbers, which were tuned for a much narrower tile. 224px leaves an
-     18px margin over the 206px --tile-h(72)+134 actually needs. */
-  --tile-h: 72px;
-  --step: 60px;
+     up onto the open one's bottom edge -- the fan.
+
+     Phone (base, mobile-first): the tile is much narrower here (max-width
+     is a cap, and the actual width is the phone's own content column, ~270-
+     380px) than at 768px and up, so the one-liner and the Markets/
+     Instruments pair wrap to more lines and need more room per tile even
+     though the tile itself is shorter. --expanded is measured with
+     Playwright (scrollHeight vs clientHeight on the open body, at every
+     tile as active, at 320/375/393/412/430), not guessed. */
+  --tile-h: 48px;
+  --step: 40px;
   --overlap: calc(var(--tile-h) - var(--step));
-  --expanded: 224px;
-  --pad-x: 28px;
+  --expanded: 264px;
+  --pad-x: 20px;
   max-width: 640px;
+}
+/* 768 and up: the tile is the full 640px cap (or close to it), so the
+   content wraps less and needs less room per tile despite the tile itself
+   being taller -- 224px was measured the same way at this width, before
+   the phone tier existed. */
+@media (min-width: 768px) {
+  .stx-pin { --tile-h: 72px; --step: 60px; --expanded: 224px; --pad-x: 28px; }
 }
 @media (min-width: 1280px) {
   .stx-pin { --tile-h: 80px; --step: 66px; --expanded: 232px; --pad-x: 32px; }
@@ -104,8 +117,14 @@ const css = `
 /* Travel is deliberately short -- six ticks in well under one viewport of
    extra scroll, not the 140vh (six ticks of ~187px each) the recovered
    version used. That is "keep it tight": the reader needing six modest
-   flicks of the wheel instead of a slow multi-screen crawl. */
-.stx--pinned .stx-spacer { height: 70vh; }
+   flicks of the wheel instead of a slow multi-screen crawl. Phone gets an
+   even shorter spacer: the deck itself is shorter too (a smaller --tile-h/
+   --step/--expanded tier), and the owner's ~2.5-viewport ceiling on total
+   scroll travel at 393x852 is tighter than desktop's budget. */
+.stx--pinned .stx-spacer { height: 45vh; }
+@media (min-width: 768px) {
+  .stx--pinned .stx-spacer { height: 70vh; }
+}
 .stx--static .stx-spacer { display: none; }
 
 .stx-deck { position: relative; }
@@ -160,7 +179,10 @@ button.stx-head:focus-visible {
 .stx-muted { opacity: .82; }
 
 /* ---- static: reduced motion, no JS, and the server render --------------- */
-.stx--static .stx-deck { display: grid; gap: 16px; grid-template-columns: repeat(2, 1fr); }
+.stx--static .stx-deck { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 640px) {
+  .stx--static .stx-deck { grid-template-columns: repeat(2, 1fr); }
+}
 .stx--static .stx-tile { position: relative; height: auto; }
 .stx--static .stx-head { padding-top: 24px; }
 .stx--static .stx-body { padding-bottom: 24px; }
@@ -199,13 +221,23 @@ export default function PinnedStrategies({ strategies }: { strategies: Strategy[
   const N = strategies.length;
 
   /* Mode is resolved after mount so the server render -- and any client with
-     JS off -- gets the fully readable static grid rather than a dead pin. */
+     JS off -- gets the fully readable static grid rather than a dead pin.
+     Two conditions force the static grid: reduced motion, and a short
+     viewport (landscape phone -- 734x393 / 852x393 are the owner's named
+     examples) that has no room to pin a panel in at all. 500px clears both
+     examples (393px tall) while sparing every portrait phone in the matrix
+     (568px and up) and any laptop window worth calling tall. */
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const apply = () => setMode(reduce.matches ? "static" : "pinned");
+    const short = window.matchMedia("(max-height: 500px)");
+    const apply = () => setMode(reduce.matches || short.matches ? "static" : "pinned");
     apply();
     reduce.addEventListener("change", apply);
-    return () => reduce.removeEventListener("change", apply);
+    short.addEventListener("change", apply);
+    return () => {
+      reduce.removeEventListener("change", apply);
+      short.removeEventListener("change", apply);
+    };
   }, []);
 
   /* One rAF-throttled passive scroll listener, only while pinned. */

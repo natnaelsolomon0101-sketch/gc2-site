@@ -3,112 +3,85 @@ import ECBGrid from "@/components/viz/ECBGrid";
 import PinnedStrategies from "@/components/PinnedStrategies";
 
 /* ===========================================================================
-   STRATEGIES — hairline rows on phone, the sliding/fanning tile deck from
-   768px up.
+   STRATEGIES — the sliding/fanning tile deck, every width.
 
-   Round 0 replaced the deck with six hairline rows everywhere: it was six
-   full-height chromatic tiles stacked, about four viewports for a list of
-   six names on a phone. Round "bring the sliding thing back" restores the
-   deck (PinnedStrategies.tsx, a client component — the scroll-progress
-   tracking it needs is real interactivity, not a layout decision) but keeps
-   it scoped to >=768px, where the four-viewport phone cost never applied in
-   the first place: the deck's own natural height at that width is a few
-   hundred pixels, not several screens.
+   Round 0 replaced the deck with six hairline rows because it cost four
+   phone viewports and clipped its own tile bodies. "Bring the sliding thing
+   back" rebuilt it (PinnedStrategies.tsx) instead of restoring it, fixing
+   both, and shipped it >=768px only, phone keeping the rows. Owner decision,
+   this round: the deck goes on phones too — see PinnedStrategies.tsx for the
+   phone-tier sizing and the landscape-phone / reduced-motion static-grid
+   gating that makes that safe. The rows are gone; the deck's own static
+   grid mode is the reduced-motion (and no-JS/SSR) fallback everywhere now,
+   so a second, parallel "phone-only" presentation had nothing left to do.
 
-   Both are always in the DOM; CSS alone decides which one is visible
-   (`.stx-rows`/`.stx-deck-wrap`'s min-width:768px media queries below), same
-   technique the /strategies rail already uses for its sticky-column vs.
-   horizontal-strip split — nothing here measures the window in JavaScript to
-   choose a layout. The heading and lede are written once and shared by both;
-   only the list beneath them differs.
+   Composition: the heading block (eyebrow, h2, lede) is written once. Below
+   1024px it sits in normal document flow above the deck — nothing measures
+   the window to arrange that, it is just DOM order. At >=1024px `.stx-wrap`
+   becomes a two-column grid — the deck on the left, the heading sticky on
+   the right — so the deck's own column width no longer leaves the rest of
+   the viewport as empty paper for the whole scroll-through. `.stx-header`
+   is deliberately not itself the grid item: see the comment on `.stx-header`
+   below for why the sticky element and the stretched grid cell have to be
+   two different elements.
 
-   Colour: rows keep the rationed-swatch treatment from round 0 (a chip of
-   the tile hue, not a card ground — DESIGN.md principle 2). The deck's tiles
-   are full chromatic fills with the paired `-fg` token, same pairing
-   Tile.tsx and DESIGN.md's "Chromatic tiles" table define; see
-   PinnedStrategies.tsx for the rest of that rebuild's reasoning (no dead
-   ground, no clipped bodies, no phone).
-
-   No box-shadow anywhere in this file's own CSS (rows never had one; the
-   deck doesn't get one back — depth is the ground/surface step and a
-   hairline, same as everywhere else on the light canvas).
-
-   Motion: the rows' first-reveal stagger is unchanged from round 0
-   (`--dur-base`/`--stagger`, load-once, reduced-motion off). The deck's own
-   timings are `--dur-base`/`--dur-fast`/`--ease` throughout — see that file.
+   Colour: the deck's tiles are full chromatic fills with the paired `-fg`
+   token, the pairing DESIGN.md's "Chromatic tiles" table and Tile.tsx both
+   define. No box-shadow — depth is the ground/surface step and a hairline,
+   same as everywhere else on the light canvas. Motion: `--dur-base` /
+   `--dur-fast` / `--ease` throughout, all in PinnedStrategies.tsx.
    ========================================================================= */
 
-/** Index-matched to `strategies`. A swatch, not a card ground — no text sits
-    on these, so there is no foreground pairing to guarantee here (contrast
-    that ui/Tile.tsx enforces for the chromatic-card case doesn't apply). */
-const accents = [
-  "#847dff", // iris gleam
-  "#00b3dd", // cyan signal
-  "#d1c9ff", // pale iris
-  "#4b49aa", // deep iris
-  "#dd90d8", // orchid bloom
-  "#90b8f0", // periwinkle
-];
-
 const css = `
-/* ---- shared heading block ------------------------------------------------ */
 @media (max-width: 767px) {
   .stx.band { padding-block: 56px 64px; }
 }
 
-/* ---- phone: hairline rows ------------------------------------------------ */
-.stx-rows-wrap { margin-top: 24px; }
+.stx-deck-wrap { margin-top: 32px; }
 @media (min-width: 768px) {
-  .stx-rows-wrap { display: none; }
-}
-
-.stx-row {
-  border-top: 1px solid var(--color-hairline);
-  animation: stxIn var(--dur-base) var(--ease) both;
-  animation-delay: calc(var(--stx-i, 0) * var(--stagger));
-}
-.stx-list .stx-row:last-child { border-bottom: 1px solid var(--color-hairline); }
-
-.stx-link {
-  display: flex; flex-direction: column; gap: 12px;
-  padding-block: 24px; min-height: 44px; justify-content: center;
-  color: inherit; text-decoration: none;
-  transition: background var(--dur-fast) var(--ease);
-}
-.stx-top { display: flex; align-items: center; gap: 12px; }
-/* The rationed accent: the tile hue as a small fill, not a card ground. No
-   foreground pairing is needed the way ui/Tile.tsx guarantees one — nothing
-   is set in type on the swatch itself. */
-.stx-swatch { width: 9px; height: 9px; border-radius: 50%; flex: none; background: var(--stx-accent); }
-.stx-name { color: var(--color-ink); }
-.stx-one { color: var(--color-ink-2); max-width: 46em; }
-.stx-markets { color: var(--color-ink-3); }
-
-@media (hover: hover) and (pointer: fine) {
-  .stx-link:hover { background: rgba(20,19,17,.04); }
-  .stx-link:hover .stx-swatch { background: var(--color-ink); }
-}
-.stx-link:active { background: rgba(20,19,17,.07); }
-.stx-link:focus-visible {
-  outline: 2px solid var(--color-ink); outline-offset: -2px;
-  border-radius: 4px; background: rgba(20,19,17,.04);
-}
-
-@keyframes stxIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: none; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .stx-row { animation: none; }
-}
-
-/* ---- >=768: the deck ------------------------------------------------------ */
-.stx-deck-wrap { display: none; }
-@media (min-width: 768px) {
-  .stx-deck-wrap { display: block; margin-top: 40px; }
+  .stx-deck-wrap { margin-top: 40px; }
 }
 @media (min-width: 1280px) {
   .stx-deck-wrap { margin-top: 48px; }
+}
+
+/* A heading tier sized for a full-width band can be wider than its own
+   sentence once it is squeezed into the sidebar column below — "framework."
+   set at .t-display-sm's 80px ceiling does not fit inside a ~404px column
+   at 1024px viewport width (measured: a document 100px wider than the
+   viewport). overflow-wrap:anywhere is a safety net, not the primary fix —
+   it only ever engages where normal wrapping would otherwise overflow, so
+   it changes nothing at the widths where the column is already wide enough
+   (>=1280px, where this heading already wraps cleanly on its own). */
+.stx-header h2 { overflow-wrap: anywhere; }
+
+/* ---- >=1024: header moves beside the deck, not above it -------------------
+   Below this the header stays exactly where DOM order already puts it —
+   above the deck, no CSS needed. At >=1024 the deck (640px, matching
+   PinnedStrategies.tsx's own --pin max-width) takes the left column and the
+   header takes the right, sticky, so the right half of the viewport a
+   scroll-through deck used to leave as empty paper is now reading the
+   section header the whole time instead. */
+@media (min-width: 1024px) {
+  .stx-wrap { display: grid; grid-template-columns: 640px 1fr; column-gap: 56px; }
+  /* Both get an explicit grid-row, not just grid-column: auto-placement with
+     only a column specified does not reliably backfill row 1's other column
+     once the first item has been placed — deck-wrap landed in row 2, under
+     header-wrap, in testing, which is exactly the "header stacked above,
+     not beside" bug this round exists to fix. Pin both to row 1. */
+  .stx-deck-wrap { grid-column: 1; grid-row: 1; margin-top: 0; }
+  /* .stx-header-wrap is the grid item and stretches (default align-items) to
+     the row's full height; .stx-header, its child, is the actual sticky
+     element and stays its own natural (short) content height — the same
+     wrapper/child split the /strategies rail uses for the same reason: a
+     sticky element that IS the stretched grid item has nothing to stick
+     within, because its own box already spans the whole row. */
+  .stx-header-wrap { grid-column: 2; grid-row: 1; }
+  .stx-header { position: sticky; top: calc(var(--nav-h) + 32px); }
+  /* The ECB strip spans both columns, below the deck row — a grid item with
+     no explicit placement would otherwise auto-place into whatever column
+     falls next in DOM order, not full width. */
+  .stx-ecb { grid-column: 1 / -1; grid-row: 2; }
 }
 
 /* ---- the ECB strip. Full section width at every size. --------------------- */
@@ -128,36 +101,19 @@ export default function Strategies() {
   return (
     <section id="strategies" aria-labelledby="strategies-h" className="stx band">
       <style dangerouslySetInnerHTML={{ __html: css }} />
-      <div className="wrap">
-        <p className="t-mono">Strategies</p>
-        <h2 id="strategies-h" className="t-display-sm mt-4 md:mt-6">
-          Six strategies. One risk framework.
-        </h2>
-        <p className="t-sub stx-lede mt-4 md:mt-6" style={{ maxWidth: "31em" }}>
-          Six separate books, each underwritten by our own research before it is allowed
-          to carry capital, and every one of them sized by the same risk framework rather
-          than by conviction.
-        </p>
-
-        <div className="stx-rows-wrap">
-          <ul className="stx-list">
-            {strategies.map((s, k) => (
-              <li key={s.slug} className="stx-row" style={{ ["--stx-i" as string]: k }}>
-                <a href={`/strategies#${s.slug}`} className="stx-link">
-                  <span className="stx-top">
-                    <span
-                      className="stx-swatch"
-                      style={{ ["--stx-accent" as string]: accents[k] }}
-                      aria-hidden="true"
-                    />
-                    <span className="t-heading-sm stx-name">{s.name}</span>
-                  </span>
-                  <span className="t-small stx-one">{s.oneLiner}</span>
-                  <span className="t-mono-xs stx-markets">{s.markets}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
+      <div className="wrap stx-wrap">
+        <div className="stx-header-wrap">
+          <div className="stx-header">
+            <p className="t-mono">Strategies</p>
+            <h2 id="strategies-h" className="t-display-sm mt-4 md:mt-6">
+              Six strategies. One risk framework.
+            </h2>
+            <p className="t-sub stx-lede mt-4 md:mt-6" style={{ maxWidth: "31em" }}>
+              Six separate books, each underwritten by our own research before it is allowed
+              to carry capital, and every one of them sized by the same risk framework rather
+              than by conviction.
+            </p>
+          </div>
         </div>
 
         <div className="stx-deck-wrap">
