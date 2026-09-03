@@ -19,6 +19,10 @@ export const metadata: Metadata = {
 const jsonLd = {
   "@context": "https://schema.org", "@type": "Organization",
   name: site.name, alternateName: site.mark, url: siteUrl,
+  /* Absolute, not "/logo.png": schema.org consumers do not resolve a relative
+     URL, and this is the image Google may put beside the name. Same mark as the
+     favicon set, from scripts/make-icons.ts. */
+  logo: `${siteUrl}/logo.png`,
   email: site.emails.investors, foundingDate: site.foundedISO,
   address: { "@type": "PostalAddress", addressLocality: "Miami", addressRegion: "FL", addressCountry: "US" },
 };
