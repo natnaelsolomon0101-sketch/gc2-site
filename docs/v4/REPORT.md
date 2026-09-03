@@ -78,6 +78,14 @@ build ✓ · killist (incl. motion-timing gate, 0 pins) ✓ · regime 506(b) ✓
 - **The sliding strategies deck restored** (`src/components/PinnedStrategies.tsx`): the pinned scroll-through from the original build, re-lit for paper, on every width including phones (rows deleted); header sticky beside the deck on ≥1024; landscape phones and reduced motion get the static grid; open-tile height measured from content; titles never clipped. Gates on /, /strategies, /firm, /diligence: 152/152; print clean.
 - ECB grid rows on one line on phones; PageHeader caption/quickLink slots capped at 60ch.
 
+## 10c. Lighthouse (§9 gate, first run 4 Sep 2026)
+Production, mobile preset, all 19 routes: Performance 96–99, Accessibility 96–100, Best Practices 100, SEO 100. **LCP 2.0–2.7s under Lighthouse's simulated Slow 4G — misses the doc's 1.5s bar** (the hero's own Slow-4G+4×CPU measurement is 1.10s; Lighthouse's simulation is harsher). CLS 0 everywhere except / at 0.031 before hero r4 (now 0). Dominant opportunity on every route: "Reduce unused JavaScript" (~150ms) — the Next client runtime, not site code. Not chased further this run on the owner's instruction to spend only on visible change.
+
+## 10d. gstack reviews
+- `/qa-only` on production: 96/100 (docs/v4/QA-REPORT-prod-2026-09-04.md); its three findings (favicon, feed, 404 desktop gap) are all fixed and live.
+- `/cso` daily: 0 findings at the 8/10 gate; hardening headers shipped report-only (docs/v4/SECURITY-REPORT-2026-09-04.md).
+- axe (all 19 routes × 3 scenarios): 0 violations outside one strategies tile contrast (fixed in strategies r7).
+
 ## 11. Open items for Nate
 1. ~~Copy (counsel, medium)~~ — APPLIED 4 Sep 2026 on Nate's instruction and promoted to production: "if the return arrives"; partnership "structures the firm runs" / "which one we would rather run" / "Why there is nothing to download"; questions "would you expect to do badly in?" / capacity opener; diligence "Direct to eligible investors"; founding caption on /firm and /diligence. Still unchanged (not on counsel's list): "has stayed small" on /firm and /questions.
 2. **gc2.fund DNS** — attach the domain to the Vercel project (or point it) so the 308 in `vercel.json` takes effect; emails stay @gc2.fund (facts).
@@ -88,4 +96,5 @@ build ✓ · killist (incl. motion-timing gate, 0 pins) ✓ · regime 506(b) ✓
 7. **Copy-bound heights** — shorten the four stage bodies if "≤3 viewports" matters; tearsheet cannot be one page with its current content.
 8. **The firm's facts** (family-principal): `src/config/fund.ts` is null everywhere — no person, provider, registration, entity, reporting cadence or GP commitment. The site's own copy tells allocators to demand each of these. Fill `docs/INTAKE.md`; the components render them the moment they exist.
 9. **IA**: the eight allocator pages are footer-only (nav.ts). Consider a "For allocators" item in the top bar.
-10. **Memory note**: the Conductor's project memory could not be written this session (macOS blocked the Obsidian-vault path); everything is in `docs/v4/`.
+10. **Search Console** — the favicon and FAQ rich result need Google to recrawl; add the property and request indexing (docs/v4/GOOGLE-PRESENCE.md has the exact clicks once the presence audit lands).
+11. **Memory note**: the Conductor's project memory could not be written this session (macOS blocked the Obsidian-vault path); everything is in `docs/v4/`.
