@@ -26,6 +26,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { site } from "@/config/site";
 import { nav } from "@/config/nav";
+import SessionClock from "@/components/viz/SessionClock";
 
 const CTA = { label: "Investor inquiries", href: "/contact" } as const;
 
@@ -108,20 +109,28 @@ html{ scroll-padding-top: var(--nav-h); }
 }
 .sn-burger:hover{ color:var(--color-pure); }
 
-/* Desktop bar vs. the drawer trigger: width alone is not the signal.
-   852x393 / 932x430 / 812x375 (landscape phones, EVERY-SCREEN.md §7 rule 8)
-   are all >=768px WIDE, so a min-width:768px breakpoint alone put the full
-   five-item bar + CTA into a 48px-tall row on every one of them instead of
-   the drawer. Foundation already treats "short + landscape" as the phone
-   signal for --nav-h; this reuses the same signal so the trigger and the
-   height token never disagree. */
+/* Desktop bar vs. the drawer trigger, two rules that must never disagree:
+   1. THE THRESHOLD IS 769px, matching --nav-h's own max-width:768px tier
+      (globals.css) and the sitewide inner-route scale break (DESIGN.md:
+      "Second numbers are at min-width: 769px"). Tailwind's md: is
+      min-width:768px -- one pixel off from everything else on this site --
+      which used to show the FULL desktop bar squeezed into the compact
+      56px nav at exactly 768px, no hamburger in sight. 768 and down is
+      drawer territory everywhere on this site now, including here.
+   2. WIDTH ALONE IS STILL NOT ENOUGH. 852x393 / 932x430 / 812x375
+      (landscape phones, EVERY-SCREEN.md §7 rule 8) are all >=769px wide,
+      so the width rule alone put the full five-item bar + CTA into a 48px
+      row on every one of them instead of the drawer. Foundation already
+      treats "short + landscape" as the phone signal for --nav-h; this
+      reuses the same signal so the trigger and the height token agree
+      there too. */
 .sn-desktop-nav{ display:none; }
-@media (min-width:768px){ .sn-desktop-nav{ display:flex; } }
+@media (min-width:769px){ .sn-desktop-nav{ display:flex; } }
 @media (max-height:500px) and (orientation:landscape){
   .sn-desktop-nav{ display:none !important; }
   .sn-burger{ display:inline-flex !important; }
 }
-@media (min-width:768px){ .sn-burger{ display:none; } }
+@media (min-width:769px){ .sn-burger{ display:none; } }
 
 /* ---- drawer: fades, never slides; opaque; gutter-aligned ---- */
 .sn-drawer{
@@ -135,7 +144,7 @@ html{ scroll-padding-top: var(--nav-h); }
   opacity:1; visibility:visible;
   transition:opacity var(--dur-menu) var(--ease), visibility 0s linear 0s;
 }
-@media (min-width:768px){ .sn-drawer{ display:none; } }
+@media (min-width:769px){ .sn-drawer{ display:none; } }
 @media (max-height:500px) and (orientation:landscape){ .sn-drawer{ display:block; } }
 
 /* Fills the viewport so the investor block sits on the bottom edge instead of
@@ -148,6 +157,8 @@ html{ scroll-padding-top: var(--nav-h); }
 .sn-drawer-foot{ margin-top:auto; padding-top:48px; }
 
 .sn-eyebrow{ color:var(--color-fog); }
+.sn-sessions-label{ margin-top:32px; }
+.sn-sessions{ margin-top:8px; }
 
 .sn-list{ border-bottom:1px solid var(--color-steel); }
 
@@ -378,11 +389,14 @@ export default function SiteNav() {
               {site.emails.investors}
             </a>
             <p className="t-small mt-2 text-fog">{site.city}</p>
-            {/* SessionClock slot (cross-section object, OWNERSHIP.md). sec-motion
-                builds src/components/viz/SessionClock.tsx; it does not exist on
-                this branch yet, so the slot renders nothing rather than a dash
-                placeholder (STATE.md §0.2 item 6 — never render "--:--:--").
-                Wire `<SessionClock />` in here once that file lands. */}
+
+            {/* SessionClock (cross-section object, OWNERSHIP.md): sec-motion
+                builds it, sec-chrome places it. It renders nothing until
+                hydrated (own component, STATE.md §0.2 item 6) and decides
+                tablet-vs-phone display itself via a container query, not a
+                width check here — the drawer's own width is its container. */}
+            <p className="t-mono-xs sn-eyebrow sn-sessions-label">Sessions</p>
+            <SessionClock className="sn-sessions" />
           </div>
         </div>
       </div>

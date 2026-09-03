@@ -46,9 +46,20 @@ const CSS = `
   .gc2-ftr-table{ grid-template-columns:repeat(3, 1fr); column-gap:48px; row-gap:0; }
   .gc2-ftr-col + .gc2-ftr-col{ border-left:1px solid var(--color-steel); padding-left:48px; }
 }
+/* Capped so a stacked column (<1024, where it would otherwise run the full
+   .wrap width) stays a link LIST, not an 80ch+ line -- matrix measured
+   ~81ch on some widths before this. Well clear of the 3-column widths too
+   (~300-350px there), so this is a no-op at >=1024. */
+.gc2-ftr-col{ max-width:24em; }
 .gc2-ftr-col-head{ padding-block:14px; }
-.gc2-ftr-row{ border-top:1px solid var(--color-steel); }
-.gc2-ftr-link{ transition:color var(--dur-fast) var(--ease); }
+/* The row IS the target (§7 rule 11), and adjacent rows sharing a hairline
+   with zero gap between them fails the matrix's <8px-to-another-target
+   check even though the shared border reads fine to the eye. 4px padding
+   top and bottom on every row = 8px between one row's link box and the
+   next's, with the hairline sitting in the middle of that gap instead of
+   flush against the text -- reads calmer, not just compliant. */
+.gc2-ftr-row{ border-top:1px solid var(--color-steel); padding-block:4px; }
+.gc2-ftr-link{ transition:color var(--dur-fast) var(--ease); min-height:44px; }
 .gc2-ftr-link:hover{ color:var(--color-cloud); }
 
 .gc2-ftr-disclosure{ margin-top:64px; max-width:80ch; }
