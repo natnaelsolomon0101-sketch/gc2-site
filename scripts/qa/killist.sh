@@ -114,7 +114,7 @@ DEFS = "src/app/globals.css"
 BASELINE = {
     "src/app/globals.css":                       (3, "foundation"),
     "src/app/insights/page.tsx":                 (2, "sec-insights"),
-    "src/app/legal/page.tsx":                    (1, "sec-legal"),
+    "src/app/legal/page.tsx":                    (0, "sec-legal"),
     "src/app/questions/page.tsx":                (1, "sec-allocators"),
     "src/components/HairlineList.tsx":           (1, "sec-allocators"),
     "src/components/PinnedStrategies.tsx":       (2, "sec-strategies"),

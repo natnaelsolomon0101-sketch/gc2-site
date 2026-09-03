@@ -74,7 +74,7 @@ const CSS = `
   .t-mono, .t-mono-xs { font-size: 8pt !important; }
   a, .link { border-bottom: 0 !important; text-decoration: underline !important; }
   .rule-t { border-color: #cccccc !important; }
-  .measure-legal, .measure-lead, .measure-head, .measure-prose { max-width: none !important; }
+  .measure-body, .measure-lead, .measure-head, .measure-prose { max-width: none !important; }
   .grid-gc2 { display: block !important; }
   .section-y { padding-block: 0 12pt !important; }
   .pv-band { break-inside: avoid; page-break-inside: avoid; }
@@ -168,7 +168,7 @@ export default function Privacy() {
       node: (
         <>
           <Ledger />
-          <p className="t-body measure-legal mt-8">
+          <p className="t-body measure-body mt-8">
             This is a static website. Every page is built in advance and served as
             finished HTML, so there is no database behind it, no session, and no
             profile of you for one to hold. Reading these pages leaves nothing with
@@ -184,25 +184,25 @@ export default function Privacy() {
         "This is the only route by which we come to hold anything about you, and you open it deliberately.",
       node: (
         <>
-          <p className="t-body measure-legal">
+          <p className="t-body measure-body">
             The addresses on this site are plain email links. They open your own
             mail client, which means nothing is captured at the moment you click —
             the message reaches us only if you write it and send it.
           </p>
-          <p className="t-body measure-legal mt-6">
+          <p className="t-body measure-body mt-6">
             When you do, we receive what you chose to put in it: your email address,
             your name if you sign it, whatever you tell us, and anything you attach.
             We use it to reply and to work out whether there is a fit. We do not use
             it for anything else, and we do not add you to a list you did not ask to
             be on.
           </p>
-          <p className="t-body measure-legal mt-6">
+          <p className="t-body measure-body mt-6">
             Enquiries are read by the people who manage the money rather than routed
             through a sales team. Correspondence is kept for as long as there is a
             business reason to keep it, and records connected with the partnership
             are kept for the periods the firm is required to keep them.
           </p>
-          <p className="t-body measure-legal mt-6">
+          <p className="t-body measure-body mt-6">
             The mail itself is carried and stored by the firm&rsquo;s email provider,
             as every organisation&rsquo;s email is. That provider is not named on this
             page because we would rather name nobody than name the wrong party.
@@ -216,7 +216,7 @@ export default function Privacy() {
       kicker: "The one place data exists without you doing anything.",
       node: (
         <>
-          <p className="t-body measure-legal">
+          <p className="t-body measure-body">
             Serving a web page requires a server to receive a request, and every
             request carries technical detail with it: the network address it came
             from, the time, the page asked for, and the identifier your browser
@@ -224,7 +224,7 @@ export default function Privacy() {
             order to deliver pages and to keep the site up and secure. That is true
             of every website, including the ones that tell you they collect nothing.
           </p>
-          <p className="t-body measure-legal mt-6">
+          <p className="t-body measure-body mt-6">
             We do not combine that technical detail with anything else, we do not use
             it to build a picture of you, and it is not joined to any correspondence
             you send us.
@@ -237,12 +237,12 @@ export default function Privacy() {
       title: "What we do not do",
       node: (
         <>
-          <p className="t-body measure-legal">
+          <p className="t-body measure-body">
             We do not sell personal information, and we do not share it for anyone
             else&rsquo;s advertising. There is no advertising on this site and no
             advertising network attached to it.
           </p>
-          <p className="t-body measure-legal mt-6">
+          <p className="t-body measure-body mt-6">
             We do not profile visitors, and no decision about you is made
             automatically from anything you did on this website — there is no record
             of what you did on this website for such a decision to draw on.
@@ -257,14 +257,14 @@ export default function Privacy() {
         "Which rights you have depends on where you live. The route to exercising them is the same either way.",
       node: (
         <>
-          <p className="t-body measure-legal">
+          <p className="t-body measure-body">
             Depending on your jurisdiction, the law may give you the right to ask what
             personal information we hold about you, to have it corrected, to have it
             deleted, to object to how it is used, or to receive a copy. Because the
             site itself collects nothing, in practice the only thing we are likely to
             hold is an exchange of email you started.
           </p>
-          <p className="t-body measure-legal mt-6">
+          <p className="t-body measure-body mt-6">
             To ask any of that, write to the address below. We will confirm we have
             received it and tell you what we hold or why we cannot act on the request.
           </p>
@@ -280,7 +280,7 @@ export default function Privacy() {
       id: "scope",
       title: "Who this site is for",
       node: (
-        <p className="t-body measure-legal">
+        <p className="t-body measure-body">
           This website is addressed to institutional and professional investors and
           to their advisers. It is not directed to children, and we do not knowingly
           hold personal information belonging to one.
@@ -292,7 +292,7 @@ export default function Privacy() {
       title: "Changes to this policy",
       node: (
         <>
-          <p className="t-body measure-legal">
+          <p className="t-body measure-body">
             If what this site does changes, this page changes with it. The version
             published here is the one that applies, and we would rather amend it than
             leave a sentence standing that has stopped being true.
@@ -309,19 +309,19 @@ export default function Privacy() {
       kicker: "Said here rather than only in an internal note, because a reader is entitled to know.",
       node: (
         <>
-          <p className="t-body measure-legal">
+          <p className="t-body measure-body">
             This policy was written to describe what this website actually does, and
             each statement above was checked against the site&rsquo;s own source
             before it was written down. It has not yet been reviewed by privacy
             counsel, and it carries no effective date for that reason.
           </p>
-          <p className="t-body measure-legal mt-6">
+          <p className="t-body measure-body mt-6">
             Anything concerning the partnership rather than this website — how
             investor information is handled once a relationship exists — is governed
             by the offering documents and the agreements that come with them, not by
             this page.
           </p>
-          <p className="t-body measure-legal mt-6">
+          <p className="t-body measure-body mt-6">
             For the securities disclaimers that apply to this website, see{" "}
             <TextLink href="/disclosures">Disclosures</TextLink>.
           </p>
@@ -347,7 +347,7 @@ export default function Privacy() {
               <div className="col-span-4 md:col-span-4">
                 <p className="t-mono-xs text-fog">{String(i + 1).padStart(2, "0")}</p>
                 <h2 className="t-h2 mt-3">{b.title}</h2>
-                {b.kicker && <p className="t-small measure-legal mt-6">{b.kicker}</p>}
+                {b.kicker && <p className="t-small measure-body mt-6">{b.kicker}</p>}
               </div>
               <div className="col-span-4 md:col-span-7 md:col-start-6">{b.node}</div>
             </div>
