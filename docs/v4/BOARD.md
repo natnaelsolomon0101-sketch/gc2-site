@@ -2,7 +2,7 @@
 
 | Section | Round | Status | Last failing viewports | Next action |
 |---|---|---|---|---|
-| foundation | 2 | REOPENED r1: hyphens off body, .t-display-sm/.t-h2 ceilings, .t-prose phone, .fade-1..8, canonical './', h1 line-height | — | merge, rebuild, full matrix |
+| foundation | 2 | DONE r1 merged (13273f0): hyphens opt-in, ceilings, prose phone tier, fade-1..8, canonical './', line-height constants (root cause: invalid calc), measure-legal min(60em,80ch), text-wrap balance, left-anchor >1920 | — | closed |
 | viewport-runner | 1 | DONE (tool merged 2639fec→recommitted) | — | rerun baseline-full against a healthy :3000 |
 | sec-chrome | 1 | MERGED r0 (683100c) — reviewed: landscape menu, tap targets, big footer wordmark right; menu verified 5 links at 393/320 | — | r1: disclosure in .t-small sentence case; SessionClock slot when motion lands |
 | sec-hero | 1 | MERGED r0 (f23f39c) — reviewed: poster + landscape right; 4-line wrap fixed; frame curve slot is an empty box until YieldCurve lands | 3440 left-anchoring is foundation r1 | r1 after sec-motion: swap placeholder for YieldCurve, delete Atmosphere.tsx |
