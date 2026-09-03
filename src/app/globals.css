@@ -107,9 +107,14 @@
      Only the tiers the brief names (display up to 128px, h1 up to 96px)
      grow again here; every other tier stays flat at its clamp() ceiling,
      matching the pre-fluid baseline at 1920 and 3440 exactly. */
+  /* Foundation r1, deliverable 2: .t-display-sm and .t-h2 read pixel-identical
+     to their 1920 size all the way out to 3440 without a ceiling rise of
+     their own — added here alongside .t-display's existing one. */
   @media (min-width: 1920px) {
-    .t-display { font-size: clamp(96px, calc(55.58px + 2.11vw), 128px);
+    .t-display    { font-size: clamp(96px, calc(55.58px + 2.11vw), 128px);
                  line-height: clamp(.85, calc(.9632 - .00329vw), .9); }
+    .t-display-sm { font-size: clamp(80px, calc(49.68px + 1.58vw), 104px);
+                 line-height: clamp(.9, calc(1.01316 - .00329vw), .95); }
   }
 
   /* Card-title tier. The scale jumped 38px -> 16px with nothing between, so
@@ -202,6 +207,8 @@
   @media (min-width: 1920px) {
     .t-h1 { font-size: clamp(80px, calc(59.79px + 1.05vw), 96px);
             line-height: clamp(.92, calc(.9879 - .0019737vw), .95); }
+    .t-h2 { font-size: clamp(38px, calc(30.42px + .39vw), 44px);
+            line-height: clamp(.97, calc(1.03789 - .0019737vw), 1); }
   }
   .t-lead    { font-size: clamp(15px, calc(11.57px + 1.07vw), 18px);
                line-height: clamp(1.5, calc(1.6071 - .01786vw), 1.55);
