@@ -42,7 +42,7 @@ export default function Disclosures() {
               `.t-body` is ash (7.20:1) on obsidian — the `text-black` /
               `text-ink` the paper build set here were both invisible on the
               Origin ground. */}
-          <div className="measure-prose pb-16 md:pb-24">
+          <div className="measure-legal pb-16 md:pb-24">
             {sections.map((s) => (
               <div key={s.h} className="rule-t py-8">
                 <h2 className="t-h3">{s.h}</h2>

@@ -3,6 +3,7 @@ import Container from "@/components/Container";
 import PageHeader from "@/components/PageHeader";
 import TextLink from "@/components/TextLink";
 import { fund } from "@/config/fund";
+import PrintButton from "./PrintButton";
 
 /**
  * /tearsheet — a page about tearsheets, which is not a tearsheet.
@@ -312,6 +313,38 @@ export default function Tearsheet() {
         title="The tearsheet."
         standfirst="A tearsheet is performance on one page. Under Rule 506(b) it cannot sit on a public one, and every figure that would go on ours is unpublished. So this page does the next most useful thing: it sets out what a tearsheet contains, what an allocator should refuse to accept one without, and why this site does not carry one."
       />
+
+      {/* The preview. A `<header>`, not a `<section>`: it is print utility
+          chrome for the page below it — a paper-proportioned object and the
+          one control that produces it — not article content, exactly the
+          same distinction `scripts/qa/print.ts` already draws for the nav
+          and the footer ("a menu is not content, and a reader holding the
+          sheet cannot click it"). `print:hidden` drops it from the printed
+          page; the same landmark tells the print gate it was dropped on
+          purpose rather than lost. The object itself carries no text of its
+          own — everything it would say is already the `<h1>` two lines up —
+          so it reads as an abstraction of a printed sheet (title bar, a few
+          lines) rather than a duplicate caption. Letter's own 8.5:11 ratio,
+          the shape `scripts/qa/print.ts` emulates. Centered in its own
+          viewport-height band rather than left with the rest of the grid,
+          because it is an object, not a column of text. */}
+      <header className="print:hidden">
+        <Container>
+          <div className="flex min-h-[70dvh] flex-col items-center justify-center gap-8 py-16">
+            <div
+              aria-hidden="true"
+              className="flex aspect-[8.5/11] w-full max-w-xs flex-col gap-3 rounded-card border border-void/10 bg-pure p-8 md:max-w-sm"
+            >
+              <div className="h-3 w-2/3 rounded-control bg-void/15" />
+              <div className="mt-4 h-2 w-full rounded-control bg-void/10" />
+              <div className="h-2 w-full rounded-control bg-void/10" />
+              <div className="h-2 w-5/6 rounded-control bg-void/10" />
+              <div className="mt-auto h-2 w-1/3 rounded-control bg-void/10" />
+            </div>
+            <PrintButton />
+          </div>
+        </Container>
+      </header>
 
       {/* Bands alternate obsidian / abyss, matching /firm, /diligence and
           /governance. Ordinals come from the RENDERED index rather than a fixed
