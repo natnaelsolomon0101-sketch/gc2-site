@@ -305,9 +305,18 @@
   animation: originFadeIn var(--dur-base) var(--ease) both,
              originRise  var(--dur-base) var(--ease) both;
 }
+/* Reveal tiers: delay for .fade-N is (N-1) * --stagger, both halves of the
+   animation-delay list kept in lockstep. Extended from three tiers to eight
+   so a longer stagger group (e.g. an 8-item strategy or team grid) doesn't
+   run out of tiers and fall back to an un-staggered .fade-in. */
 .fade-1 { animation-delay: 0ms, 0ms; }
 .fade-2 { animation-delay: var(--stagger), var(--stagger); }
 .fade-3 { animation-delay: calc(var(--stagger) * 2), calc(var(--stagger) * 2); }
+.fade-4 { animation-delay: calc(var(--stagger) * 3), calc(var(--stagger) * 3); }
+.fade-5 { animation-delay: calc(var(--stagger) * 4), calc(var(--stagger) * 4); }
+.fade-6 { animation-delay: calc(var(--stagger) * 5), calc(var(--stagger) * 5); }
+.fade-7 { animation-delay: calc(var(--stagger) * 6), calc(var(--stagger) * 6); }
+.fade-8 { animation-delay: calc(var(--stagger) * 7), calc(var(--stagger) * 7); }
 
 @media (prefers-reduced-motion: reduce) {
   .fade-in { animation: none; opacity: 1; transform: none; }
