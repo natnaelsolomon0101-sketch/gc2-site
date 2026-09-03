@@ -132,7 +132,6 @@ BASELINE = {
     # Dead code: neither is imported by any route, and §8.2 forbids a marquee
     # outright. Pinned rather than fixed because it is not sec-motion's to
     # delete; reported to the Conductor.
-    "src/components/ui/infinite-slider.tsx":      (3, "Conductor"),
 }
 
 TOKEN   = re.compile(r"var\(\s*--(dur-[a-z]+|ease|stagger)\b")
