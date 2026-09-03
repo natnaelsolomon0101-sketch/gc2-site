@@ -1,3 +1,4 @@
+import { css } from "@/lib/css";
 import Reveal from "@/components/ui/Reveal";
 import { fetchEcbRates, signed, ECB_SOURCE, ECB_ATTRIBUTION } from "./ecb";
 import { asOf } from "./treasury";
@@ -40,7 +41,7 @@ export default async function ECBGrid({ className = "" }: { className?: string }
       data-source={ECB_SOURCE}
       data-asof={data.date}
     >
-      <style>{css}</style>
+      <style>{CSS}</style>
       <ul className="eg-rows">
         {data.pairs.map((p, i) => (
           <Reveal
@@ -76,7 +77,7 @@ export default async function ECBGrid({ className = "" }: { className?: string }
 
 /* No timing literals: the reveal's duration, easing and stagger come from
    Reveal.module.css, which reads --dur-base / --ease / --stagger. */
-const css = `
+const CSS = css`
 .eg { margin: 0; container-type: inline-size; }
 .eg-rows { list-style: none; margin: 0; padding: 0; display: grid;
            grid-template-columns: 1fr auto auto; }
