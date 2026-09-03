@@ -57,3 +57,7 @@ docs/v4/shots/*/**/*.png
 !docs/v4/shots/*/sheets/*.png
 !docs/v4/shots/baseline/*.png
 !docs/v4/shots/foundation/*.png
+# v4 Lighthouse gate (§9): raw per-route reports are regenerated on demand
+# (each is 0.5-1MB, one per route × preset); keep summary.json
+docs/v4/lighthouse/*/*--mobile.json
+docs/v4/lighthouse/*/*--desktop.json

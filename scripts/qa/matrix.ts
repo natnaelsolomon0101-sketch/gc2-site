@@ -45,7 +45,7 @@ interface Args {
   workers: number;
 }
 
-const ALL_ROUTES = [
+export const ALL_ROUTES = [
   "/",
   "/firm",
   "/strategies",
@@ -1321,7 +1321,12 @@ async function main() {
   console.log(`duration: ${(durationMs / 1000).toFixed(1)}s`);
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+// Guard against side effects on import: lighthouse.ts imports ALL_ROUTES
+// from this module to keep one source of truth for the route list, and
+// without this guard that import would execute the entire matrix run.
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
+}

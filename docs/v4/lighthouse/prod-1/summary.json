@@ -1,0 +1,1158 @@
+{
+  "round": "prod-1",
+  "base": "https://girlscantrade2.com",
+  "durationMs": 211991,
+  "routes": [
+    "/",
+    "/firm",
+    "/strategies",
+    "/insights",
+    "/insights/capacity-is-a-research-problem",
+    "/diligence",
+    "/governance",
+    "/team",
+    "/partnership",
+    "/letters",
+    "/tearsheet",
+    "/questions",
+    "/access",
+    "/contact",
+    "/legal",
+    "/legal/terms",
+    "/legal/privacy",
+    "/disclosures",
+    "/this-route-does-not-exist"
+  ],
+  "results": [
+    {
+      "route": "/firm",
+      "preset": "mobile",
+      "file": "firm--mobile.json",
+      "performance": 98,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 2303.465,
+      "clsScore": 0,
+      "tbtMs": 62.5,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 150
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/",
+      "preset": "mobile",
+      "file": "home--mobile.json",
+      "performance": 96,
+      "accessibility": 96,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 2663.8875,
+      "clsScore": 0.03068165221854369,
+      "tbtMs": 51.5,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 150
+        },
+        {
+          "id": "unminified-css",
+          "title": "Minify CSS",
+          "savingsMs": 0
+        },
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/",
+      "preset": "desktop",
+      "file": "home--desktop.json",
+      "performance": 100,
+      "accessibility": 96,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 649.6545,
+      "clsScore": 0.002517635933806147,
+      "tbtMs": 0,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 20
+        },
+        {
+          "id": "unminified-css",
+          "title": "Minify CSS",
+          "savingsMs": 0
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/firm",
+      "preset": "desktop",
+      "file": "firm--desktop.json",
+      "performance": 100,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 522.559,
+      "clsScore": 0,
+      "tbtMs": 0,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 20
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/strategies",
+      "preset": "desktop",
+      "file": "strategies--desktop.json",
+      "performance": 100,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 520.861,
+      "clsScore": 0,
+      "tbtMs": 0,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 20
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/strategies",
+      "preset": "mobile",
+      "file": "strategies--mobile.json",
+      "performance": 98,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 2381.8755,
+      "clsScore": 0,
+      "tbtMs": 35.5,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 150
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/insights",
+      "preset": "mobile",
+      "file": "insights--mobile.json",
+      "performance": 98,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 2290.511,
+      "clsScore": 0,
+      "tbtMs": 23.5,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 150
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/insights",
+      "preset": "desktop",
+      "file": "insights--desktop.json",
+      "performance": 100,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 525.9929999999999,
+      "clsScore": 0,
+      "tbtMs": 0,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 10
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/insights/capacity-is-a-research-problem",
+      "preset": "mobile",
+      "file": "insights_capacity-is-a-research-problem--mobile.json",
+      "performance": 98,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 2285.3959999999997,
+      "clsScore": 0,
+      "tbtMs": 15,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 150
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/insights/capacity-is-a-research-problem",
+      "preset": "desktop",
+      "file": "insights_capacity-is-a-research-problem--desktop.json",
+      "performance": 100,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 575.5715,
+      "clsScore": 0,
+      "tbtMs": 0,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 40
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/governance",
+      "preset": "mobile",
+      "file": "governance--mobile.json",
+      "performance": 98,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 2386.182,
+      "clsScore": 0,
+      "tbtMs": 15.5,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 70
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/diligence",
+      "preset": "mobile",
+      "file": "diligence--mobile.json",
+      "performance": 99,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 2247.886,
+      "clsScore": 0,
+      "tbtMs": 8.5,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 150
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/diligence",
+      "preset": "desktop",
+      "file": "diligence--desktop.json",
+      "performance": null,
+      "accessibility": null,
+      "bestPractices": null,
+      "seo": null,
+      "lcpMs": null,
+      "clsScore": null,
+      "tbtMs": null,
+      "inpMs": null,
+      "opportunities": [],
+      "error": "Runtime error encountered: The page did not paint any content. Please ensure you keep the browser window in the foreground during the load and try again. (NO_FCP)"
+    },
+    {
+      "route": "/governance",
+      "preset": "desktop",
+      "file": "governance--desktop.json",
+      "performance": 100,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 399.2455,
+      "clsScore": 0,
+      "tbtMs": 0,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 0
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/team",
+      "preset": "mobile",
+      "file": "team--mobile.json",
+      "performance": 99,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 2214.656,
+      "clsScore": 0,
+      "tbtMs": 16.5,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 150
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/team",
+      "preset": "desktop",
+      "file": "team--desktop.json",
+      "performance": 100,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 487.59799999999996,
+      "clsScore": 0,
+      "tbtMs": 0,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 40
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/partnership",
+      "preset": "mobile",
+      "file": "partnership--mobile.json",
+      "performance": 99,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 2208.1075,
+      "clsScore": 0,
+      "tbtMs": 9.5,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 150
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/partnership",
+      "preset": "desktop",
+      "file": "partnership--desktop.json",
+      "performance": 100,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 503.486,
+      "clsScore": 0,
+      "tbtMs": 0,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 20
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/letters",
+      "preset": "mobile",
+      "file": "letters--mobile.json",
+      "performance": 99,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 2226.0995000000003,
+      "clsScore": 0,
+      "tbtMs": 19,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 150
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/letters",
+      "preset": "desktop",
+      "file": "letters--desktop.json",
+      "performance": 100,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 496.7095,
+      "clsScore": 0,
+      "tbtMs": 0,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 20
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/tearsheet",
+      "preset": "mobile",
+      "file": "tearsheet--mobile.json",
+      "performance": 98,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 2296.459,
+      "clsScore": 0,
+      "tbtMs": 29,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 150
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/tearsheet",
+      "preset": "desktop",
+      "file": "tearsheet--desktop.json",
+      "performance": 100,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 492.80899999999997,
+      "clsScore": 0,
+      "tbtMs": 0,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 40
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/questions",
+      "preset": "mobile",
+      "file": "questions--mobile.json",
+      "performance": 98,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 2398.2465,
+      "clsScore": 0,
+      "tbtMs": 28,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 150
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/questions",
+      "preset": "desktop",
+      "file": "questions--desktop.json",
+      "performance": 100,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 531.048,
+      "clsScore": 0,
+      "tbtMs": 0,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 20
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/access",
+      "preset": "mobile",
+      "file": "access--mobile.json",
+      "performance": 98,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 2278.4385,
+      "clsScore": 0,
+      "tbtMs": 52.5,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 150
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/access",
+      "preset": "desktop",
+      "file": "access--desktop.json",
+      "performance": 100,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 510.9875,
+      "clsScore": 0,
+      "tbtMs": 0,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 20
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/contact",
+      "preset": "desktop",
+      "file": "contact--desktop.json",
+      "performance": 100,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 547.692,
+      "clsScore": 0,
+      "tbtMs": 0,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 40
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/contact",
+      "preset": "mobile",
+      "file": "contact--mobile.json",
+      "performance": 98,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 2298.9885,
+      "clsScore": 0,
+      "tbtMs": 14,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 150
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/legal",
+      "preset": "mobile",
+      "file": "legal--mobile.json",
+      "performance": 99,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 2227.065,
+      "clsScore": 0,
+      "tbtMs": 26,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 150
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/legal/terms",
+      "preset": "desktop",
+      "file": "legal_terms--desktop.json",
+      "performance": 100,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 515.8205,
+      "clsScore": 0,
+      "tbtMs": 0,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 20
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/legal",
+      "preset": "desktop",
+      "file": "legal--desktop.json",
+      "performance": 100,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 511.9415,
+      "clsScore": 0,
+      "tbtMs": 0,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 30
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/legal/terms",
+      "preset": "mobile",
+      "file": "legal_terms--mobile.json",
+      "performance": 99,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 2227.8525,
+      "clsScore": 0,
+      "tbtMs": 28.5,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 150
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/legal/privacy",
+      "preset": "desktop",
+      "file": "legal_privacy--desktop.json",
+      "performance": 100,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 502.4805,
+      "clsScore": 0,
+      "tbtMs": 0,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 20
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/legal/privacy",
+      "preset": "mobile",
+      "file": "legal_privacy--mobile.json",
+      "performance": 99,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 2211.6315,
+      "clsScore": 0,
+      "tbtMs": 13.5,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 150
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/disclosures",
+      "preset": "mobile",
+      "file": "disclosures--mobile.json",
+      "performance": 99,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 2036.008,
+      "clsScore": 0,
+      "tbtMs": 13.5,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 150
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/this-route-does-not-exist",
+      "preset": "mobile",
+      "file": "this-route-does-not-exist--mobile.json",
+      "performance": null,
+      "accessibility": null,
+      "bestPractices": null,
+      "seo": null,
+      "lcpMs": null,
+      "clsScore": null,
+      "tbtMs": null,
+      "inpMs": null,
+      "opportunities": [],
+      "error": "expected: Lighthouse will not score a non-2xx response (Status code: 404) — /this-route-does-not-exist is intentionally a 404 test route"
+    },
+    {
+      "route": "/this-route-does-not-exist",
+      "preset": "desktop",
+      "file": "this-route-does-not-exist--desktop.json",
+      "performance": null,
+      "accessibility": null,
+      "bestPractices": null,
+      "seo": null,
+      "lcpMs": null,
+      "clsScore": null,
+      "tbtMs": null,
+      "inpMs": null,
+      "opportunities": [],
+      "error": "expected: Lighthouse will not score a non-2xx response (Status code: 404) — /this-route-does-not-exist is intentionally a 404 test route"
+    },
+    {
+      "route": "/disclosures",
+      "preset": "desktop",
+      "file": "disclosures--desktop.json",
+      "performance": 100,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 520.857,
+      "clsScore": 0,
+      "tbtMs": 0,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 30
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    }
+  ]
+}
