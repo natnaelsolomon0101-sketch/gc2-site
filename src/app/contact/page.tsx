@@ -205,22 +205,24 @@ export default function Contact() {
             href={`mailto:${site.emails.investors}`}
             className="flex min-h-11 flex-col gap-2 py-5"
           >
-            <span className="t-mono-xs text-fog">Existing investors</span>
-            <span className="t-h3 break-all text-pure">{site.emails.investors}</span>
+            <span className="t-mono-xs text-ink-3">Existing investors</span>
+            <span className="t-h3 break-all text-ink">{site.emails.investors}</span>
           </a>
         </Container>
       </section>
 
-      {/* Bands alternate obsidian / abyss to match /firm and /diligence, so an
-          inner page reads as the same site. The "01/02/03/04" ordinal that
-          shipped here read as a sequence; these are four audiences, not four
-          steps, and the preamble's numerals rule ("no numerals on things that
-          are not sequences") applies — removed. Heading pure 19.05:1 /
-          19.81:1, body ash 7.20:1 / 7.49:1. */}
+      {/* Bands alternate ground / ground-2 to match /firm and /diligence, so an
+          inner page reads as the same site — and (light canvas) every band
+          also gets its own top hairline, not only the first: the 1.10
+          ground->ground-2 step does not read as a boundary on its own. The
+          "01/02/03/04" ordinal that shipped here read as a sequence; these
+          are four audiences, not four steps, and the preamble's numerals
+          rule ("no numerals on things that are not sequences") applies —
+          removed. Heading ink 17.04:1 / 15.47:1, body ink-2 7.55:1 / 6.85:1. */}
       {blocks.map((b, i) => (
-        <section key={b.id} id={b.id} className={`scroll-mt-24 ${i % 2 ? "bg-abyss" : ""}`}>
+        <section key={b.id} id={b.id} className={`scroll-mt-24 ${i % 2 ? "bg-ground-2" : ""}`}>
           <Container>
-            <div className={`grid-gc2 py-16 md:py-24 ${i === 0 ? "rule-t" : ""}`}>
+            <div className="grid-gc2 py-16 md:py-24 rule-t">
               <div className="col-span-4 md:col-span-4">
                 <h2 className="t-h2">{b.title}</h2>
               </div>
@@ -235,12 +237,12 @@ export default function Contact() {
           exists, stated once, so an address arriving from somewhere else can be
           checked against it. `site.address` and `site.phone` are null and are
           deliberately absent rather than substituted for. Alternation continues
-          off blocks.length: four blocks end on abyss, so this lands on
-          obsidian. */}
-      <section className={blocks.length % 2 ? "bg-abyss" : ""}>
+          off blocks.length: four blocks end on ground-2, so this lands on
+          ground. */}
+      <section className={blocks.length % 2 ? "bg-ground-2" : ""}>
         <Container>
           <div className="rule-t py-16 md:py-24">
-            <p className="t-mono-xs text-fog">The published addresses</p>
+            <p className="t-mono-xs text-ink-3">The published addresses</p>
             <p className="t-body measure-body mt-6">
               Two, and there is not a third: {site.emails.investors} and{" "}
               {site.emails.press}. No telephone line is published on this site,
