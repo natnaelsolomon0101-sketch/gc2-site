@@ -16,13 +16,16 @@ const FOOTER_GROUPS = [
       row so it reads as one ruled object even though the three groups (4, 8,
       2 items) are different heights — that asymmetry is real data, not a bug
       to hide.
-   2. THE DISCLOSURE IS `.t-caption`. `.measure-legal` (60em, globals.css) is
-      tuned for the sans-serif legal pages; `.t-caption` is mono, uppercase,
-      and letter-spaced .182em, so 60em of IT renders past 80ch (measured
-      87ch, Conductor) -- three things that all widen a monospace line past
-      what the same em-count gives a proportional one. `.gc2-ftr-disclosure`
-      sets `max-width:80ch` directly instead, which is what the rule (§7.5 /
-      matrix "Text measure") actually asks for.
+   2. THE DISCLOSURE IS `.t-small` (14px Inter, sentence case), not
+      `.t-caption`: a legal paragraph run in caption's 13px uppercase mono
+      with .182em tracking came out nine lines on a phone and unreadable
+      (Conductor, round 1). `.t-caption` stays reserved for the short column
+      labels ("SITE", "FOR ALLOCATORS", "LEGAL") where an eyebrow is the
+      point. `.gc2-ftr-disclosure` still caps `max-width:80ch` directly --
+      `.measure-legal` (60em, globals.css) is tuned for `.t-prose`/legal-page
+      body copy at a different size and isn't the same 80ch on `.t-small`
+      either, so the explicit cap stays regardless of which type tier sits
+      on the paragraph.
    3. THE MARK IS THE ONE PLACE ON THE SITE A DELIBERATELY OVERSIZED WORDMARK
       IS WELCOME. It starts at the same left gutter as everything else and is
       allowed to run past the .wrap container and the true viewport edge —
@@ -103,7 +106,7 @@ export default function Footer() {
           ))}
         </div>
 
-        <p className="t-caption gc2-ftr-disclosure">
+        <p className="t-small text-fog gc2-ftr-disclosure">
           {site.name} is a private investment partnership. This website is for
           informational purposes only and does not constitute an offer to sell or a
           solicitation of an offer to buy any security. Past performance is not
