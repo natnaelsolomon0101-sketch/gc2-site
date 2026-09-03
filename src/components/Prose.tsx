@@ -1,18 +1,21 @@
-/* Long-form body copy on the Origin ground.
+/* Long-form body copy on the paper ground.
 
-   Two changes beyond the colour swap, both about reading comfort on black:
+   Two changes beyond the colour swap, both about reading comfort in a long
+   paragraph:
 
-   1. The paper build pinned every paragraph to `.t-body` (16px/1.5), which
-      overrode the `.t-prose` 18px/1.7 on the wrapper. On a dark ground the
+   1. The paper build (v1) pinned every paragraph to `.t-body` (16px/1.5),
+      which overrode the `.t-prose` 17/18px, 1.65/1.7 on the wrapper. The
       tighter setting is markedly harder to hold a line in, so the paragraph
-      override is gone and `.t-prose` now governs: 18px, 1.7, ash.
+      override is gone and `.t-prose` now governs.
    2. `h2` carried a font change and no size, so subheads rendered at body size
       and the article had no visible structure. They now take `.t-heading-sm`
-      (26px display) at cloud.
+      (26px display) at ink.
 
-   Colour: body ash #9f9fa0 on obsidian #0f1011 = 7.20:1. Headings and inline
-   emphasis lift to cloud #f5f5f7 = 17.49:1. Pure white is deliberately NOT used
-   for running text — it glares over a paragraph this long.
+   Colour (light canvas, DESIGN.md "Measured — ink on every ground"): body
+   ink-2 #544e45 on ground #f7f5f0 = 7.55:1. Headings and inline emphasis lift
+   to ink #141311 = 17.04:1. Ink is used for structure (headings, strong,
+   links, the blockquote rule), not for running text — full-weight ink over a
+   paragraph this long reads as shouting; ink-2 is the reading colour.
 
    Measure: `clamp(20em, 90vw, 36em)` per §5.6, not the shared 680px
    `.measure-prose` — that class also serves the legal/disclosures pages
@@ -22,16 +25,16 @@ export default function Prose({ children }: { children: React.ReactNode }) {
   return (
     <div
       className="max-w-[clamp(20em,90vw,36em)] t-prose mx-auto
-        [&>p]:mt-6 [&>p]:text-ash
+        [&>p]:mt-6 [&>p]:text-ink-2
         [&>h2]:font-display [&>h2]:mt-12 [&>h2]:text-2xl [&>h2]:leading-tight
-        [&>h2]:tracking-tight [&>h2]:text-cloud
-        [&>ul]:mt-6 [&>ul]:list-disc [&>ul]:pl-6 [&>ul]:text-ash
-        [&>ol]:mt-6 [&>ol]:list-decimal [&>ol]:pl-6 [&>ol]:text-ash
-        [&>blockquote]:mt-8 [&>blockquote]:border-l [&>blockquote]:border-steel
-        [&>blockquote]:pl-6 [&>blockquote]:text-cloud
+        [&>h2]:tracking-tight [&>h2]:text-ink
+        [&>ul]:mt-6 [&>ul]:list-disc [&>ul]:pl-6 [&>ul]:text-ink-2
+        [&>ol]:mt-6 [&>ol]:list-decimal [&>ol]:pl-6 [&>ol]:text-ink-2
+        [&>blockquote]:mt-8 [&>blockquote]:border-l [&>blockquote]:border-hairline-strong
+        [&>blockquote]:pl-6 [&>blockquote]:text-ink
         [&_li]:mt-2
-        [&_strong]:font-medium [&_strong]:text-cloud
-        [&_a]:text-pure [&_a]:underline [&_a]:underline-offset-4"
+        [&_strong]:font-medium [&_strong]:text-ink
+        [&_a]:text-ink [&_a]:underline [&_a]:underline-offset-4"
     >
       {children}
     </div>
@@ -44,7 +47,7 @@ export default function Prose({ children }: { children: React.ReactNode }) {
 
    ≥1280 (`xl:`): an `aside` in the left margin, flown out of the flow with
    `right-full` so its right edge sits at the article measure's own left
-   edge — the article column has ~250px+ of clear obsidian to its left at
+   edge — the article column has ~250px+ of clear paper ground to its left at
    this width (measure ceiling 36em ≈ 648px inside a 1152px content area at
    1280), so a 180px note with a 32px gap never touches the container edge.
    The wrapper is a zero-height block dropped where the note belongs in the
@@ -62,13 +65,13 @@ export function Marginalia({ children }: { children: React.ReactNode }) {
         aria-label="Margin note"
         className="absolute right-full top-0 hidden w-[180px] pr-8 text-left xl:block"
       >
-        <p className="t-mono-xs leading-relaxed text-fog">{children}</p>
+        <p className="t-mono-xs leading-relaxed text-ink-3">{children}</p>
       </aside>
       <details className="rule-t pt-4 xl:hidden">
-        <summary className="t-mono-xs inline-flex min-h-11 min-w-11 cursor-pointer items-center text-fog">
+        <summary className="t-mono-xs inline-flex min-h-11 min-w-11 cursor-pointer items-center text-ink-3">
           Note
         </summary>
-        <p className="t-small mt-3 text-ash">{children}</p>
+        <p className="t-small mt-3 text-ink-2">{children}</p>
       </details>
     </div>
   );
@@ -95,7 +98,7 @@ export function FootnoteRef({ n }: { n: number }) {
       <a
         href={`#fn${n}`}
         id={`fnref${n}`}
-        className="t-mono-xs -mx-2 px-2 py-3.5 text-pure no-underline"
+        className="t-mono-xs -mx-2 px-2 py-3.5 text-ink no-underline"
       >
         [{n}]
       </a>
@@ -106,7 +109,7 @@ export function FootnoteRef({ n }: { n: number }) {
 export function Footnotes({ children }: { children: React.ReactNode }) {
   return (
     <div className="rule-t mt-12 pt-6">
-      <p className="t-mono-xs text-fog">Notes</p>
+      <p className="t-mono-xs text-ink-3">Notes</p>
       <ol className="mt-4 space-y-3">{children}</ol>
     </div>
   );
@@ -114,12 +117,12 @@ export function Footnotes({ children }: { children: React.ReactNode }) {
 
 export function Footnote({ n, children }: { n: number; children: React.ReactNode }) {
   return (
-    <li id={`fn${n}`} className="t-small text-ash">
+    <li id={`fn${n}`} className="t-small text-ink-2">
       {children}{" "}
       <a
         href={`#fnref${n}`}
         aria-label="Back to text"
-        className="-mx-4 px-4 py-3.5 text-pure no-underline"
+        className="-mx-4 px-4 py-3.5 text-ink no-underline"
       >
         ↩
       </a>

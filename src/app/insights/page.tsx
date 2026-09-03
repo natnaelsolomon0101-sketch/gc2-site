@@ -10,16 +10,20 @@ export const metadata: Metadata = {
 };
 
 /* The rows are written out here rather than through HairlineList because that
-   component's hover state is `hover:bg-stone` — a paper-build token that no
-   longer exists in the theme, so it compiled to nothing and the list had no
-   hover at all. On the Origin ground the row lifts onto abyss (#090a0b, the
-   deeper band) and the title goes to pure, which reads as a deliberate state
-   change on black instead of the near-invisible tint a graphite hover gives.
+   component's hover state is `hover:bg-stone` — a token from an even earlier
+   build that no longer exists in the theme, so it compiled to nothing and the
+   list had no hover at all. The row steps to ground-2 (#eeeae1, DESIGN.md's
+   "full-bleed band, one step darker" role — "Measured — the ground steps":
+   1.10:1, a real but quiet step, no shadow needed), which reads as a
+   deliberate state change rather than the near-invisible tint a plain
+   hover:bg-surface would give at this size.
 
-   Colour on obsidian: title cloud 17.49:1 (pure 19.05:1 on hover, over abyss
-   19.81:1), dek ash 7.20:1 (7.49:1 over abyss), date fog 4.61:1, category ash.
-   Row is py-7 on a block link — 56px of padding alone, well past the 44px
-   target. */
+   Colour on ground: title ink 17.04:1 already at rest (`.t-h3`'s own base
+   colour — there is no higher tier to hover into, so the title's hover-colour
+   transition is gone; the row's background step and the focus-visible ring
+   are the state changes now), dek ink-2 7.55:1, date ink-3 5.61:1, category
+   ink-2 (inherited from `.t-mono-xs`'s own base). Row is py-7 on a block
+   link — 56px of padding alone, well past the 44px target. */
 export default function Insights() {
   return (
     <>
@@ -31,19 +35,19 @@ export default function Insights() {
               <Link
                 key={n.slug}
                 href={`/insights/${n.slug}`}
-                /* The row inherits ash, and the base `:focus-visible` ring
-                   resolves against currentColor here, so the ring came out ash
-                   (7.20:1 — visible, but a different ring from every other
-                   control on the site). Pinning it to pure keeps it 19.05:1 and
-                   identical to the nav and the prose links. */
-                className="rule-b group block px-2 py-7 transition-colors duration-[var(--dur-fast)] hover:bg-abyss focus-visible:outline-pure"
+                /* The row inherits ink-2, and the base `:focus-visible` ring
+                   resolves against currentColor here, so the ring came out
+                   ink-2 (7.55:1 — visible, but a different ring from every
+                   other control on the site). Pinning it to ink keeps it
+                   17.04:1 and identical to the nav and the prose links. */
+                className="rule-b group block px-2 py-7 transition-colors duration-[var(--dur-fast)] hover:bg-ground-2 focus-visible:outline-ink"
               >
                 <div className="grid-gc2 items-baseline">
-                  <span className="t-small col-span-4 text-fog md:col-span-2">
+                  <span className="t-small col-span-4 text-ink-3 md:col-span-2">
                     {formatDate(n.date)}
                   </span>
                   <span className="col-span-4 md:col-span-8">
-                    <span className="t-h3 block transition-colors duration-[var(--dur-fast)] group-hover:text-pure">
+                    <span className="t-h3 block">
                       {n.title}
                     </span>
                     <span className="t-body measure-body mt-2 block">{n.dek}</span>

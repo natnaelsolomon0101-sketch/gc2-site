@@ -60,7 +60,7 @@ export default function Insights() {
             <p className="t-mono">Insights</p>
             <h2 className="t-display-sm mt-6">Notes from the desk.</h2>
           </div>
-          <p className="t-mono-xs max-w-xs text-fog">
+          <p className="t-mono-xs max-w-xs text-ink-3">
             {notes.length === 1
               ? "One note. It argues a position we actually hold."
               : `${notes.length} notes. Each one argues a position we actually hold.`}
@@ -71,26 +71,37 @@ export default function Insights() {
              on a violet chromatic tile with quotation marks and centered text
              — a second "emphasize a sentence" object next to Statement, which
              the brief forbids. It now sets through <Statement> below, full-
-             bleed, the same object Feature.tsx uses for its own quote. ---- */}
+             bleed, the same object Feature.tsx uses for its own quote.
+
+             Light pass: the eyebrow row's hover used to shift to iris-gleam
+             (a chromatic accent). On paper that measures 3.03:1 as text —
+             DESIGN.md: "will not pass as text and no amount of weight or
+             size fixes them" — so hover now steps ink-3 -> ink, the same
+             de-emphasized-to-full-contrast jump every other hover state on
+             this page uses instead. Row titles already render at .t-h3-
+             equivalent full ink weight at rest (no lighter "cloud" tier to
+             lift from any more), so their hover colour transition is gone
+             too — the row's background/eyebrow/arrow already carry the
+             hover cue. ---- */}
         <Link
           href={`/insights/${lead.slug}`}
-          className="group mt-14 block border-t border-steel pt-10 md:mt-20 md:pt-14"
+          className="group mt-14 block rule-t pt-10 md:mt-20 md:pt-14"
         >
-          <p className="t-mono-xs text-fog transition-colors duration-[var(--dur-fast)] group-hover:text-iris-gleam motion-reduce:transition-none">
+          <p className="t-mono-xs text-ink-3 transition-colors duration-[var(--dur-fast)] group-hover:text-ink motion-reduce:transition-none">
             {lead.category}
-            <span aria-hidden="true" className="px-3 text-fog">
+            <span aria-hidden="true" className="px-3 text-ink-3">
               /
             </span>
             <time dateTime={lead.date}>{formatDate(lead.date)}</time>
           </p>
 
-          <h3 className="mt-6 max-w-2xl font-display text-4xl leading-none tracking-tight text-cloud transition-colors duration-[var(--dur-fast)] group-hover:text-pure md:text-6xl motion-reduce:transition-none">
+          <h3 className="mt-6 max-w-2xl font-display text-4xl leading-none tracking-tight text-ink md:text-6xl">
             {lead.title}
           </h3>
 
-          <p className="t-sub mt-7 max-w-md text-ash">{lead.dek}</p>
+          <p className="t-sub mt-7 max-w-md text-ink-2">{lead.dek}</p>
 
-          <span className="t-mono-xs mt-8 inline-flex min-h-11 items-center gap-3 text-pure">
+          <span className="t-mono-xs mt-8 inline-flex min-h-11 items-center gap-3 text-ink">
             Read the note
             <Arrow />
           </span>
@@ -106,9 +117,9 @@ export default function Insights() {
             <Link
               key={n.slug}
               href={`/insights/${n.slug}`}
-              className="group grid gap-x-12 gap-y-5 border-t border-steel py-9 lg:grid-cols-12 lg:py-11"
+              className="group grid gap-x-12 gap-y-5 rule-t py-9 lg:grid-cols-12 lg:py-11"
             >
-              <p className="t-mono-xs text-fog transition-colors duration-[var(--dur-fast)] group-hover:text-iris-gleam lg:col-span-3 motion-reduce:transition-none">
+              <p className="t-mono-xs text-ink-3 transition-colors duration-[var(--dur-fast)] group-hover:text-ink lg:col-span-3 motion-reduce:transition-none">
                 {n.category}
                 <span className="block pt-1">
                   <time dateTime={n.date}>{formatDate(n.date)}</time>
@@ -116,13 +127,13 @@ export default function Insights() {
               </p>
 
               <div className="lg:col-span-5">
-                <h3 className="font-display text-2xl leading-tight tracking-tight text-cloud transition-colors duration-[var(--dur-fast)] group-hover:text-pure md:text-3xl motion-reduce:transition-none">
+                <h3 className="font-display text-2xl leading-tight tracking-tight text-ink md:text-3xl">
                   {n.title}
                 </h3>
                 <p className="t-small mt-3 max-w-md">{n.dek}</p>
               </div>
 
-              <blockquote className="border-l border-iris-gleam pl-5 font-display text-lg leading-snug text-ash lg:col-span-4">
+              <blockquote className="border-l border-iris-gleam pl-5 font-display text-lg leading-snug text-ink-2 lg:col-span-4">
                 &ldquo;{QUOTES[n.slug]}&rdquo;
               </blockquote>
             </Link>
@@ -131,10 +142,10 @@ export default function Insights() {
         ) : null}
 
         {/* closing rule + index link */}
-        <div className={`flex justify-end border-t border-steel ${rest.length ? "pt-6" : "mt-12 pt-6 md:mt-16"}`}>
+        <div className={`flex justify-end rule-t ${rest.length ? "pt-6" : "mt-12 pt-6 md:mt-16"}`}>
           <Link
             href="/insights"
-            className="t-mono-xs group inline-flex min-h-11 items-center gap-3 text-pure"
+            className="t-mono-xs group inline-flex min-h-11 items-center gap-3 text-ink"
           >
             All notes
             <Arrow />

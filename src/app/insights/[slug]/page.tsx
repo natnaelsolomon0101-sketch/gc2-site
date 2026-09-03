@@ -47,20 +47,20 @@ export default async function Note({ params }: { params: Promise<{ slug: string 
             (pb-20) and desktop top (md:pt-20) as every other route. */}
         <div className="pb-20 pt-8 md:pt-20">
           <div className={`${measure} mx-auto`}>
-            <p className="t-mono text-fog">
+            <p className="t-mono text-ink-3">
               {note.category}
             </p>
             <h1 className="t-article-title mt-6">
               {note.title}
             </h1>
-            <p className="t-small mt-6 text-fog">{formatDate(note.date)}</p>
+            <p className="t-small mt-6 text-ink-3">{formatDate(note.date)}</p>
           </div>
 
           <div className="mt-12">
             <Prose><Body /></Prose>
           </div>
 
-          <p className={`t-small ${measure} mx-auto rule-t mt-16 pt-6 text-fog`}>
+          <p className={`t-small ${measure} mx-auto rule-t mt-16 pt-6 text-ink-3`}>
             This note is commentary from the desk. It is not investment advice and does
             not describe any position the fund holds.
           </p>
