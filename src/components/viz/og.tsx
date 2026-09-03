@@ -76,7 +76,19 @@ export type OgCard = {
    * fetch the page uses, so a share of the home page is dated. `null` — an
    * unreachable feed — falls back to the plain card rather than to a fake line.
    */
-  curve?: { d: string; width: number; height: number; source: string } | null;
+  curve?: {
+    d: string; width: number; height: number;
+    /** "U.S. Treasury par yield curve" — the plot named in type, above the line. */
+    title: string;
+    /** "U.S. Treasury · as of {date}". */
+    source: string;
+    /** "Public market data. Not fund performance." */
+    note: string;
+  } | null;
+  /** The frame line every share card carries. Counsel's second read puts it on
+   *  the home Open Graph card too: it is the card most likely to be seen by
+   *  someone who has never seen the site. */
+  frame?: string | null;
 };
 
 /** Alt text for the card, so the `og:image:alt` a screen reader hears is the
@@ -85,7 +97,7 @@ export function ogAlt({ title, description }: OgCard): string {
   return `${title} — ${opening(description)}`;
 }
 
-export function ogImage({ title, description, curve = null }: OgCard) {
+export function ogImage({ title, description, curve = null, frame = null }: OgCard) {
   return Promise.all([displayFont, uiFont]).then(
     ([display, ui]) =>
       new ImageResponse(
@@ -138,15 +150,22 @@ export function ogImage({ title, description, curve = null }: OgCard) {
                 justifyContent: "space-between",
               }}
             >
-              <div
-                style={{
-                  fontFamily: "DM Serif Display",
-                  fontSize: 34,
-                  letterSpacing: "-0.01em",
-                  color: INK,
-                }}
-              >
-                {site.mark}
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                {frame ? (
+                  <div style={{ marginBottom: 12, fontSize: 16, color: INK_3, letterSpacing: "0.09em" }}>
+                    {frame}
+                  </div>
+                ) : null}
+                <div
+                  style={{
+                    fontFamily: "DM Serif Display",
+                    fontSize: 34,
+                    letterSpacing: "-0.01em",
+                    color: INK,
+                  }}
+                >
+                  {site.mark}
+                </div>
               </div>
               {curve ? (
                 <div
@@ -156,6 +175,9 @@ export function ogImage({ title, description, curve = null }: OgCard) {
                     alignItems: "flex-start",
                   }}
                 >
+                  <div style={{ marginBottom: 14, fontSize: 19, color: INK }}>
+                    {curve.title}
+                  </div>
                   <svg
                     width={curve.width}
                     height={curve.height}
@@ -171,6 +193,9 @@ export function ogImage({ title, description, curve = null }: OgCard) {
                   </svg>
                   <div style={{ marginTop: 14, fontSize: 17, color: INK_3, letterSpacing: "0.09em" }}>
                     {curve.source}
+                  </div>
+                  <div style={{ marginTop: 4, fontSize: 17, color: INK_3, letterSpacing: "0.09em" }}>
+                    {curve.note}
                   </div>
                 </div>
               ) : null}

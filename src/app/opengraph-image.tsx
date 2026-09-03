@@ -39,12 +39,22 @@ export const contentType = OG_CONTENT_TYPE;
 
 export default async function Image() {
   const data = await fetchYieldCurve();
+  /* The same three strings the share cards carry (counsel's second read): the
+     plot named in type above the line, what it is not underneath, and the frame
+     line. This is the card most likely to be seen by someone who has never seen
+     the site, so it is the last place to leave a rising hairline unlabelled. */
   const curve = data
     ? {
         ...PLOT,
         d: geometry(data.points, PLOT.width, PLOT.height).d,
+        title: "U.S. Treasury par yield curve",
         source: `${TREASURY_ATTRIBUTION} · as of ${asOf(data.date)}`,
+        note: "Public market data. Not fund performance.",
       }
     : null;
-  return ogImage({ ...card, curve });
+  return ogImage({
+    ...card,
+    curve,
+    frame: `Informational only. Not an offer. ${site.domain}`,
+  });
 }

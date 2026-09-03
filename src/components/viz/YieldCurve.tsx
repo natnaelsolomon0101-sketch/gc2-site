@@ -18,23 +18,18 @@ import {
  * level; no fund data of any kind, per §1 and the 506(b) list.
  *
  * ONE 1px INK HAIRLINE ON PAPER. The rule never changed — one hairline, no
- * fill, no gradient — only which end of the scale it sits at: it is now
- * `--color-ink` on `--color-ground` (LIGHT-PASS.md). Nothing else about the drawing changes: no fill, no
- * gradient, no second colour, and the accents stay out of it — a data
- * component is the one place DESIGN.md's "one accent per section" ration is
- * spent on nothing at all.
+ * fill, no gradient, no second colour — only which end of the scale it sits at:
+ * `--color-ink` on `--color-ground` (LIGHT-PASS.md). The accents stay out of it;
+ * a data component is the one place DESIGN.md's "one accent per section" ration
+ * is spent on nothing at all.
  *
- * preserveAspectRatio="none", DELIBERATELY, with vector-effect="non-scaling-
- * stroke" on the path. The alternative, "xMidYMid meet", scales the drawing
- * uniformly: at 320 the hairline thins below a pixel and at 3440 it fattens to
- * three, and the letterboxing leaves dead bands the composition has no use for.
- * With "none" the plot fills its box at every width and the stroke stays
- * exactly 1px, which is what APPENDIX-A means by a hairline. The distortion
- * that buys is vertical exaggeration of a curve with no printed y scale, which
- * claims nothing either way. Tenor labels are HTML, not SVG text, so they hold
- * .t-caption at its own size instead of scaling with the box — that is the
- * other half of the same decision, and it is why the 13px floor survives at
- * 320 and the labels do not become billboards at 3440. Checked at both.
+ * The stroke keeps `vector-effect="non-scaling-stroke"`, which is what holds it
+ * at exactly 1px from a 320 phone to a 3440 monitor — a hairline that thins
+ * below a pixel at one end and fattens to three at the other is not the
+ * hairline APPENDIX-A means. Tenor labels are HTML, not SVG text, for the same
+ * reason: they hold .t-caption at its own size rather than scaling with the
+ * box, which is why the 13px floor survives at 320 and the labels do not become
+ * billboards at 3440. Checked at both.
  */
 
 /* Four labels, not thirteen. On a log axis 1Y and 2Y sit twelve percent apart,
@@ -42,19 +37,31 @@ import {
    four are spread across the axis at every width the site supports. */
 const LABELLED = new Set(["1M", "1Y", "10Y", "30Y"]);
 
+/* ONE canonical shape, everywhere.
+ *
+ * The page used to fill its box with preserveAspectRatio="none" while the cards
+ * rendered the viewBox's own ratio, so the same day's curve was steeper on the
+ * site than on a card someone had just shared. That IS the exaggeration counsel
+ * objected to; naming which surface stretches does not fix it.
+ *
+ * Now the box always has the viewBox's ratio (CSS `aspect-ratio`) and the SVG
+ * is fitted into it uniformly ("xMidYMid meet"). Distortion is impossible by
+ * construction rather than by convention: if a consumer forces a height that
+ * disagrees, the drawing letterboxes — visibly, honestly — instead of quietly
+ * getting steeper. A slot that needs a different shape sets `--yc-aspect`,
+ * which changes the BOX and the drawing together. */
 const VIEW = { w: 1000, h: 260 };
 
 export type YieldCurveProps = {
   className?: string;
   /**
-   * Share-card mode. securities-counsel's round-2 read (docs/v4/COUNSEL.md,
-   * finding 1, BLOCKING): on the page the curve sits inside a section that says
-   * what it is, but a card travels alone — an unlabelled rising hairline beside
-   * a fund's wordmark can be read as the fund's own record. So a card NAMES the
-   * plot in type and says what it is not, and it drops the vertical
-   * exaggeration: the page fills its box with preserveAspectRatio="none", a
-   * card renders the viewBox's own 1000:260 so the line on the card is never
-   * steeper than the line in the data.
+   * Card presentation. Counsel's SECOND read closed the loophole the first one
+   * left: round 2 gave the title and the "not fund performance" line to the
+   * cards only, on the reasoning that a card travels alone while the page has a
+   * section around it. Counsel does not accept the distinction — a rising
+   * hairline on a fund's own home page is read the same way — so BOTH strings
+   * are now unconditional and this prop only chooses the title's type tier:
+   * .t-h3 on a card, .t-caption on the page, where it costs about 40px.
    */
   card?: boolean;
 };
@@ -75,12 +82,16 @@ export default async function YieldCurve({ className = "", card = false }: Yield
       data-asof={curve.date}
     >
       <style>{css}</style>
-      {card ? <h3 className="t-h3 yc-title">U.S. Treasury par yield curve</h3> : null}
+      {/* Always. A plot that is not named in type is a plot the reader has to
+          guess at, and the guess a fund's own page invites is the wrong one. */}
+      <p className={card ? "t-h3 yc-title" : "t-caption yc-title"}>
+        U.S. Treasury par yield curve
+      </p>
       <div className="yc-plot">
         <svg
           className="yc-svg"
           viewBox={`0 0 ${VIEW.w} ${VIEW.h}`}
-          preserveAspectRatio={card ? "xMidYMid meet" : "none"}
+          preserveAspectRatio="xMidYMid meet"
           role="img"
           aria-label={`United States Treasury par yield curve as of ${date}, from one month to thirty years.`}
         >
@@ -125,9 +136,7 @@ export default async function YieldCurve({ className = "", card = false }: Yield
       <figcaption className="t-caption yc-source">
         {TREASURY_ATTRIBUTION} · as of {date}
       </figcaption>
-      {card ? (
-        <p className="t-caption yc-note">Public market data. Not fund performance.</p>
-      ) : null}
+      <p className="t-caption yc-note">Public market data. Not fund performance.</p>
     </figure>
   );
 }
@@ -161,22 +170,25 @@ const css = `
 .yc-svg {
   display: block;
   width: 100%;
-  /* A consumer sets its slot's height by assigning --yc-h on the figure rather
-     than reaching inside for .yc-svg — the hero's short-desktop slot height is
-     the case this exists for. */
-  height: var(--yc-h, clamp(132px, 15vw, 240px));
+  /* The box carries the viewBox's ratio, so "meet" fits it exactly and nothing
+     is ever stretched or letterboxed. A slot that needs a different shape sets
+     --yc-aspect on the figure; it moves the box and the drawing together, which
+     a height override cannot do. */
+  aspect-ratio: var(--yc-aspect, 1000 / 260);
+  height: auto;
   overflow: visible;
 }
 .yc-axis { position: relative; height: 1.9em; margin-top: 12px; }
 .yc-tick { position: absolute; top: 0; white-space: nowrap; }
 .yc-source { display: block; margin-top: 6px; }
 
-/* Card mode. The heading is .t-h3 — the display face at the caption-to-h3 size
-   counsel asked for — and the plot takes its own aspect from the viewBox rather
-   than a forced height, which is what removes the stretch. */
-.yc-title { margin: 0 0 22px; }
+/* The title and the note ship on every surface. On a card the title is .t-h3,
+   the display face at the size counsel asked for; on the page it is .t-caption,
+   which puts it in the same voice as the tenor labels and the source line and
+   costs about 40px. */
+.yc-title { display: block; margin: 0 0 14px; }
+.yc[data-card="true"] .yc-title { margin-bottom: 22px; }
 .yc-note { display: block; margin: 2px 0 0; color: var(--color-ink-3); hyphens: none; }
-.yc[data-card="true"] .yc-svg { height: auto; }
 
 /* Label collision, and where the 470px comes from.
  *
