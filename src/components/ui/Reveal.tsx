@@ -23,19 +23,24 @@ export type RevealMode = "load" | "scroll";
 export type RevealProps = {
   /** `scroll` (default) reveals on entry; `load` reveals once on first paint. */
   mode?: RevealMode;
-  /** Stagger step. 0 / 1 / 2 / 3 -> 0 / 1 / 2 / 3 x `--stagger` (70ms) in
-   *  load mode; in scroll mode the timeline range is shifted instead. */
-  delay?: 0 | 1 | 2 | 3;
+  /**
+   * Stagger tier, on the SAME scale as globals.css `.fade-1 … .fade-8`: tier N
+   * delays (N - 1) x `--stagger` (70ms), so `delay={3}` and `.fade-3` are the
+   * same beat. One scale, because two would be the exact drift `motion.ts`
+   * exists to prevent.
+   */
+  delay?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
   as?: "div" | "section" | "article" | "li" | "p" | "span" | "figure";
   className?: string;
   children: React.ReactNode;
 } & Omit<React.HTMLAttributes<HTMLElement>, "className" | "children">;
 
-const DELAY = [undefined, styles.d1, styles.d2, styles.d3] as const;
+const DELAY = [undefined, styles.d1, styles.d2, styles.d3, styles.d4,
+               styles.d5, styles.d6, styles.d7, styles.d8] as const;
 
 export default function Reveal({
   mode = "scroll",
-  delay = 0,
+  delay = 1,
   as = "div",
   className = "",
   children,
