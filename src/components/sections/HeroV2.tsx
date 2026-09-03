@@ -598,7 +598,9 @@ export default function HeroV2() {
 
         <dl className="hv2-ledger">
           <div className="hv2-lrow">
-            <dt><span className="hv2-lx">01</span>Structure</dt>
+            {/* "Vehicle" rather than "Structure": it is the word a tearsheet
+                uses for this row, and the record should read like one. */}
+            <dt><span className="hv2-lx">01</span>Vehicle</dt>
             <dd>{site.structure}</dd>
           </div>
           <div className="hv2-lrow">
@@ -608,9 +610,21 @@ export default function HeroV2() {
         </dl>
 
         <div className="hv2-row hv2-foot">
+          {/* Written to the voice the rest of the site already uses — "We build
+              the data before we build the view", "Sized to survive the tail, not
+              to flatter the mean", "Risk runs independently of the desk and can
+              cut any position". Short declaratives, a term of art where a term
+              of art is accurate, no category words doing the work.
+              It was: "<name> runs concentrated, systematic strategies across
+              liquid global markets, underwritten by our own research and a
+              single risk framework." One 24-word sentence of institutional
+              boilerplate, and the only line on the site that read like a
+              brochure. Every claim below is one the firm already makes on /firm;
+              nothing here is a number, a track record, or a capacity figure. */}
           <p className="hv2-lead">
-            {site.name} runs concentrated, systematic strategies across liquid global
-            markets, underwritten by our own research and a single risk framework.
+            Concentrated systematic strategies in liquid global markets. One research
+            process, one risk framework, and a risk seat that runs independently of
+            the desk.
           </p>
           <div className="hv2-cta">
             <Link href="/firm" className="hv2-btn">
