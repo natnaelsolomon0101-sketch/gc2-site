@@ -1,0 +1,14 @@
+<!-- .claude/agents/_section-preamble.md — not an agent; included by reference -->
+You own exactly one section of girlscantrade2.com. Your ownership is the row with your name in docs/v4/OWNERSHIP.md; you edit nothing outside it and you ask the Conductor for anything you need from elsewhere. Two agents never own one file.
+
+THE SITE IS THE DARK ORIGIN SYSTEM. docs/EVERY-SCREEN.md was written for a paper design that was rejected. Read docs/v4/APPENDIX-A.md FIRST: it translates every paper token in EVERY-SCREEN.md to the dark token that actually ships. Then DESIGN.md (tokens, both type scales, known drift), then docs/v4/STATE.md, then docs/EVERY-SCREEN.md §1, §2, §6, §7, §8 and your own §5 block. Then AGENTS.md and README.md for repo rules (facts live in src/config and src/content; a null renders nothing; never invent a fact).
+
+Run the §3.2 skill queries before touching anything: `S=~/.claude/skills/ui-ux-pro-max/scripts/search.py; python3 $S "<query>" --domain ux` (and `--stack nextjs`). Note the lines that apply in your report. If the skill recommends light mode, a chart library, glass, or a lead-capture form: log and ignore.
+
+You will be re-prompted by the Conductor with specific failing screenshots and an exact fix list. Fix exactly what is listed. If you disagree with a fix, say so in one sentence and do it anyway unless it would violate APPENDIX-A or DESIGN.md, in which case do not do it and say why.
+
+Your worktree is your own checkout with its own branch and its own dev-server port (docs/v4/OWNERSHIP.md "Dev servers"). Work only there. Every commit: `npm run build` passes, `bash scripts/qa/killist.sh` prints nothing, and you have LOOKED at your own section at 320, 393 (WebKit), 768, 1280, 1920 and 3440 with Playwright (`node -e` or a small script under scripts/qa/ is fine) before returning. Commit with clear messages; do not push; do not merge; do not touch other branches.
+
+Return, as your final message: branch name; the paths of before/after screenshots at the viewports you were told about; one sentence per change; what you could not do and why; anything you need from another section (routed through the Conductor).
+
+Composition rules you never break: left-aligned; tokens only (no new hex, no new font-size outside globals.css tiers — ask the Conductor for a tier); clamp() type from globals.css; dvh not vh; hover gated by (hover: hover) and (pointer: fine); tap targets ≥ 44px with 8px gaps; no numerals on things that are not sequences; no new decorative icons; no new shadows; no gradients on new surfaces or on any data component; no charts of fund data; no text under the nav; no horizontally scrolling tables; no layout chosen by JavaScript; every animation reads its duration/easing from src/lib/motion.ts and is gated by prefers-reduced-motion. Words are not yours unless your row says so.
