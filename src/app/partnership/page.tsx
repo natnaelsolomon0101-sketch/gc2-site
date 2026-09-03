@@ -34,28 +34,30 @@ const regime: "506b" | "506c" = fund.regime;
 
 const CSS = `
 /* Doors are full-width hairline blocks, not cards and not a comparison grid.
-   The only ornament is a 2px chromatic bar over the door name, drawn from the
-   warm end of the palette per the build brief. Cyan is not used. */
-.pt-door{ border-bottom:1px solid rgba(255,255,255,.12); }
-.pt-door:first-child{ border-top:1px solid rgba(255,255,255,.12); }
-.pt-accent{ display:block; width:40px; height:2px; }
+   The only ornament was a 2px chromatic bar over the door name, one accent
+   per door. Light-pass round: no chromatic fills on this page except at
+   most one deep-iris rule, so the three separate accent colours come off —
+   a plain ink bar in their place, same weight, same read as an ornament. */
+.pt-door{ border-bottom:1px solid var(--color-hairline); }
+.pt-door:first-child{ border-top:1px solid var(--color-hairline); }
+.pt-accent{ display:block; width:40px; height:2px; background:var(--color-ink); }
 
 /* Real tables, hairline rows, mono row header (the .t-caption tier: 13px,
-   the §6.3 floor — this table used to set 11px, which failed it), cloud
-   value (17.49:1 on obsidian / 18.17:1 on abyss). Stacks to term-over-value
-   under 768px, with each row set as its own grid so a 38% column does not
-   crush a date into four lines on a phone. */
+   the §6.3 floor — this table used to set 11px, which failed it), ink
+   value (17.04:1 on ground / 15.47:1 on ground-2, measured). Stacks to
+   term-over-value under 768px, with each row set as its own grid so a 38%
+   column does not crush a date into four lines on a phone. */
 .pt-table{ width:100%; border-collapse:collapse; }
 .pt-table th, .pt-table td{ text-align:left; vertical-align:top;
-  padding:20px 0; border-top:1px solid rgba(255,255,255,.12); }
+  padding:20px 0; border-top:1px solid var(--color-hairline); }
 .pt-table th{ font-family:var(--font-mono); font-size:13px; line-height:2;
   text-transform:uppercase; letter-spacing:.182em; font-weight:500;
-  color:var(--color-ash); padding-right:24px; width:38%; }
-.pt-table td{ font-size:16px; line-height:1.5; color:var(--color-cloud); }
+  color:var(--color-ink-2); padding-right:24px; width:38%; }
+.pt-table td{ font-size:16px; line-height:1.5; color:var(--color-ink); }
 /* Rows carry a top rule, so the last one needs a bottom rule to close the
    table. Without it the final value hangs off the end of an open box. */
 .pt-table tbody tr:last-child th,
-.pt-table tbody tr:last-child td{ border-bottom:1px solid rgba(255,255,255,.12); }
+.pt-table tbody tr:last-child td{ border-bottom:1px solid var(--color-hairline); }
 @media (max-width:767px){
   .pt-table tbody tr{ display:grid; row-gap:4px; }
   .pt-table th, .pt-table td{ display:block; width:auto; padding-right:0; }
@@ -64,13 +66,12 @@ const CSS = `
   .pt-table tbody tr:last-child th{ border-bottom:0; }
 }
 
-.pt-step{ border-top:1px solid rgba(255,255,255,.12); }
+.pt-step{ border-top:1px solid var(--color-hairline); }
 `;
 
 const doors = [
   {
     n: "01",
-    accent: "bg-orchid-bloom",
     kicker: "Commingled",
     name: "The fund",
     body: [
@@ -80,7 +81,6 @@ const doors = [
   },
   {
     n: "02",
-    accent: "bg-pale-iris",
     kicker: "On the family's balance sheet",
     name: "Separate account",
     body: [
@@ -90,7 +90,6 @@ const doors = [
   },
   {
     n: "03",
-    accent: "bg-periwinkle",
     kicker: "Alongside the book",
     name: "Co-investment",
     body: [
@@ -135,7 +134,7 @@ function TermsTable({
       <Container>
         <div className="grid-gc2 py-16 md:py-24">
           <div className="col-span-4 md:col-span-3">
-            <p className="t-mono-xs text-fog">{ordinal}</p>
+            <p className="t-mono-xs text-ink-3">{ordinal}</p>
             <h2 className="t-h2 mt-3">Terms</h2>
           </div>
           <div className="col-span-4 md:col-span-8 md:col-start-5">
@@ -152,7 +151,7 @@ function TermsTable({
                 ))}
               </tbody>
             </table>
-            <p className="t-small mt-8 text-fog">
+            <p className="t-small mt-8 text-ink-3">
               Summary only. The offering documents govern in all respects and
               prevail wherever the two disagree.
             </p>
@@ -209,10 +208,10 @@ export default function Partnership() {
   const showTerms = terms.length > 0;
 
   /* Two sections appear and disappear with the config, so neither the ordinals
-     nor the alternating obsidian/abyss grounds can be hard-coded. Hard-coding
+     nor the alternating ground/ground-2 grounds can be hard-coded. Hard-coding
      them produced both failure modes at once with all fields null: the page
      skipped from 02 to 04, and Alignment sat directly against "How a
-     relationship starts" as one undifferentiated 1,400px slab of abyss. */
+     relationship starts" as one undifferentiated 1,400px slab of ground-2. */
   const order = [
     "doors",
     "alignment",
@@ -222,7 +221,7 @@ export default function Partnership() {
   ];
   const at = (key: string) => {
     const i = order.indexOf(key);
-    return { ordinal: String(i + 1).padStart(2, "0"), ground: i % 2 ? "bg-abyss" : "" };
+    return { ordinal: String(i + 1).padStart(2, "0"), ground: i % 2 ? "bg-ground-2" : "" };
   };
   const sTerms = at("terms");
   const sReporting = at("reporting");
@@ -245,7 +244,7 @@ export default function Partnership() {
             {/* Closes the page header, the way /firm closes its own. */}
             <div className="grid-gc2 rule-t pt-14 md:pt-16">
               <div className="col-span-4 md:col-span-3">
-                <p className="t-mono-xs text-fog">01</p>
+                <p className="t-mono-xs text-ink-3">01</p>
                 <h2 className="t-h2 mt-3">Three doors</h2>
               </div>
               <div className="col-span-4 md:col-span-8 md:col-start-5">
@@ -261,9 +260,9 @@ export default function Partnership() {
               {doors.map((d) => (
                 <article key={d.n} className="pt-door grid-gc2 py-12 md:py-16">
                   <div className="col-span-4 md:col-span-4">
-                    <span className={`pt-accent ${d.accent}`} aria-hidden="true" />
+                    <span className="pt-accent" aria-hidden="true" />
                     <h3 className="t-h3 mt-5">{d.name}</h3>
-                    <p className="t-mono-xs mt-3 text-fog">{d.kicker}</p>
+                    <p className="t-mono-xs mt-3 text-ink-3">{d.kicker}</p>
                   </div>
                   <div className="col-span-4 md:col-span-7 md:col-start-6">
                     {d.body.map((t, i) => (
@@ -276,7 +275,7 @@ export default function Partnership() {
               ))}
             </div>
 
-            <p className="t-small measure-body mt-10 text-fog">
+            <p className="t-small measure-body mt-10 text-ink-3">
               Which structure suits a family is a function of size, horizon and
               what the family already holds — not of what we would rather sell.
             </p>
@@ -285,11 +284,11 @@ export default function Partnership() {
       </section>
 
       {/* ---- 02 · Alignment ----------------------------------------------- */}
-      <section className="bg-abyss">
+      <section className="bg-ground-2">
         <Container>
           <div className="grid-gc2 py-16 md:py-24">
             <div className="col-span-4 md:col-span-3">
-              <p className="t-mono-xs text-fog">02</p>
+              <p className="t-mono-xs text-ink-3">02</p>
               <h2 className="t-h2 mt-3">Alignment</h2>
             </div>
             <div className="col-span-4 md:col-span-8 md:col-start-5">
@@ -339,7 +338,7 @@ export default function Partnership() {
           <Container>
             <div className="grid-gc2 py-16 md:py-24">
               <div className="col-span-4 md:col-span-3">
-                <p className="t-mono-xs text-fog">{sReporting.ordinal}</p>
+                <p className="t-mono-xs text-ink-3">{sReporting.ordinal}</p>
                 <h2 className="t-h2 mt-3">Reporting</h2>
               </div>
               <div className="col-span-4 md:col-span-8 md:col-start-5">
@@ -363,7 +362,7 @@ export default function Partnership() {
                   </tbody>
                 </table>
                 {fund.updatedAt && (
-                  <p className="t-small mt-8 text-fog">Last updated {fund.updatedAt}.</p>
+                  <p className="t-small mt-8 text-ink-3">Last updated {fund.updatedAt}.</p>
                 )}
               </div>
             </div>
@@ -376,7 +375,7 @@ export default function Partnership() {
         <Container>
           <div className="grid-gc2 py-16 md:py-24">
             <div className="col-span-4 md:col-span-3">
-              <p className="t-mono-xs text-fog">{sStart.ordinal}</p>
+              <p className="t-mono-xs text-ink-3">{sStart.ordinal}</p>
               <h2 className="t-h2 mt-3">How a relationship starts</h2>
             </div>
             <div className="col-span-4 md:col-span-8 md:col-start-5">
@@ -391,8 +390,8 @@ export default function Partnership() {
               <div className="mt-10">
                 {steps.map((s) => (
                   <div key={s.n} className="pt-step py-7">
-                    <p className="t-mono-xs text-fog">{s.n}</p>
-                    <h3 className="t-heading-sm mt-2 text-cloud">{s.h}</h3>
+                    <p className="t-mono-xs text-ink-3">{s.n}</p>
+                    <h3 className="t-heading-sm mt-2 text-ink">{s.h}</h3>
                     <p className="t-body measure-body mt-3">{s.p}</p>
                   </div>
                 ))}
@@ -401,7 +400,7 @@ export default function Partnership() {
               <a href="/access" className="btn mt-10 min-h-11">
                 How to ask for an introduction
               </a>
-              <p className="t-small measure-body mt-6 text-fog">
+              <p className="t-small measure-body mt-6 text-ink-3">
                 There is no download on that page and no form on it either. The
                 reason it works that way is written out in full when you get
                 there. Written enquiries reach us at {site.emails.investors}.

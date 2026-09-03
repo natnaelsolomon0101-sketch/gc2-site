@@ -57,11 +57,11 @@ function Ledger({
       <caption className="sr-only">{caption}</caption>
       <thead className="sr-only md:not-sr-only">
         <tr className="block md:table-row">
-          <th scope="col" className="t-caption block pb-3 text-left text-fog md:table-cell md:w-5/12 md:pr-6">
+          <th scope="col" className="t-caption block pb-3 text-left text-ink-3 md:table-cell md:w-5/12 md:pr-6">
             {termHead}
           </th>
           {heads.map((h) => (
-            <th key={h} scope="col" className="t-caption block pb-3 text-left text-fog md:table-cell md:pr-6">
+            <th key={h} scope="col" className="t-caption block pb-3 text-left text-ink-3 md:table-cell md:pr-6">
               {h}
             </th>
           ))}
@@ -75,7 +75,7 @@ function Ledger({
           <tr key={r.term} className="rule-t grid gap-y-1 py-5 md:table-row md:gap-y-0 md:py-0">
             <th
               scope="row"
-              className="t-body block text-left font-normal text-fog md:table-cell md:w-5/12 md:py-6 md:pr-6 md:align-top"
+              className="t-body block text-left font-normal text-ink-3 md:table-cell md:w-5/12 md:py-6 md:pr-6 md:align-top"
             >
               {r.term}
             </th>
@@ -96,10 +96,10 @@ function Ledger({
                 >
                   {!empty && (
                     <>
-                      <span aria-hidden="true" className="t-caption block text-fog md:hidden">
+                      <span aria-hidden="true" className="t-caption block text-ink-3 md:hidden">
                         {heads[i]}
                       </span>
-                      <span className="t-body block text-cloud">{c}</span>
+                      <span className="t-body block text-ink">{c}</span>
                     </>
                   )}
                 </td>
@@ -340,7 +340,7 @@ export default function Diligence() {
           This is an index, not a download wall. Under Regulation D 506(b) nothing that
           constitutes offering material may sit on a public page, so the offering documents are
           released directly to investors who qualify and never from here. That is what
-          <span className="text-cloud"> behind the gate</span> means below.
+          <span className="text-ink"> behind the gate</span> means below.
         </p>
         <p className="t-body measure-body mt-6">
           Everything else goes to diligence teams on request. A row in this index is something we
@@ -370,7 +370,7 @@ export default function Diligence() {
       <dl>
         {operations.map((o) => (
           <div key={o.h} className="rule-t py-8">
-            <dt className="t-mono text-cloud">{o.h}</dt>
+            <dt className="t-mono text-ink">{o.h}</dt>
             <dd className="t-body measure-body mt-3">{o.p}</dd>
           </div>
         ))}
@@ -412,17 +412,17 @@ export default function Diligence() {
         standfirst="What an allocator needs before a first call, in one place: who keeps the books, what we are registered as, which documents are released and on what terms, and how the operating controls are built."
       />
 
-      {/* Bands alternate obsidian / abyss, matching /firm, so an inner page
+      {/* Bands alternate ground / ground-2, matching /firm, so an inner page
           reads as the same site. Ordinals are taken from the RENDERED index,
           not from a fixed list, so a collapsed block never leaves a gap in the
-          numbering. Heading pure 19.05:1 / 19.81:1, body ash 7.20:1 / 7.49:1,
-          fog labels 4.61:1 / 4.80:1. */}
+          numbering. Heading ink 17.04:1 / 15.47:1, body ink-2 7.55:1 / 6.85:1,
+          ink-3 labels 5.61:1 / 5.09:1. */}
       {blocks.map((b, i) => (
-        <section key={b.id} id={b.id} className={`scroll-mt-24 ${i % 2 ? "bg-abyss" : ""}`}>
+        <section key={b.id} id={b.id} className={`scroll-mt-24 ${i % 2 ? "bg-ground-2" : ""}`}>
           <Container>
             <div className={`grid-gc2 py-16 md:py-24 ${i === 0 ? "rule-t" : ""}`}>
               <div className="col-span-4 md:col-span-4">
-                <p className="t-mono-xs text-fog">{String(i + 1).padStart(2, "0")}</p>
+                <p className="t-mono-xs text-ink-3">{String(i + 1).padStart(2, "0")}</p>
                 <h2 className="t-h2 mt-3">{b.title}</h2>
                 {b.kicker && <p className="t-small measure-body mt-6">{b.kicker}</p>}
               </div>
@@ -434,9 +434,9 @@ export default function Diligence() {
 
       {/* Stamped only when there is a date to stamp. */}
       {fund.updatedAt && (
-        <section className={blocks.length % 2 ? "bg-abyss" : ""}>
+        <section className={blocks.length % 2 ? "bg-ground-2" : ""}>
           <Container>
-            <p className="t-mono-xs rule-t py-8 text-fog">Last updated {fund.updatedAt}</p>
+            <p className="t-mono-xs rule-t py-8 text-ink-3">Last updated {fund.updatedAt}</p>
           </Container>
         </section>
       )}
