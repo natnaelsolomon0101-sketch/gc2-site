@@ -4,6 +4,7 @@ import PageHeader from "@/components/PageHeader";
 import TextLink from "@/components/TextLink";
 import { fund } from "@/config/fund";
 import { strategies } from "@/content/strategies";
+import StrategiesRail from "./StrategiesRail";
 
 /**
  * /strategies — the six books, then the two questions the six raise.
@@ -363,6 +364,10 @@ export default function Strategies() {
 .stx-rail a:focus-visible {
   outline: 2px solid var(--color-ink); outline-offset: 2px; border-radius: 4px;
 }
+/* The section currently in view (see StrategiesRail.tsx's IntersectionObserver) —
+   same ink + hairline-strong underline hover/active already read as, so it
+   is not a new visual language, just a persistent version of it. */
+.stx-rail a[aria-current] { color: var(--color-ink); border-color: var(--color-ink); }
 @keyframes stxRailIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .stx-rail a { animation: none; } }
 
@@ -430,15 +435,7 @@ export default function Strategies() {
               is duplicated in the DOM and nothing picks the layout in JS. */}
           <div className="stx-layout">
             <div className="stx-rail-wrap">
-              <nav className="stx-rail" aria-label="Jump to a strategy">
-                <ul>
-                  {strategies.map((s, k) => (
-                    <li key={s.slug} style={{ ["--stx-i" as string]: k }}>
-                      <a href={`#${s.slug}`} className="t-small">{s.name}</a>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
+              <StrategiesRail items={strategies} />
             </div>
             <div className="stx-rows">
               {strategies.map((s) => (
