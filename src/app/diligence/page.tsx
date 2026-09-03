@@ -339,8 +339,8 @@ export default function Diligence() {
         <p className="t-body measure-body">
           This is an index, not a download wall. Under Regulation D 506(b) nothing that
           constitutes offering material may sit on a public page, so the offering documents are
-          released directly to investors who qualify and never from here. That is what
-          <span className="text-ink"> behind the gate</span> means below.
+          released directly to investors who qualify and never from here. That is what{" "}
+          <TextLink href="/access">behind the gate</TextLink> means below.
         </p>
         <p className="t-body measure-body mt-6">
           Everything else goes to diligence teams on request. A row in this index is something we
