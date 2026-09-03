@@ -96,6 +96,47 @@ const css = `
   padding-block: var(--nav-h) 24px;
   display: flex; align-items: center; overflow: hidden;
 }
+/* ---- the pin on a phone -------------------------------------------------
+   svh, not vh. A sticky panel sized in vh is the classic mobile bug: vh is the
+   LARGEST viewport, so with the URL bar showing the panel is taller than the
+   screen and its bottom edge — the deck, the thing you are here to read — sits
+   under the chrome until you scroll. svh is the smallest viewport, so the panel
+   always fits and the bar collapsing only ever reveals more ground.
+   The panel also has to lose weight to hold a readable deck: the lede goes (it
+   is supporting copy, and every tile states its own case in the deck below it),
+   the rhythm tightens, and the tiles shrink to a 46px collapsed slice, which is
+   still past the 44px touch target the deck has always promised. */
+@media (max-width: 1023px) {
+  /* --expanded is content height PLUS --overlap. The card after the open one is
+     pulled up by --overlap on purpose, so that the fan reads the same either
+     side of the open card — which means the open card's last --overlap pixels
+     are always sitting under its neighbour. At 228px, exactly its content
+     height, that ate the MARKETS / INSTRUMENTS row. 248 = 228 + 15 + a pixel of
+     air. Desktop never showed this because its --expanded already carried
+     slack.
+     304px, measured: the head is 60 and the body's natural height at a phone
+     measure is 229 (the one-liner wraps to three lines and MARKETS /
+     INSTRUMENTS stack), so 60 + 229 + 15 of overlap = 304. That is the same
+     value desktop uses, which is the tell that the content, not the breakpoint,
+     sets this number. Anything smaller is clipped twice over: the tile has
+     overflow:hidden, and the next card is pulled up onto it.
+     320, not 304: the six bodies are not the same height. Measured in place with
+     the transition settled, the tallest is 244px (Tail Overlay), so
+     60 + 244 + 15 = 319. Sizing to the average clips the two longest cards. */
+  .stx--pinned { --tile-h: 60px; --step: 45px; --expanded: 320px; }
+  /* The heading drops to the t-heading-lg tier while pinned on a phone. This
+     adopts a size the scale already declares (32/38) rather than inventing one:
+     the deck needs 545px of the panel and a 40px display heading wrapping to
+     three lines does not leave it. Unpinned and on desktop the heading is
+     untouched. */
+  .stx--pinned .stx-col h2 { font-size: 32px; line-height: 1.05; }
+  .stx--pinned .stx-track { height: 260svh; }
+  .stx--pinned .stx-panel { height: 100svh; padding-block: var(--nav-h) 16px; }
+  .stx--pinned .stx-lede { display: none; }
+  .stx--pinned .stx-grid { gap: 16px; margin-top: 14px; }
+  .stx--pinned .stx-meter { margin-top: 16px; }
+  .stx--pinned .stx-hint { margin-top: 8px; }
+}
 .stx-inner { width: 100%; }
 
 .stx-headrow {
@@ -220,7 +261,17 @@ export default function Strategies() {
      off — gets the fully readable static grid rather than a dead pin. */
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const wide = window.matchMedia("(min-width: 1024px)");
+    /* Pinning is gated on HEIGHT, not width. It used to be (min-width: 1024px),
+       which handed every phone the unpinned deck — the scroll-through is the
+       thing that makes this section worth having, and it was desktop-only for
+       no reason a phone actually fails. What a pin genuinely needs is enough
+       vertical room to hold a readable panel, so that is what is asked for.
+       820px is measured, not guessed: the phone panel needs 759px to hold the
+       headrow, heading, meter, hint and a deck whose collapsed slice is still a
+       46px touch target. At 667px tall it overflowed by 119px, so a 667 phone
+       and every landscape phone keep the deck, where a sticky full-height panel
+       would be a trap rather than a feature. */
+    const wide = window.matchMedia("(min-height: 820px)");
     const apply = () => setMode(reduce.matches ? "static" : wide.matches ? "pinned" : "deck");
     apply();
     reduce.addEventListener("change", apply);
@@ -240,7 +291,14 @@ export default function Strategies() {
       const el = trackRef.current;
       if (!el) return;
       const r = el.getBoundingClientRect();
-      const total = r.height - window.innerHeight;
+      /* Measure the panel, not the window. The panel is sized in svh, and on a
+         phone window.innerHeight grows and shrinks as the URL bar hides — using
+         it here made the travel denominator disagree with the actual sticky
+         element mid-scroll, so the active card could jump a step on a bar
+         collapse without the reader scrolling at all. */
+      const panel = el.firstElementChild as HTMLElement | null;
+      const panelH = panel?.getBoundingClientRect().height || window.innerHeight;
+      const total = r.height - panelH;
       if (total <= 0) return;
       const p = Math.min(Math.max(-r.top / total, 0), 0.9999);
       setI(Math.min(N - 1, Math.floor(p * N)));
