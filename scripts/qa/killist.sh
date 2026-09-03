@@ -112,7 +112,7 @@ DEFS = "src/app/globals.css"
 
 # Pinned pre-existing drift: path -> (count, owning section).
 BASELINE = {
-    "src/app/globals.css":                       (3, "foundation"),
+    "src/app/globals.css":                       (0, "foundation"),
     "src/app/insights/page.tsx":                 (2, "sec-insights"),
     "src/app/legal/page.tsx":                    (1, "sec-legal"),
     "src/app/questions/page.tsx":                (1, "sec-allocators"),
@@ -127,8 +127,8 @@ BASELINE = {
     "src/components/sections/MarketsBand.tsx":   (5, "sec-hero"),
     "src/components/sections/SiteNav.tsx":       (8, "sec-chrome"),
     "src/components/sections/Strategies.tsx":    (2, "sec-strategies"),
-    "src/components/ui/Button.tsx":              (1, "Conductor"),
-    "src/components/ui/Card.tsx":                (1, "Conductor"),
+    "src/components/ui/Button.tsx":              (0, "Conductor"),
+    "src/components/ui/Card.tsx":                (0, "Conductor"),
     # Dead code: neither is imported by any route, and §8.2 forbids a marquee
     # outright. Pinned rather than fixed because it is not sec-motion's to
     # delete; reported to the Conductor.
