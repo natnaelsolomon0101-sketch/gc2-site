@@ -14,7 +14,7 @@ import { notes, formatDate } from "@/content/notes";
  * each. Nothing here is invented: no read times, no authors, no metrics.
  */
 const QUOTES: Record<string, string> = {
-  // src/content/notes/capacity-is-a-research-problem.mdx, lines 14–15
+  // src/content/notes/capacity-is-a-research-problem.mdx, lines 16–17
   "capacity-is-a-research-problem":
     "Nobody lies; the number simply drifts toward the one that lets the work continue.",
 };
@@ -71,12 +71,6 @@ export default function Insights() {
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
           <div className="flex flex-col lg:col-span-7">
             <p className="t-mono-xs text-fog transition-colors duration-200 group-hover:text-iris-gleam motion-reduce:transition-none">
-              <span className="text-ash transition-colors duration-200 group-hover:text-iris-gleam motion-reduce:transition-none">
-                01
-              </span>
-              <span aria-hidden="true" className="px-3 text-fog">
-                /
-              </span>
               {lead.category}
               <span aria-hidden="true" className="px-3 text-fog">
                 /
@@ -112,19 +106,13 @@ export default function Insights() {
            failed to load. ---- */}
       {rest.length ? (
       <div className="mt-12 md:mt-16">
-        {rest.map((n, i) => (
+        {rest.map((n) => (
           <Link
             key={n.slug}
             href={`/insights/${n.slug}`}
             className="group grid gap-x-12 gap-y-5 border-t border-steel py-9 lg:grid-cols-12 lg:py-11"
           >
             <p className="t-mono-xs text-fog transition-colors duration-200 group-hover:text-iris-gleam lg:col-span-3 motion-reduce:transition-none">
-              <span className="text-ash transition-colors duration-200 group-hover:text-iris-gleam motion-reduce:transition-none">
-                {`0${i + 2}`}
-              </span>
-              <span aria-hidden="true" className="px-3 text-fog">
-                /
-              </span>
               {n.category}
               <span className="block pt-1">
                 <time dateTime={n.date}>{formatDate(n.date)}</time>
