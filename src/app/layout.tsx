@@ -56,14 +56,18 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0f1011", width: "device-width", initialScale: 1, viewportFit: "cover",
+  /* theme-color is the ground colour. EVERY-SCREEN.md 0.2 item 7: "if the
+     canvas is paper, theme-color must be paper". The canvas is now paper, so
+     this is --color-ground. One value, no `media` variant: the site does not
+     change under prefers-color-scheme and neither does its chrome. */
+  themeColor: "#f7f5f0", width: "device-width", initialScale: 1, viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${dmserif.variable} ${inter.variable} ${monoFace.variable}`}>
       <body>
-        <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-6 focus:top-6 focus:z-50 focus:bg-pure focus:px-4 focus:py-3 focus:text-void">
+        <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-6 focus:top-6 focus:z-50 focus:bg-ink focus:px-4 focus:py-3 focus:text-ground">
           Skip to content
         </a>
         <Nav />
