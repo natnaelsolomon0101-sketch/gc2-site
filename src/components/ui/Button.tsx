@@ -24,7 +24,7 @@ export type ButtonVariant = "filled" | "text";
 const BASE =
   "inline-flex min-h-11 select-none items-center justify-center gap-2.5 " +
   "rounded-control font-ui text-base font-normal leading-none no-underline " +
-  "transition-colors duration-200 " +
+  "transition-colors duration-[var(--dur-fast)] ease-[var(--ease)] " +
   "focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-cloud " +
   "disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50";
 

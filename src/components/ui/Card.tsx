@@ -57,7 +57,7 @@ export default function Card({
     PADDING[padding],
     bordered || interactive ? "border border-steel" : "",
     interactive
-      ? "transition-colors duration-200 hover:border-ash focus-within:border-ash"
+      ? "transition-colors duration-[var(--dur-fast)] ease-[var(--ease)] hover:border-ash focus-within:border-ash"
       : "",
     className,
   ]
