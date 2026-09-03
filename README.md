@@ -32,10 +32,23 @@ refuse to publish rather than show sample figures.
 
 ## Design system
 
-`DESIGN.md` is the reference: tokens, the type scale, and the measured contrast
-ratio behind every colour pairing. Known drift between it and
-`src/app/globals.css` is tracked in the open PR; check `globals.css` for the
-shipped token values before trusting a hex in the doc.
+`DESIGN.md` is the reference: tokens, both type scales, and the measured
+contrast ratio behind every colour pairing. Its hex values match
+`src/app/globals.css`. Where the shipped code has moved away from a stated
+principle, the gap is recorded in that file's "Known drift" section rather than
+edited out — read it before changing anything in `globals.css`.
+
+## The rest of the docs
+
+| File | What it is |
+| --- | --- |
+| `DESIGN.md` | Tokens, type scales, contrast, motion, known drift |
+| `docs/INTAKE.md` | The facts only the owner can supply, ordered by what they unlock |
+| `docs/BUILD100K.md` | The brief this redesign was built to: audience, tokens, hard rules |
+| `docs/design-plan.md` | The plan behind the current home page |
+| `docs/21st/` | What was studied on 21st.dev and what was deliberately rejected |
+| `docs/references/` | Dated research captures from Sept 2026. Historical, not current state |
+| `CHANGELOG.md` | What shipped, by version |
 
 ## Develop
 

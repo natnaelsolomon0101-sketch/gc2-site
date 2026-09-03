@@ -4,9 +4,18 @@ What the survey in `SURVEY.md` and the two retrieved components in
 `markets-table.md` / `financial-hero.md` contributed to the primitive library,
 and what was deliberately left on the floor.
 
-**Nothing was installed.** No `npx shadcn add`, no new entry in `package.json`.
-Every catalog entry ships some combination of `framer-motion`, `next-themes`,
+**Nothing was installed for the components below.** No `npx shadcn add`. Every
+catalog entry ships some combination of `framer-motion`, `next-themes`,
 `lucide-react` and shadcn's `cn`/`cva` conventions; all four are banned here.
+
+That ban has since been broken outside this document, and `package.json` is the
+authority, not this paragraph. `framer-motion`, `motion`, `lucide-react`,
+`class-variance-authority`, `@radix-ui/react-slot`, `clsx`, `tailwind-merge` and
+`react-use-measure` are all installed. Only `framer-motion`, `react-use-measure`,
+`clsx` and `tailwind-merge` are imported at all, by
+`src/components/ui/infinite-slider.tsx`, `src/components/ui/progressive-blur.tsx`
+and `src/lib/utils.ts` — and their only consumer, `HeroTicker`, is not imported
+by any route, so none of it reaches the bundle. The other four are dead weight.
 Structure and real behaviour were rewritten by hand against the BUILD100K
 tokens; motion was rewritten as CSS keyframes and scroll-driven timelines.
 
@@ -268,8 +277,8 @@ misrepresentations:
 
 So `Stat` has no `value` prop and no `label` prop. It takes `fact`, a key into
 `STRUCTURAL_FACTS`, and every entry in that registry is read from
-`src/config/site.ts` or derived from `src/content/strategies.ts` — founded 2019,
-Austin Texas, private partnership, liquid markets global, six strategies
+`src/config/site.ts` or derived from `src/content/strategies.ts` — founded
+September 2026, Miami, private partnership, the mandate, six strategies
 (`strategies.length`, spelled), and the markets and instruments flattened off
 the strategy records. No figure in this component was typed by a designer.
 `assertNoFigures()` runs at module load and throws on `%`, a currency symbol, a

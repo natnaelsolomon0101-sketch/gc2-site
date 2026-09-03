@@ -13,7 +13,11 @@ Fill this in one sitting. Ordered by what unlocks the most.
 
 - [x] **Regulation D regime: 506(b).** Confirmed. The public site therefore
       cannot mention the raise, terms, minimums, or anything reading as an
-      invitation to invest. `scripts/qa/regime.ts` enforces this on every build.
+      invitation to invest. `scripts/qa/regime.ts` checks the rendered HTML of
+      every public route against a prohibited-language list, but nothing runs it
+      for you: `npm run build` does not invoke it and there is no CI. Run it by
+      hand against a live server (`npx tsx scripts/qa/regime.ts`) before any
+      deploy that changes public copy.
       **Still needs securities counsel sign-off before production.**
 
 ## TIER 1 — unlocks `/diligence`, the highest-value new page

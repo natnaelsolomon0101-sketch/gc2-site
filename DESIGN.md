@@ -1,8 +1,10 @@
 # GC2 — Design system
 
-The Origin system. Dark ground, serif display, chromatic tiles used only inside
-the pinned strategies panel. Every contrast number below was computed from the
-shipped token values, not copied from a spec.
+The Origin system. Dark ground, serif display, chromatic tiles rationed across
+the page. Every contrast number below was computed from the shipped token values
+in `src/app/globals.css`, not copied from a spec. Where the shipped code has
+moved away from a principle below, it is recorded in "Known drift" at the end
+rather than quietly written out of the doc.
 
 ## Principles
 
@@ -18,8 +20,8 @@ shipped token values, not copied from a spec.
 |---|---|---|
 | `obsidian` | `#0f1011` | Page ground |
 | `abyss` | `#090a0b` | Deeper band, section inversion |
-| `graphite` | `#2e2e2e` | Card surface |
-| `steel` | `#3f4041` | Hairlines, control borders |
+| `graphite` | `#1c1d21` | Card surface |
+| `steel` | `#26272b` | Hairlines, control borders |
 | `pure` | `#ffffff` | Display type, wordmark, primary button fill |
 | `cloud` | `#f5f5f7` | Card headings |
 | `silver` | `#cacaca` | Light tile ground |
@@ -30,14 +32,20 @@ shipped token values, not copied from a spec.
 Measured on `obsidian` (WCAG 2.1, sRGB):
 
 `pure` 19.05 · `cloud` 17.49 · `silver` 11.62 · `ash` 7.20 · `fog` 4.61.
-On `graphite`: `cloud` 12.47 · `ash` 5.14. All at or above 4.5.
+On `graphite` (`#1c1d21`): `cloud` 15.46 · `ash` 6.37. All at or above 4.5.
+
+`graphite` and `steel` are darker than the first Origin draft (`#2e2e2e` and
+`#3f4041`). Text contrast improved; the obsidian-to-graphite surface step did
+not survive it. See "Known drift".
 
 `fog` is `#7c7d7d`, not the original `#6a6b6b`. That value measured 3.56:1 and
 failed AA on four 14px usages, the footer legal disclaimer among them.
 
 ## Chromatic tiles
 
-Used only by `PinnedStrategies`. Foreground is per-tile, not uniform: white
+The six accents. `Strategies` is the primary consumer, one tile per strategy;
+`Feature`, `Insights`, `HeroV2`, `Approach`, `SiteNav`, `/partnership` and
+`/questions` also draw on them. Foreground is per-tile, not uniform: white
 passes on exactly one of the six.
 
 | Tile | Background | Foreground | Ratio |
@@ -68,9 +76,31 @@ Display is DM Serif Display, UI is Inter, data and labels are mono.
 | `t-mono` | 12px | Eyebrow labels |
 | `t-mono-xs` | 11px | Card eyebrows, definition terms |
 
-Second numbers are at `min-width: 768px`. There are no inline `font-size`
-overrides in the codebase; if a size is missing from this table, add a tier
-rather than patching at the call site.
+Second numbers are at `min-width: 768px`.
+
+The 17 inner routes run on a second, parallel scale (`.t-h1`/`.t-h2`/`.t-h3`
+rather than `.t-display`/`.t-display-sm`), paired with `.container-gc2` and
+`.section-y` instead of `.wrap` and `.band`:
+
+| Class | Size | Role |
+|---|---|---|
+| `t-h1` | 44 / 80px | Inner-route page title |
+| `t-h2` | 32 / 38px | Inner-route section heading |
+| `t-h3` | 24 / 28px | Inner-route subheading |
+| `t-article-title` | 56px | Insight note title |
+| `t-nav-mobile` | 40px | Mobile nav item |
+| `t-lead` | 18px | Inner-route lead paragraph |
+| `t-prose` | 18px | Long-form body, 1.7 line-height |
+| `t-caption` | 12px | Inner-route mono caption |
+
+Second numbers are at `min-width: 769px`. Both systems are live; the home page
+uses the first, everything under it uses the second.
+
+If a size is missing from these tables, add a tier rather than patching at the
+call site. Six pages break that rule today: `access`, `partnership` and
+`questions` declare screen `font-size` inside their own scoped `<style>` blocks,
+and the three `legal/` pages do the same in `pt` for print. The print overrides
+are defensible; the three screen ones are missing tiers.
 
 ## Motion
 
@@ -89,6 +119,31 @@ at rest by design and expands to 146x48 on focus.
 
 ## Content rules
 
-`site.ts` is the only place the fund name appears. `site.address` and
-`site.phone` are `null` and render nothing rather than a placeholder. The panel
-figures carry an "Illustrative" marker. Do not ship an invented number.
+`src/config/site.ts` is the only place the fund name appears. `site.address` and
+`site.phone` are `null` and render nothing rather than a placeholder.
+`src/config/fund.ts` extends the same rule to providers, registrations, terms
+and people: a null field renders nothing, and a section with no facts does not
+render at all. Do not ship an invented number.
+
+## Known drift
+
+Recorded rather than removed, so the next reader knows the difference between a
+rule and a description.
+
+- **Principle 2 (colour confined to the strategy tiles).** Chromatic tokens also
+  paint `Feature`, `Insights`, `HeroV2`, `Approach`, the `SiteNav` underline, and
+  the `/partnership` and `/questions` pages. The rule is still the intent; the
+  page is no longer achromatic outside the tiles.
+- **Principle 4 (no shadows).** `box-shadow` ships in
+  `src/components/sections/Strategies.tsx` and
+  `src/components/sections/Feature.tsx`. The stated depth mechanism is the
+  obsidian-to-graphite surface step, and at the shipped values that step is
+  1.13:1 — close to invisible — which is what the shadows are standing in for.
+  Fix the step, then remove the shadows; do not add more.
+- **Two primitive systems.** `globals.css` ships `.wrap`/`.band`/`.t-display*`
+  for the home page and `.container-gc2`/`.section-y`/`.t-h*` for the inner
+  routes. Neither is deprecated. Match the file you are editing.
+- **Unshipped primitives.** `src/components/ui/` (`Tile`, `Badge`, `Card`,
+  `Stat`, `Rule`, `Reveal`) and the `BloomField`, `MarketsBand`, `HeroTicker`
+  and `PinnedStrategies` sections are not imported by any route. They are
+  documented in `docs/21st/HARVEST.md` but do not describe what renders.

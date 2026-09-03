@@ -13,8 +13,8 @@ Base branch: `redesign/origin-100k`, cut from `redesign/origin`.
 
 ## WHO THIS IS FOR — read before designing anything
 
-Girlscantrade2 is a hedge fund trading equities, and its audience is **women**.
-The name is the whole premise. That is not a footnote to the design, it is the
+Girls Can Trade 2 (`site.name`; "Girlscantrade2" is not the shipped form) is a
+hedge fund, and its audience is **women**. The name is the whole premise. That is not a footnote to the design, it is the
 brief.
 
 What this changes:
@@ -55,8 +55,8 @@ it on a phone and does not ask who built it.
 |---|---|---|
 | obsidian | `#0f1011` | page ground |
 | abyss | `#090a0b` | deeper band |
-| graphite | `#2e2e2e` | card surface |
-| steel | `#3f4041` | hairlines, borders |
+| graphite | `#1c1d21` | card surface |
+| steel | `#26272b` | hairlines, borders |
 | pure | `#ffffff` | display type |
 | cloud | `#f5f5f7` | headings |
 | silver | `#cacaca` | light tile ground |
@@ -85,8 +85,9 @@ Radius: 8px controls, 16px cards, 30px tiles.
 
 Metadata search is unlimited; full code retrieval is capped at 2/day, so use
 `search` and `get_inspiration` freely and do not ask for `get_component`.
-Endpoint: POST https://21st.dev/api/mcp, header `x-api-key` (the key is at
-/private/tmp/claude-501/-Users-natnaelsolomon/ddc4f8e0-7d58-4737-af5f-cb88882de792/scratchpad/.k — read it, never print or commit it).
+Endpoint: POST https://21st.dev/api/mcp, header `x-api-key`. The key is supplied
+out of band by the owner and lives only in the session scratchpad — it is not in
+this repo and no path to it belongs here. Never print or commit it.
 Body: {"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"search","arguments":{"query":"...","limit":6}}}
 Use it for INSPIRATION — read the descriptions and previews, then build to the
 tokens above. Nothing ships with a default kit look.
