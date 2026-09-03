@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import type { KeyboardEvent } from "react";
 import type { Strategy } from "@/content/strategies";
+import { tileAccents } from "./tileAccents";
 
 /* ===========================================================================
    PinnedStrategies — the sliding/fanning tile deck, back by owner's request.
@@ -59,21 +60,10 @@ import type { Strategy } from "@/content/strategies";
    motion-allowed, tall-enough client upgrades to.
    ========================================================================= */
 
-/** `dark` marks the one tile (deep-iris) whose fill is dark enough that its
-    paired foreground is `ground`, not `ink` — see the print handling below. */
-type Tile = { bg: string; fg: string; dark?: boolean };
-
-/** Index-matched to `strategies`. Reads the paired accent/-fg tokens
-    DESIGN.md defines and Tile.tsx already asserts >=4.5:1 for — no hex here,
-    so there is nothing for this file to drift out of sync with that table. */
-const tiles: Tile[] = [
-  { bg: "var(--color-accent-iris-gleam)", fg: "var(--color-accent-iris-gleam-fg)" },
-  { bg: "var(--color-accent-cyan-signal)", fg: "var(--color-accent-cyan-signal-fg)" },
-  { bg: "var(--color-accent-pale-iris)", fg: "var(--color-accent-pale-iris-fg)" },
-  { bg: "var(--color-accent-deep-iris)", fg: "var(--color-accent-deep-iris-fg)", dark: true },
-  { bg: "var(--color-accent-orchid-bloom)", fg: "var(--color-accent-orchid-bloom-fg)" },
-  { bg: "var(--color-accent-periwinkle)", fg: "var(--color-accent-periwinkle-fg)" },
-];
+/* Fills live in tileAccents.ts now, shared with /strategies' chapter
+   headers (round 8: they use "the same chromatic fill and -fg text as the
+   home deck," which means one array, not two hand-kept copies). */
+const tiles = tileAccents;
 
 type Mode = "static" | "pinned";
 
