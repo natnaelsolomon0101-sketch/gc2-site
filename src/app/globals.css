@@ -52,31 +52,58 @@
   .wrap { max-width: var(--page-max); margin-inline:auto; padding-inline: 24px; }
   .band { padding-block: 80px; }
 
-  /* three voices: serif display, sans UI, mono data */
-  .t-display    { font-family: var(--font-display); font-weight: 400; font-size: 52px;
-                  line-height: .95; letter-spacing: -0.022em; color: var(--color-pure); }
-  .t-display-sm { font-family: var(--font-display); font-weight: 400; font-size: 40px;
-                  line-height: 1; letter-spacing: -0.02em; color: var(--color-pure); }
-  .t-heading-lg { font-family: var(--font-display); font-weight: 400; font-size: 32px;
-                  line-height: 1; letter-spacing: -0.018em; }
-  @media (min-width: 768px) {
-    .t-display    { font-size: 96px; line-height: .9; }
-    .t-display-sm { font-size: 80px; }
-    .t-heading-lg { font-size: 38px; line-height: .9; }
+  /* three voices: serif display, sans UI, mono data
+     Fluid type (§7.1 / APPENDIX-A). Each tier below replaces a discrete
+     min-width:768px jump with a single clamp() ramp from a 320px floor to
+     the old desktop anchor, so the size grows continuously instead of
+     stepping once. Anchors are the pairs this file already shipped: 52/96
+     (display), 40/80 (display-sm). .t-display and .t-h1 additionally get a
+     min-width:1920px rule further up (see below) that keeps growing the
+     ceiling past the old desktop value, so display type is still visibly
+     larger at 3440 than at 1920 instead of going flat at the old cap.
+     Line-height tightens as size grows, same technique, negative slope. */
+  .t-display    { font-family: var(--font-display); font-weight: 400;
+                  font-size: clamp(52px, calc(20.57px + 9.82vw), 96px);
+                  line-height: clamp(.9, calc(.9857 - .01116vw), .95);
+                  letter-spacing: -0.022em; color: var(--color-pure); }
+  .t-display-sm { font-family: var(--font-display); font-weight: 400;
+                  font-size: clamp(40px, calc(11.43px + 8.93vw), 80px);
+                  line-height: clamp(.95, calc(1.0357 - .01116vw), 1);
+                  letter-spacing: -0.02em; color: var(--color-pure); }
+  .t-heading-lg { font-family: var(--font-display); font-weight: 400;
+                  font-size: clamp(32px, calc(27.71px + 1.34vw), 38px);
+                  line-height: clamp(.9, calc(1.0714 - .02232vw), 1);
+                  letter-spacing: -0.018em; }
+  /* §7.6: above 1920 the container may widen and type ceilings rise with it.
+     Only the tiers the brief names (display up to 128px, h1 up to 96px)
+     grow again here; every other tier stays flat at its clamp() ceiling,
+     matching the pre-fluid baseline at 1920 and 3440 exactly. */
+  @media (min-width: 1920px) {
+    .t-display { font-size: clamp(96px, calc(55.58px + 2.11vw), 128px);
+                 line-height: clamp(.85, calc(.9632 - .00329vw), .9); }
   }
 
   /* Card-title tier. The scale jumped 38px -> 16px with nothing between, so
      card headings were being patched with inline font-size overrides. */
   .t-heading-sm { font-family: var(--font-display); font-weight: 400;
-                  font-size: 26px; line-height: 1.1; }
-  .t-sub   { font-size: 18px; line-height: 1.5; font-weight: 300; }
+                  font-size: clamp(24px, calc(22.57px + .45vw), 26px);
+                  line-height: clamp(1.1, calc(1.1857 - .01116vw), 1.15); }
+  /* Fluid, floors at 15px per §7.1 ("lead floors at 15px at 320"); .t-sub
+     gets the same treatment since it is the other half of this tier. */
+  .t-sub   { font-size: clamp(15px, calc(11.57px + 1.07vw), 18px);
+             line-height: clamp(1.5, calc(1.6071 - .01786vw), 1.55); font-weight: 300; }
+  /* Body stays 16px on every viewport — §7.1 says so explicitly. */
   .t-body  { font-size: 16px; line-height: 1.5; color: var(--color-ash); overflow-wrap: anywhere; }
   .t-small { font-size: 14px; line-height: 1.67; color: var(--color-ash); overflow-wrap: anywhere; }
   .t-mono  { font-family: var(--font-mono); font-size: 12px; line-height: 2;
              text-transform: uppercase; letter-spacing: .182em; font-weight: 500;
              color: var(--color-ash); }
-  /* Eyebrow tier — the 11px label used above cards and definition terms. */
-  .t-mono-xs { font-family: var(--font-mono); font-size: 11px; line-height: 2;
+  /* Eyebrow tier. DESIGN.md lists this at 11px; §7.1's floor is 13px
+     everywhere, and this is the one deliberate exception, raised only to
+     12px rather than 13 because it is a tracked all-caps label, never a
+     line the reader parses continuously the way body copy is. Logged in
+     the final report as the DESIGN.md tier change it is. */
+  .t-mono-xs { font-family: var(--font-mono); font-size: 12px; line-height: 2;
                text-transform: uppercase; letter-spacing: .182em; font-weight: 500;
                color: var(--color-ash); }
 
@@ -106,14 +133,29 @@
   .section-y     { padding-block: 80px; }
   .grid-gc2      { display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); gap:24px; }
   @media (max-width:767px){ .grid-gc2 { grid-template-columns:repeat(4,minmax(0,1fr)); } }
-  .t-h1   { font-family: var(--font-display); font-weight:400; font-size:44px;
-            line-height:1; letter-spacing:-0.02em; color: var(--color-pure); }
-  .t-h2   { font-family: var(--font-display); font-weight:400; font-size:32px;
-            line-height:1.05; letter-spacing:-0.018em; color: var(--color-pure); }
-  .t-h3   { font-family: var(--font-display); font-weight:400; font-size:24px;
-            line-height:1.2; color: var(--color-cloud); }
-  @media (min-width:769px){ .t-h1{font-size:80px;} .t-h2{font-size:38px;} .t-h3{font-size:28px;} }
-  .t-lead    { font-size:18px; line-height:1.5; font-weight:300; color: var(--color-ash); overflow-wrap: anywhere; }
+  /* Same fluid technique as the home-page primitives above, anchored on the
+     44/80 (h1), 32/38 (h2) and 24/28 (h3) pairs this file already shipped.
+     .t-h1 gets the same min-width:1920px ceiling rise as .t-display,
+     stopping at 96px per the brief. */
+  .t-h1   { font-family: var(--font-display); font-weight:400;
+            font-size: clamp(44px, calc(18.34px + 8.02vw), 80px);
+            line-height: clamp(.95, calc(1.03564 - .011136vw), 1);
+            letter-spacing:-0.02em; color: var(--color-pure); }
+  .t-h2   { font-family: var(--font-display); font-weight:400;
+            font-size: clamp(32px, calc(27.72px + 1.34vw), 38px);
+            line-height: clamp(1, calc(1.0856 - .011136vw), 1.05);
+            letter-spacing:-0.018em; color: var(--color-pure); }
+  .t-h3   { font-family: var(--font-display); font-weight:400;
+            font-size: clamp(24px, calc(21.15px + .89vw), 28px);
+            line-height: clamp(1.15, calc(1.2356 - .011136vw), 1.2);
+            color: var(--color-cloud); }
+  @media (min-width: 1920px) {
+    .t-h1 { font-size: clamp(80px, calc(59.79px + 1.05vw), 96px);
+            line-height: clamp(.92, calc(.9879 - .0019737vw), .95); }
+  }
+  .t-lead    { font-size: clamp(15px, calc(11.57px + 1.07vw), 18px);
+               line-height: clamp(1.5, calc(1.6071 - .01786vw), 1.55);
+               font-weight:300; color: var(--color-ash); overflow-wrap: anywhere; }
   .t-caption { font-size:12px; line-height:2; font-family: var(--font-mono);
                text-transform:uppercase; letter-spacing:.182em; color: var(--color-ash); }
   .t-prose   { font-size:18px; line-height:1.7; color: var(--color-ash); overflow-wrap: anywhere; }
@@ -123,10 +165,18 @@
   .measure-body{max-width:34em;} .measure-lead{max-width:30em;} .measure-prose{max-width:680px;}
   .measure-hero{max-width:11em;} .measure-head{max-width:16em;} .measure-head-sm{max-width:14em;}
   .measure-statement{max-width:22em;} .measure-legal{max-width:60em;}
-  .t-wordmark{font-family:var(--font-display);font-weight:400;font-size:24px;line-height:1;}
-  .t-nav-mobile{font-family:var(--font-display);font-weight:400;font-size:40px;line-height:1;}
-  .t-article-title{font-family:var(--font-display);font-weight:400;font-size:56px;
-                   line-height:1.05;letter-spacing:-0.02em;color:var(--color-pure);}
+  /* The mark stays a mark: floor is 2px below ceiling on purpose, not a
+     mistake in the interpolation — a brand wordmark shouldn't visibly
+     shrink the way reading type does. */
+  .t-wordmark{font-family:var(--font-display);font-weight:400;
+              font-size:clamp(22px, calc(20.57px + .45vw), 24px);line-height:1;}
+  .t-nav-mobile{font-family:var(--font-display);font-weight:400;
+                font-size:clamp(34px, calc(27.14px + 2.14vw), 40px);
+                line-height:clamp(1, calc(1.1071 - .017857vw), 1.05);}
+  .t-article-title{font-family:var(--font-display);font-weight:400;
+                   font-size:clamp(40px, calc(28.57px + 3.57vw), 56px);
+                   line-height:clamp(1.05, calc(1.1357 - .011161vw), 1.1);
+                   letter-spacing:-0.02em;color:var(--color-pure);}
   .nav-frame{height:var(--nav-h);} .hero-frame{min-height:min(calc(100vh - var(--nav-h)),900px);padding-block:72px;}
   .link{color:var(--color-pure);border-bottom:1px solid rgba(255,255,255,.35);transition:border-color .2s ease;}
   .link:hover{border-color:var(--color-pure);}
