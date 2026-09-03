@@ -16,23 +16,43 @@ import { useEffect, useRef } from "react";
  * is fifteen lines below. A WebGL scene graph for fifteen lines of arithmetic
  * would be the largest dependency on the site by an order of magnitude, on the
  * page that has to paint fastest.
+ *
+ * THE CHART LAYER (hero r9). With `chart` set the floating mesh becomes a
+ * floating chart: a gridded floor under the surface, tenor labels along the
+ * front edge, the date range along the side, three yield ticks up the back
+ * corner, the ten-year as a bold line with an area ribbon dropped to the
+ * floor, and a marker on its last value with the number beside it. Every
+ * label is a real value from the feed. It is the same object, drawn as the
+ * instrument it is rather than as a sculpture of one.
  */
 
 /** One day's curve in model space: x across tenor, y up in yield. */
 export type SurfaceRow = { date: string; xs: number[]; ys: number[] };
 
+export type ChartSpec = {
+  /** Printed tenor labels, one per column ("1M" … "30Y"). */
+  tenorLabels: string[];
+  /** Column index of the highlighted series (the ten-year). */
+  seriesIndex: number;
+  /** Printed name of the highlighted series. */
+  seriesLabel: string;
+  /** Last value of the highlighted series, printed. */
+  seriesLast: string;
+  /** Three printed yield ticks, low to high, and their model-space y. */
+  ticks: { label: string; y: number }[];
+  /** Printed first and last dates of the window. */
+  firstDate: string;
+  lastDate: string;
+};
+
 export type YieldSurfaceCanvasProps = {
   rows: SurfaceRow[];
-  /** CSS height of the canvas. */
+  /** CSS height of the canvas. 0 fills the parent box. */
   height: number;
   /** Camera tilt above the horizon, in degrees. */
   tilt: number;
   /** Half-depth of the time axis in model units: z runs -depth..+depth. */
   depth: number;
-  /** Vertical scale applied to the normalized yields. */
-  amplitude: number;
-  /** Floor, in CSS px, for the drawn height of the surface. */
-  minInkHeight: number;
   /** Middle of the rock, in degrees of yaw. */
   yawCenter: number;
   /** Half-width of the rock. The yaw runs yawCenter ± yawRange. */
@@ -45,20 +65,37 @@ export type YieldSurfaceCanvasProps = {
   opacity: number;
   /** Draw one frame and stop. */
   isStatic: boolean;
+  /** Draw the chart furniture. */
+  chart?: ChartSpec;
 };
 
 const INK = "20, 19, 17";           // --color-ink, as channels for rgba()
 const DEEP_IRIS = "#4b49aa";        // the one accent, spent on today's curve
+const DEEP_IRIS_RGB = "75, 73, 170";
+const PAPER = "247, 245, 240";
 /* Half a cycle — one extreme to the other — takes 40s, so a full there-and-back
    is 80s. The yaw is a sine of time rather than a ramp, which gives the
    ease-in-out for free: the surface slows as it reaches each extreme and never
    turns a corner. */
 const HALF_CYCLE_MS = 40_000;
+/* The float: a slow vertical bob, 9s per cycle, ±6px, on its own sine so it
+   never phase-locks with the rock. */
+const BOB_MS = 9_000;
+const BOB_PX = 6;
+/* Pointer parallax (chart mode, hover devices only): the object leans up to
+   ±PARALLAX_DEG of yaw toward the pointer and rides ±PARALLAX_PX with it,
+   eased at PARALLAX_EASE per frame, so it floats with you rather than
+   snapping. Measured into the scale so it never clips. */
+const PARALLAX_DEG = 7;
+const PARALLAX_PX = 10;
+const PARALLAX_EASE = 0.045;
+/* The ten-year line draws in over REVEAL_MS from the first frame; the marker
+   arrives when the line does. */
+const REVEAL_MS = 1400;
 const CAMERA_DISTANCE = 3.2;        // in model units, from the origin
 
 export default function YieldSurfaceCanvas({
-  rows, height, tilt, depth, amplitude, minInkHeight,
-  yawCenter, yawRange, fit, opacity, isStatic,
+  rows, height, tilt, depth, yawCenter, yawRange, fit, opacity, isStatic, chart,
 }: YieldSurfaceCanvasProps) {
   const ref = useRef<HTMLCanvasElement | null>(null);
 
@@ -83,17 +120,29 @@ export default function YieldSurfaceCanvas({
     let raf = 0;
     let start = 0;
     let width = 0;
+    let boxH = height;
     let dpr = 1;
+    let mono = "monospace";
+    let reveal = 1;
+    let tx = 0, ty = 0, cx = 0, cy = 0;   // pointer parallax: target, current
+    const hover =
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    const parallax = !!chart && hover && !isStatic && !reduced;
 
     const yawAt = (ms: number) =>
       ((yawCenter + yawRange * Math.sin((ms / HALF_CYCLE_MS) * Math.PI)) * Math.PI) / 180;
+    const bobAt = (ms: number) => Math.sin((ms / BOB_MS) * Math.PI * 2) * BOB_PX;
 
     const resize = () => {
       dpr = Math.min(window.devicePixelRatio || 1, 2);
       width = canvas.clientWidth;
+      boxH = height > 0 ? height : canvas.clientHeight;
       canvas.width = Math.round(width * dpr);
-      canvas.height = Math.round(height * dpr);
+      canvas.height = Math.round(boxH * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const face = getComputedStyle(canvas).getPropertyValue("--font-mono-face").trim();
+      mono = face ? `${face}, ui-monospace, monospace` : "ui-monospace, monospace";
     };
 
     /* ---- the camera ------------------------------------------------------
@@ -101,27 +150,10 @@ export default function YieldSurfaceCanvas({
        `tilt`, then divide by depth. `f` is the perspective term: nearer points
        (smaller z) spread further from the centre, which is the entire reason
        this reads as a landscape rather than as a chart with slanted lines. */
-    /* Tilt and amplitude are the two levers the floor below pulls, so they are
-       state rather than constants. Depth is NOT a lever: the time axis runs
-       -depth..+depth in model units and the camera sits 3.2 units away, so
-       deepening z walks the far edge of the surface into the camera plane,
-       where the perspective divide explodes. The first version of the floor did
-       exactly that and collapsed the drawing to ten pixels. */
-    let ct = Math.cos((tilt * Math.PI) / 180);
-    let st = Math.sin((tilt * Math.PI) / 180);
-    let ampFactor = 1;
-    const setBoost = (b: number) => {
-      /* Tilt does the heavy lifting: it converts the ninety days of depth the
-         model already has into screen height, and it cannot diverge. Amplitude
-         is the smaller, second lever. */
-      const deg = tilt + (46 - tilt) * b;
-      ct = Math.cos((deg * Math.PI) / 180);
-      st = Math.sin((deg * Math.PI) / 180);
-      ampFactor = 1 + 2 * b;
-    };
+    const tiltRad = (tilt * Math.PI) / 180;
+    const ct = Math.cos(tiltRad);
+    const st = Math.sin(tiltRad);
 
-    /* Unscaled: the camera in model units, before the fit below decides how
-       many pixels a model unit is worth. */
     const camera = (x: number, y: number, z: number, theta: number) => {
       const c = Math.cos(theta);
       const s = Math.sin(theta);
@@ -134,158 +166,224 @@ export default function YieldSurfaceCanvas({
     };
 
     const zOf = (i: number) => ((i / (rows.length - 1)) * 2 - 1) * depth;
-    const yOf = (v: number) => v * amplitude * ampFactor;
 
-    /* ONE scale for the whole rock, not one per frame.
-     *
-     * A scale fitted to the current angle would make the surface breathe in and
-     * out as it turns, and a zoom on a data component reads as emphasis. So the
-     * extent is measured once across the whole yaw range and the worst angle
-     * sets the scale for every angle.
-     *
-     * That costs less than it did when this revolved: measured across a
-     * 45°±30° rock the horizontal extent varies by about 9% (1.01 to 1.21 model
-     * units) while the vertical varies by 50%. Width is effectively stable, and
-     * it is the vertical that the box has to make room for.
-     *
-     * The surface never clips. Both axes are fitted, uniformly, so at worst
-     * there is empty ground beside it — see the note on the band fill in
-     * YieldSurface.tsx. */
+    /* The chart floor sits a little under the lowest yield in the window. */
+    let floorY = Infinity;
+    for (const r of rows) for (const y of r.ys) if (y < floorY) floorY = y;
+    floorY -= 0.09;
+
+    /* ONE scale for the whole rock, not one per frame. The extent is measured
+       once across the whole yaw range and the worst angle sets the scale for
+       every angle; the surface never breathes as it turns. With the chart on,
+       the floor and the label margins are part of the measured extent. */
     let scale = 1;
     let originX = 0;
-
-    /** Drawn height at one yaw. */
-    const inkHeightAt = (theta: number) => {
-      let lo = Infinity;
-      let hi = -Infinity;
-      for (let i = 0; i < rows.length; i++) {
-        const z = zOf(i);
-        for (let k = 0; k < rows[i].xs.length; k++) {
-          const uy = camera(rows[i].xs[k], yOf(rows[i].ys[k]), z, theta).uy;
-          if (uy < lo) lo = uy;
-          if (uy > hi) hi = uy;
-        }
-      }
-      return (hi - lo) * scale;
-    };
-
-    /** The WORST drawn height across the rock. The floor has to hold at every
-     *  angle, not at the one the bisection happened to test: measuring only the
-     *  centre landed 393 three pixels short of its floor at the moment the
-     *  screenshot was taken. */
-    const minInkAcrossRock = () => {
-      let worst = Infinity;
-      for (let i = 0; i <= 8; i++) {
-        const h = inkHeightAt(yawAt((i / 8) * HALF_CYCLE_MS));
-        if (h < worst) worst = h;
-      }
-      return worst;
-    };
-
     const measure = () => {
       let maxX = 0;
       let maxY = 0;
+      const ys = chart ? [floorY] : [];
+      const extra = parallax ? (PARALLAX_DEG * Math.PI) / 180 : 0;
       for (let a = 0; a <= 48; a++) {
-        const theta = yawAt((a / 48) * HALF_CYCLE_MS);
+        const base = yawAt((a / 48) * HALF_CYCLE_MS);
+        for (const theta of extra ? [base - extra, base + extra] : [base]) {
         for (let i = 0; i < rows.length; i++) {
           const z = zOf(i);
           for (let k = 0; k < rows[i].xs.length; k++) {
-            const p = camera(rows[i].xs[k], yOf(rows[i].ys[k]), z, theta);
+            const p = camera(rows[i].xs[k], rows[i].ys[k], z, theta);
             if (Math.abs(p.ux) > maxX) maxX = Math.abs(p.ux);
             if (Math.abs(p.uy) > maxY) maxY = Math.abs(p.uy);
+            for (const fy of ys) {
+              const q = camera(rows[i].xs[k], fy, z, theta);
+              if (Math.abs(q.uy) > maxY) maxY = Math.abs(q.uy);
+            }
           }
         }
+        }
       }
-      const padX = 8;
-      const padY = 6;
+      const padX = chart ? 44 : 8;
+      const padY = chart ? 30 : 6;
+      /* On a phone the chart is width-bound and would be a postage stamp;
+         let it run 22% past the edges there — the floor's corners bleed, the
+         axis and the marker stay inside. */
+      const fitW = chart && width < 600 ? width * 1.22 : width;
       scale = Math.min(
-        (width / 2 - padX) / (maxX || 1),
-        (height / 2 - padY) / (maxY || 1)
+        (fitW / 2 - padX) / (maxX || 1),
+        (boxH / 2 - padY) / (maxY || 1)
       );
-      /* Band mode anchors the surface into the right two-thirds, because the
-         hero's headline sits left and a centred surface would run under it. The
-         centre moves right by as much as the remaining room allows, never far
-         enough to push the surface off the edge. */
       const half = maxX * scale + padX;
+      /* The phone overscan above pushes the near-left axis labels off the
+         edge; the whole object shifts right by their width to bring them
+         back. The far right corner bleeds instead, which has no label. */
+      const nudge = chart && width < 600 ? 30 : 0;
       originX =
         fit === "band"
           ? Math.min(width - half, Math.max(half, width * 0.62))
-          : width / 2;
+          : width / 2 + nudge;
     };
 
-    /* THE FLOOR.
-     *
-     * A narrow canvas is width-bound, so the fit scales the whole landscape
-     * down with the slot and the band flattens into a line — 57px of drawn ink
-     * at 393, nothing usable at 320. The fix is not to crop: cropping a
-     * term-structure surface cuts the 1M or the 30Y end off, and the ends are
-     * where the news is. Instead the model gets DEEPER as the canvas gets
-     * narrower — more yield amplitude, more time-depth — until the drawn height
-     * clears the floor or the canvas runs out of height.
-     *
-     * A phone slot is tall relative to its width, so there is room for it; a
-     * 1920 band is already over the floor and never enters the loop, which is
-     * why the wide-slot fill and the rock are untouched. Bisection rather than
-     * a formula because raising the amplitude also raises the envelope, which
-     * can flip the fit from width-bound to height-bound partway. */
-    const applyFloor = () => {
-      setBoost(0);
-      measure();
-      if (minInkAcrossRock() >= minInkHeight) return;
-
-      /* Bisect the boost rather than solve it: raising the tilt also raises the
-         envelope, which can flip the fit from width-bound to height-bound
-         partway, so the drawn height is not a clean function of the boost. Ten
-         steps over [0, 1] is finer than a pixel of result. */
-      let lo = 0;
-      let hi = 1;
-      setBoost(1);
-      measure();
-      const reachable = minInkAcrossRock() >= minInkHeight;
-      if (reachable) {
-        for (let i = 0; i < 10; i++) {
-          const mid = (lo + hi) / 2;
-          setBoost(mid);
-          measure();
-          if (minInkAcrossRock() >= minInkHeight) hi = mid;
-          else lo = mid;
-        }
-      }
-      /* If even a full boost cannot reach the floor the canvas is simply too
-         small for the floor asked of it; the surface stays at the tallest shape
-         available rather than being cropped to fake it. */
-      setBoost(hi);
-      measure();
-    };
-
+    let bob = 0;
     const project = (x: number, y: number, z: number, theta: number) => {
       const p = camera(x, y, z, theta);
       return {
         sx: originX + p.ux * scale,
-        sy: height / 2 - p.uy * scale,
+        sy: boxH / 2 - p.uy * scale + bob,
         depth: p.depth,
       };
     };
 
     /* Depth decides alpha, so the far edge of the surface recedes instead of
-       tangling with the near edge. This is the only thing standing in for the
-       fills and shadows the system does not allow. */
+       tangling with the near edge. */
     const near = -1.15;
     const far = 1.15;
-    const fade = (depth: number) => {
-      const t = Math.min(1, Math.max(0, (depth - far) / (near - far)));
+    const fade = (d: number) => {
+      const t = Math.min(1, Math.max(0, (d - far) / (near - far)));
       return opacity * (0.6 + 0.4 * t);
     };
 
+    const label = (text: string, x: number, y: number, align: CanvasTextAlign,
+                   alpha: number, size = 11, colour = INK) => {
+      ctx.font = `500 ${size}px ${mono}`;
+      ctx.textAlign = align;
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = `rgba(${colour}, ${alpha})`;
+      ctx.fillText(text, x, y);
+    };
+    /* Axis labels are queued during the floor pass and drawn last, over the
+       mesh, so no line runs through a numeral. */
+    type Queued = { text: string; x: number; y: number; align: CanvasTextAlign };
+    let queued: Queued[] = [];
+    const queue = (text: string, x: number, y: number, align: CanvasTextAlign) =>
+      queued.push({ text, x, y, align });
+    const flush = () => {
+      for (const q of queued) label(q.text, q.x, q.y, q.align, .66);
+      queued = [];
+    };
+
+    const drawChartFloor = (theta: number) => {
+      if (!chart) return;
+      const tenors = rows[0].xs.length;
+      const n = rows.length;
+      ctx.lineWidth = 1;
+      /* Floor grid: a line along time at every tenor, and across tenor every
+         fifteen days. Ink at 8% — it is a floor, not a fence. */
+      ctx.strokeStyle = `rgba(${INK}, .09)`;
+      for (let k = 0; k < tenors; k++) {
+        const x = rows[0].xs[k];
+        const a = project(x, floorY, zOf(0), theta);
+        const b = project(x, floorY, zOf(n - 1), theta);
+        ctx.beginPath(); ctx.moveTo(a.sx, a.sy); ctx.lineTo(b.sx, b.sy); ctx.stroke();
+      }
+      for (let i = 0; i < n; i += 15) {
+        const a = project(rows[0].xs[0], floorY, zOf(i), theta);
+        const b = project(rows[0].xs[tenors - 1], floorY, zOf(i), theta);
+        ctx.beginPath(); ctx.moveTo(a.sx, a.sy); ctx.lineTo(b.sx, b.sy); ctx.stroke();
+      }
+      /* Floor edge, a touch firmer, and the back-left yield axis. */
+      ctx.strokeStyle = `rgba(${INK}, .22)`;
+      const c0 = project(rows[0].xs[0], floorY, zOf(n - 1), theta);
+      const c1 = project(rows[0].xs[tenors - 1], floorY, zOf(n - 1), theta);
+      const c2 = project(rows[0].xs[0], floorY, zOf(0), theta);
+      ctx.beginPath(); ctx.moveTo(c0.sx, c0.sy); ctx.lineTo(c1.sx, c1.sy); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(c0.sx, c0.sy); ctx.lineTo(c2.sx, c2.sy); ctx.stroke();
+      /* The yield axis stands on the NEAR-left corner. The far corner
+         already projects near the top of the box under the tilt, so an axis
+         there runs out of the frame and its upper ticks never print. */
+      const top = chart.ticks[chart.ticks.length - 1].y + 0.04;
+      const ax0 = project(rows[0].xs[0], floorY, zOf(n - 1), theta);
+      const ax1 = project(rows[0].xs[0], top, zOf(n - 1), theta);
+      ctx.beginPath(); ctx.moveTo(ax0.sx, ax0.sy); ctx.lineTo(ax1.sx, ax1.sy); ctx.stroke();
+      for (const t of chart.ticks) {
+        const p = project(rows[0].xs[0], t.y, zOf(n - 1), theta);
+        ctx.beginPath(); ctx.moveTo(p.sx - 5, p.sy); ctx.lineTo(p.sx, p.sy); ctx.stroke();
+        queue(t.label, p.sx - 9, p.sy, "right");
+      }
+      /* Tenor labels along the front edge, every other one where they crowd. */
+      const every = width < 600 ? 3 : 2;
+      for (let k = 0; k < tenors; k++) {
+        if (tenors > 9 && k % every !== 0 && k !== tenors - 1) continue;
+        const p = project(rows[0].xs[k], floorY, zOf(n - 1), theta);
+        queue(chart.tenorLabels[k], p.sx, p.sy + 14, "center");
+      }
+      /* The window's first date at the far-right corner. Today's is in the
+         attribution, and at the near corner it fought the 30Y label. */
+      if (width >= 600) {
+        const d0 = project(rows[0].xs[tenors - 1], floorY, zOf(0), theta);
+        if (d0.sx + 64 < width) queue(chart.firstDate, d0.sx + 10, d0.sy, "left");
+      }
+    };
+
+    const drawSeries = (theta: number) => {
+      if (!chart) return;
+      const k = chart.seriesIndex;
+      const n = Math.max(2, Math.round(rows.length * reveal));
+      /* The area ribbon: the ten-year line with its drop to the floor, filled
+         in the accent at low alpha. Painted before the mesh so the mesh's
+         lines stay crisp over it. */
+      ctx.beginPath();
+      for (let i = 0; i < n; i++) {
+        const p = project(rows[i].xs[k], rows[i].ys[k], zOf(i), theta);
+        if (i === 0) ctx.moveTo(p.sx, p.sy); else ctx.lineTo(p.sx, p.sy);
+      }
+      for (let i = n - 1; i >= 0; i--) {
+        const p = project(rows[i].xs[k], floorY, zOf(i), theta);
+        ctx.lineTo(p.sx, p.sy);
+      }
+      ctx.closePath();
+      ctx.fillStyle = `rgba(${DEEP_IRIS_RGB}, .14)`;
+      ctx.fill();
+    };
+
+    const drawSeriesLine = (theta: number) => {
+      if (!chart) return;
+      const k = chart.seriesIndex;
+      const n = Math.max(2, Math.round(rows.length * reveal));
+      ctx.beginPath();
+      for (let i = 0; i < n; i++) {
+        const p = project(rows[i].xs[k], rows[i].ys[k], zOf(i), theta);
+        if (i === 0) ctx.moveTo(p.sx, p.sy); else ctx.lineTo(p.sx, p.sy);
+      }
+      ctx.strokeStyle = DEEP_IRIS;
+      ctx.lineWidth = 2.25;
+      ctx.stroke();
+      if (reveal < 1) return;
+      /* The marker on the last value: a paper halo, an accent dot, a label. */
+      const last = project(rows[n - 1].xs[k], rows[n - 1].ys[k], zOf(n - 1), theta);
+      ctx.beginPath(); ctx.arc(last.sx, last.sy, 8, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${PAPER}, .9)`; ctx.fill();
+      ctx.beginPath(); ctx.arc(last.sx, last.sy, 4.5, 0, Math.PI * 2);
+      ctx.fillStyle = DEEP_IRIS; ctx.fill();
+      /* Leader and value pill, to the upper right of the marker. */
+      const lx = last.sx + 18;
+      const ly = last.sy - 22;
+      ctx.strokeStyle = `rgba(${DEEP_IRIS_RGB}, .6)`; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(last.sx + 6, last.sy - 6); ctx.lineTo(lx - 4, ly + 8); ctx.stroke();
+      const text = `${chart.seriesLabel}  ${chart.seriesLast}`;
+      ctx.font = `500 12px ${mono}`;
+      const w = ctx.measureText(text).width + 22;
+      const h = 26;
+      const r = 13;
+      ctx.beginPath();
+      ctx.moveTo(lx + r, ly - h / 2);
+      ctx.arcTo(lx + w, ly - h / 2, lx + w, ly + h / 2, r);
+      ctx.arcTo(lx + w, ly + h / 2, lx, ly + h / 2, r);
+      ctx.arcTo(lx, ly + h / 2, lx, ly - h / 2, r);
+      ctx.arcTo(lx, ly - h / 2, lx + w, ly - h / 2, r);
+      ctx.closePath();
+      ctx.fillStyle = DEEP_IRIS; ctx.fill();
+      label(text, lx + 11, ly + 0.5, "left", 1, 12, PAPER);
+    };
+
     const draw = (theta: number) => {
-      ctx.clearRect(0, 0, width, height);
+      ctx.clearRect(0, 0, width, boxH);
       ctx.lineJoin = "round";
       ctx.lineCap = "round";
 
+      drawChartFloor(theta);
+      drawSeries(theta);
+
       /* Ribs: one polyline per day, across the tenors. Every third day, not
          every day — ninety 1px lines inside a 300px band is a grey wash, and a
-         wireframe you cannot see through is a fill by another name. The data
-         extent is still ninety days; the drawn mesh is thirty ribs of it. */
+         wireframe you cannot see through is a fill by another name. */
       ctx.lineWidth = 1;
       for (let i = 0; i < rows.length - 1; i += 3) {
         const row = rows[i];
@@ -293,7 +391,7 @@ export default function YieldSurfaceCanvas({
         let sum = 0;
         ctx.beginPath();
         for (let k = 0; k < row.xs.length; k++) {
-          const p = project(row.xs[k], yOf(row.ys[k]), z, theta);
+          const p = project(row.xs[k], row.ys[k], z, theta);
           sum += p.depth;
           if (k === 0) ctx.moveTo(p.sx, p.sy);
           else ctx.lineTo(p.sx, p.sy);
@@ -306,10 +404,11 @@ export default function YieldSurfaceCanvas({
          surface — the ribs alone read as a stack of separate curves. */
       const tenors = rows[0].xs.length;
       for (let k = 0; k < tenors; k++) {
+        if (chart && k === chart.seriesIndex) continue;
         let sum = 0;
         ctx.beginPath();
         for (let i = 0; i < rows.length; i++) {
-          const p = project(rows[i].xs[k], yOf(rows[i].ys[k]), zOf(i), theta);
+          const p = project(rows[i].xs[k], rows[i].ys[k], zOf(i), theta);
           sum += p.depth;
           if (i === 0) ctx.moveTo(p.sx, p.sy);
           else ctx.lineTo(p.sx, p.sy);
@@ -318,26 +417,38 @@ export default function YieldSurfaceCanvas({
         ctx.stroke();
       }
 
-      /* Today, at full alpha in the one accent. It is the only line on the
-         surface that is a statement about now rather than about the shape of
-         the last quarter, so it is the only one that gets the colour. */
+      /* Today, at full alpha in the one accent. */
       const today = rows[rows.length - 1];
       ctx.beginPath();
       for (let k = 0; k < today.xs.length; k++) {
-        const p = project(today.xs[k], yOf(today.ys[k]), zOf(rows.length - 1), theta);
+        const p = project(today.xs[k], today.ys[k], zOf(rows.length - 1), theta);
         if (k === 0) ctx.moveTo(p.sx, p.sy);
         else ctx.lineTo(p.sx, p.sy);
       }
       ctx.strokeStyle = DEEP_IRIS;
       ctx.lineWidth = 1.5;
       ctx.stroke();
+
+      drawSeriesLine(theta);
+      flush();
     };
 
     const frame = (t: number) => {
       if (!start) start = t;
-      draw(yawAt(t - start));
+      const ms = t - start;
+      const u = Math.min(1, ms / REVEAL_MS);
+      reveal = 1 - (1 - u) * (1 - u) * (1 - u);   // ease-out cubic
+      cx += (tx - cx) * PARALLAX_EASE;
+      cy += (ty - cy) * PARALLAX_EASE;
+      bob = bobAt(ms) + cy * PARALLAX_PX;
+      draw(yawAt(ms) + (cx * PARALLAX_DEG * Math.PI) / 180);
       raf = requestAnimationFrame(frame);
     };
+    const onPointer = (e: PointerEvent) => {
+      tx = (e.clientX / window.innerWidth - 0.5) * 2;
+      ty = (e.clientY / window.innerHeight - 0.5) * 2;
+    };
+    if (parallax) window.addEventListener("pointermove", onPointer, { passive: true });
 
     const stop = () => {
       if (raf) cancelAnimationFrame(raf);
@@ -347,11 +458,10 @@ export default function YieldSurfaceCanvas({
     const run = () => {
       stop();
       resize();
-      applyFloor();
+      measure();
       if (!animate) {
-        /* The static frame is the middle of the rock: the angle the surface
-           spends most of its time near, and the one the composition was tuned
-           at. */
+        bob = 0;
+        reveal = 1;
         draw(yawAt(0));
         return;
       }
@@ -359,18 +469,11 @@ export default function YieldSurfaceCanvas({
       raf = requestAnimationFrame(frame);
     };
 
-    /* A hidden tab still runs rAF in some browsers and, more to the point, a
-       backgrounded animation is work nobody is looking at. */
     const onVisibility = () => {
       if (document.hidden) stop();
       else if (animate) run();
     };
 
-    /* The phone rule, measured rather than assumed. If long tasks pile up while
-       the surface is turning, the surface is what stops — it is ambient, and a
-       janky scroll costs more than a still frame. Chromium-only API; where it
-       does not exist the animation simply stays on, which is the same behaviour
-       phones had before this observer. */
     let longTasks = 0;
     let observer: PerformanceObserver | null = null;
     if (phone && animate && typeof PerformanceObserver === "function") {
@@ -389,25 +492,28 @@ export default function YieldSurfaceCanvas({
       }
     }
 
-    const onResize = () => run();
+    const ro = typeof ResizeObserver === "function" ? new ResizeObserver(() => run()) : null;
+    ro?.observe(canvas);
+    const onResize = () => { if (!ro) run(); };
     window.addEventListener("resize", onResize);
     document.addEventListener("visibilitychange", onVisibility);
     run();
 
     return () => {
       stop();
+      ro?.disconnect();
       observer?.disconnect();
       window.removeEventListener("resize", onResize);
+      window.removeEventListener("pointermove", onPointer);
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [rows, height, tilt, depth, amplitude, minInkHeight,
-      yawCenter, yawRange, fit, opacity, isStatic]);
+  }, [rows, height, tilt, depth, yawCenter, yawRange, fit, opacity, isStatic, chart]);
 
   return (
     <canvas
       ref={ref}
       aria-hidden="true"
-      style={{ display: "block", width: "100%", height: `${height}px` }}
+      style={{ display: "block", width: "100%", height: height > 0 ? `${height}px` : "100%" }}
     />
   );
 }

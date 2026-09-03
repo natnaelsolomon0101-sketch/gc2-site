@@ -68,3 +68,23 @@ not a colour from either prompt.
 `pathname === "/"` -- inner routes keep the plain bar from earlier rounds,
 unchanged. Screenshots: `docs/v4/shots/r6-chrome/home--{393,768,1280,1920}
 --scroll{0,200}.png`.
+
+## sec-hero, round 9 — hero (slot 1), owner-supplied URL
+
+Owner pasted `motionsites.ai/?prompt=aethera-hero` ("Aethera Studio", Hero
+Section, 597 likes) and asked for it directly. Browsed via `/browse` (no
+login; the prompt text is behind "Copy full prompt" and was not read).
+
+**Kept:** the structure — a full-frame picture as the ground, the nav
+floating over it, one centred editorial serif line with two words in italic,
+a two-line lead, pill actions, nothing else in the top half. DM Serif
+Display's italic face is now loaded for the two words.
+
+**Stripped:** the painted meadow. Tried first as a painted Treasury
+term-structure landscape (commit 08236b9, `YieldSurface mode="painted"`,
+kept in the tree); the owner then said of the r8 wireframe "love the
+floating thing, make it more a stock chart floating." So the picture is the
+mesh, drawn as an instrument: `mode="chart"` (f7b4a12 →). Aethera's
+photographic ground is not a token this site has and a meadow says nothing
+about a partnership; the chart is public data with its citation on the
+frame.

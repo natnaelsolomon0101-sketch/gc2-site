@@ -8,7 +8,7 @@ import "./globals.css";
 /* Lyon Display is not a webfont; DM Serif Display is the spec's listed substitute.
    DM Serif ships weight 400 only, so tracking is tightened in CSS instead of using 300. */
 const dmserif = DM_Serif_Display({
-  subsets: ["latin"], weight: ["400"], variable: "--font-dmserif",
+  subsets: ["latin"], weight: ["400"], style: ["normal", "italic"], variable: "--font-dmserif",
   display: "swap", adjustFontFallback: true,
 });
 const inter = Inter({
