@@ -90,8 +90,9 @@ const ENTRY = /<m:properties>([\s\S]*?)<\/m:properties>/g;
 const FIELD = (name: string) =>
   new RegExp(`<d:${name}[^>]*>([^<]*)</d:${name}>`);
 
-function parse(xml: string): YieldCurve | null {
-  let latest: YieldCurve | null = null;
+/** Every well-formed row in one month's feed, oldest first. */
+function parseAll(xml: string): YieldCurve[] {
+  const rows: YieldCurve[] = [];
   for (const [, body] of xml.matchAll(ENTRY)) {
     const date = body.match(FIELD("NEW_DATE"))?.[1]?.slice(0, 10);
     if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) continue;
@@ -107,9 +108,14 @@ function parse(xml: string): YieldCurve | null {
     /* A row with a hole at one tenor is normal and fine; a row with almost
        nothing in it is a bad row, not a curve. */
     if (points.length < 8) continue;
-    if (!latest || date > latest.date) latest = { date, points };
+    rows.push({ date, points });
   }
-  return latest;
+  return rows.sort((a, b) => (a.date < b.date ? -1 : 1));
+}
+
+function parse(xml: string): YieldCurve | null {
+  const rows = parseAll(xml);
+  return rows.length ? rows[rows.length - 1] : null;
 }
 
 /**
@@ -131,6 +137,47 @@ export async function fetchYieldCurve(): Promise<YieldCurve | null> {
     if (curve) return curve;
   }
   return null;
+}
+
+/**
+ * The last `days` published curves, oldest first, or null.
+ *
+ * Reads seven consecutive month feeds and keeps the tail. A month of business
+ * days is 19-23, so four feeds reach 90 only if the current month is nearly
+ * over; measured on the second of September, five feeds returned 86. Seven has
+ * slack for a short quarter and for the rows dropped below. Each feed is ~4KB
+ * and they share the six-hour revalidate with everything else here, so the
+ * extra months cost a handful of cached requests a quarter-day.
+ *
+ * A month that fails to fetch is skipped rather than fatal: the surface is
+ * still true with 71 days on it, and the caption prints the count actually
+ * drawn rather than the count asked for. Null only when nothing at all came
+ * back — the same rule as the single curve, for the same reason.
+ */
+export async function fetchYieldHistory(days = 90): Promise<YieldCurve[] | null> {
+  const now = new Date();
+  const keys: string[] = [];
+  for (let back = 6; back >= 0; back--) {
+    keys.push(monthKey(new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - back, 1))));
+  }
+
+  const rows: YieldCurve[] = [];
+  const seen = new Set<string>();
+  for (const key of keys) {
+    const xml = await month(key);
+    if (!xml) continue;
+    for (const row of parseAll(xml)) {
+      /* A date can only appear once. The month feeds do not overlap today, but
+         a duplicate would put two ribs in the same plane and read as a crease
+         in the surface rather than as a bad row. */
+      if (seen.has(row.date)) continue;
+      seen.add(row.date);
+      rows.push(row);
+    }
+  }
+  if (!rows.length) return null;
+  rows.sort((a, b) => (a.date < b.date ? -1 : 1));
+  return rows.slice(-days);
 }
 
 /** `2026-09-02` -> `Sep 2, 2026`. Matches `formatDate` in src/content/notes.ts:
