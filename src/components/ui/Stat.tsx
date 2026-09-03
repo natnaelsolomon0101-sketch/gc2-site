@@ -30,12 +30,12 @@ import { strategies } from "@/content/strategies";
  * the "real-time" pulse implies a data feed that does not exist. See
  * docs/21st/HARVEST.md.
  *
- * Contrast (WCAG 2.1, sRGB):
- *   label ash #9f9fa0 on obsidian #0f1011 ..... 7.20:1
- *   label ash on graphite #2e2e2e ............. 5.14:1
- *   value cloud #f5f5f7 on obsidian ........... 17.49:1
- *   value cloud on graphite ................... 12.47:1
- *   inherit tone on any Tile .................. the tile's own 6.36:1+
+ * Contrast (WCAG 2.1, sRGB; see DESIGN.md "Measured — ink on every ground"):
+ *   label ink-2 on ground ..... 7.55:1
+ *   label ink-2 on surface .... 6.25:1
+ *   value ink   on ground ..... 17.04:1
+ *   value ink   on surface .... 14.12:1
+ *   inherit tone on any Tile .. the tile's own paired accent-*-fg ratio
  */
 
 const COUNT_WORDS = [
@@ -145,8 +145,8 @@ export default function Stat({
   ...rest
 }: StatProps) {
   const { label, value } = STRUCTURAL_FACTS[fact];
-  const labelTone = tone === "inherit" ? "text-inherit" : "text-ash";
-  const valueTone = tone === "inherit" ? "text-inherit" : "text-cloud";
+  const labelTone = tone === "inherit" ? "text-inherit" : "text-ink-2";
+  const valueTone = tone === "inherit" ? "text-inherit" : "text-ink";
 
   return (
     <div

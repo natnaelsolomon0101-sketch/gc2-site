@@ -3,21 +3,23 @@ import * as React from "react";
 /**
  * Button — two variants only.
  *
- *   filled : white fill, black label. The single primary action.
+ *   filled : ink fill, ground label. The single primary action — the same
+ *            object `.btn` names in globals.css.
  *   text   : label-weight action. Same 44px target, no fill until hover.
  *
  * 8px radius (`--radius-control`). No pills, no shadows, no gradients, no icon
  * slots — an icon library is a banned dependency on this project.
  *
- * Contrast (WCAG 2.1, sRGB, measured in-browser):
- *   filled  void #000000 on pure #ffffff .......... 21.00:1
- *   filled  void on cloud #f5f5f7 (hover) ......... 19.05:1
- *   text    cloud #f5f5f7 on obsidian #0f1011 ..... 17.49:1
- *   text    cloud on graphite #2e2e2e ............. 12.47:1
- *   focus   cloud ring on obsidian ................ 17.49:1
+ * Contrast (WCAG 2.1, sRGB; see DESIGN.md "Measured — ink on every ground"
+ * and "Controls"):
+ *   filled  ground on ink .......................... 17.04:1
+ *   filled  ground on ink-2 (hover) ................. 7.55:1
+ *   filled  ground on ink-3 (active) ................ 5.61:1
+ *   text    ink on ground ........................... 17.04:1
+ *   focus   ink ring on ground ...................... 17.04:1
  *
- * The focus ring is `cloud`, never a chromatic or dark colour: a dark ring on a
- * near-black ground measures under 2:1 and is effectively invisible.
+ * The focus ring is `ink`, never a chromatic colour: a chromatic ring against
+ * paper is not guaranteed to clear the 3:1 non-text minimum at every accent.
  */
 export type ButtonVariant = "filled" | "text";
 
@@ -25,12 +27,12 @@ const BASE =
   "inline-flex min-h-11 select-none items-center justify-center gap-2.5 " +
   "rounded-control font-ui text-base font-normal leading-none no-underline " +
   "transition-colors duration-[var(--dur-fast)] ease-[var(--ease)] " +
-  "focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-cloud " +
+  "focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-ink " +
   "disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50";
 
 const VARIANTS: Record<ButtonVariant, string> = {
-  filled: "bg-pure px-5 text-void hover:bg-cloud active:bg-silver",
-  text: "bg-transparent px-3 text-cloud hover:bg-pure/10 hover:text-pure active:bg-pure/15",
+  filled: "bg-ink px-5 text-ground hover:bg-ink-2 active:bg-ink-3",
+  text: "bg-transparent px-3 text-ink hover:bg-ink/10 active:bg-ink/15",
 };
 
 type Common = {
