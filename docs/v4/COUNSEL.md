@@ -25,3 +25,11 @@ Verdict: **share kit NOT SHIPPABLE** as of cc82237; site copy has one BLOCKING a
 - Site-wide habitual past tense: add one caption line to /firm and /diligence: "The firm was formed in September 2026. What is described here is the policy the firm operates under, not a record of periods it has run."
 
 Counsel's full text is in the Conductor transcript; this file is the actionable digest. NOT LEGAL ADVICE — counsel reviews before production per the repo's own rule.
+
+## Second read (after the light pass) — 4 Sep 2026
+
+**Share kit: SHIPPABLE.** All four card findings discharged in the pixels. New highs: risk-framework card "when the return arrives" (owner's sentence, flagged twice); four-stages and strategies cards need a founding-date caption ("The firm was formed in September 2026. This describes the policy the firm operates under, not a record of periods it has run.") — applied via sec-motion r4.
+
+**Site: NOT PROMOTABLE until three items land (all sec-motion r4):** YieldCurve's title + "Public market data. Not fund performance." must render on the PAGE, not only in card mode, and without vertical exaggeration; the home OG image must carry the same three strings; ECBGrid's figcaption must carry the caveat. Plus (medium, sec-allocators r3): the drawdown answer's founding-fact paragraph must come first.
+
+Site fixes 5–9 from the first read verified landed verbatim. SessionClock captions and the light canvas introduce nothing new.
