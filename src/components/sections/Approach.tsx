@@ -36,7 +36,7 @@ import { stagger } from "@/lib/motion";
  * stages" the overlay stands under.
  *
  * Colour: one chromatic accent in the whole section (DESIGN.md principle 2) —
- * the iris-gleam rule on the tail-overlay band. Everything else is achromatic.
+ * the deep-iris rule on the tail-overlay band. Everything else is achromatic.
  *
  * Every claim here is sourced from firm copy already in the repo. No people,
  * no titles, no headcount, no numbers. Server component: no client JS.
@@ -139,36 +139,36 @@ export function StageStrip({ link = true }: { link?: boolean }) {
             key={s.n}
             /* border-l is the spine at one column and the connecting rule
                between columns at two and four; border-t is the rung. */
-            className="fade-in relative border-t border-l border-white/12 pt-6 pb-7 pl-12 @2xl:pt-8 @2xl:pb-8 @2xl:pl-14 @6xl:row-span-5 @6xl:grid @6xl:grid-rows-subgrid @6xl:pl-6"
+            className="fade-in relative border-t border-l border-hairline pt-6 pb-7 pl-12 @2xl:pt-8 @2xl:pb-8 @2xl:pl-14 @6xl:row-span-5 @6xl:grid @6xl:grid-rows-subgrid @6xl:pl-6"
             style={{ animationDelay: `${i * stagger}ms` }}
           >
             {/* In the margin, beside the spine, until there is room to stack it
                 above the label — a 48px numeral gutter is a phone idea. */}
             <p
-              className="t-heading-sm absolute top-6 left-3 text-fog @2xl:top-8 @2xl:left-4 @6xl:static @6xl:mb-3"
+              className="t-heading-sm absolute top-6 left-3 text-ink-3 @2xl:top-8 @2xl:left-4 @6xl:static @6xl:mb-3"
               aria-hidden="true"
             >
               {s.n}
             </p>
 
             <div>
-              <p className={`t-mono ${s.standing ? "text-pure" : "text-cloud"}`}>
+              <p className="t-mono text-ink">
                 <span className="sr-only">Stage {s.n}. </span>
                 {s.label}
               </p>
-              <p className="t-small mt-1 text-fog">
+              <p className="t-small mt-1 text-ink-3">
                 Held by{" "}
-                <span className={s.standing ? "text-cloud" : "text-ash"}>{s.holder}</span>
+                <span className={s.standing ? "text-ink" : "text-ink-2"}>{s.holder}</span>
               </p>
             </div>
 
-            <h3 className={`t-h3 mt-3 hyphens-none ${s.standing ? "text-pure" : ""}`}>
+            <h3 className="t-h3 mt-3 hyphens-none">
               {s.heading}
             </h3>
             <p className="t-body measure-body mt-3">{s.body}</p>
 
             <div className="rule-t mt-5 pt-3">
-              <p className="t-caption text-fog">{s.gateLabel}</p>
+              <p className="t-caption text-ink-3">{s.gateLabel}</p>
               <p className="t-small measure-body mt-1">{s.gate}</p>
             </div>
           </li>
@@ -176,20 +176,20 @@ export function StageStrip({ link = true }: { link?: boolean }) {
       </ol>
 
       {/* ------------------------------------- underneath all of it, permanently */}
-      <div className="border-t border-white/12 pt-6 @2xl:pt-12">
-        <div className="rounded-card border-t-2 border-iris-gleam bg-graphite p-6 @2xl:p-10">
+      <div className="border-t border-hairline pt-6 @2xl:pt-12">
+        <div className="card-surface border-t-2 border-accent-deep-iris p-6 @2xl:p-10">
           <div className="grid gap-6 @4xl:grid-cols-12">
             <div className="@4xl:col-span-7">
-              <p className="t-caption text-fog">{tailOverlay.kicker}</p>
-              <h3 className="t-heading-lg mt-3 hyphens-none text-pure">
+              <p className="t-caption text-ink-3">{tailOverlay.kicker}</p>
+              <h3 className="t-heading-lg mt-3 hyphens-none">
                 {tailOverlay.heading}
               </h3>
               <p className="t-body measure-body mt-4">{tailOverlay.body}</p>
             </div>
 
-            <div className="border-t border-white/12 pt-6 @4xl:col-span-4 @4xl:col-start-9 @4xl:border-t-0 @4xl:pt-0">
-              <p className="t-caption text-fog">{tailOverlay.asideLabel}</p>
-              <p className="t-body mt-2 text-cloud">{tailOverlay.aside}</p>
+            <div className="border-t border-hairline pt-6 @4xl:col-span-4 @4xl:col-start-9 @4xl:border-t-0 @4xl:pt-0">
+              <p className="t-caption text-ink-3">{tailOverlay.asideLabel}</p>
+              <p className="t-body mt-2">{tailOverlay.aside}</p>
               {link && (
                 <Link
                   href="/governance"
@@ -216,7 +216,7 @@ export default function Approach() {
           <h2 id="approach-title" className="t-display-sm mt-4 hyphens-none">
             How an idea earns capital.
           </h2>
-          <p className="t-sub measure-lead mt-6 text-ash">
+          <p className="t-sub measure-lead mt-6 text-ink-2">
             Durable returns in liquid markets come from process, not prediction. We build
             our own data, write our own models, and put every idea through adversarial
             review before it earns capital.
@@ -224,12 +224,12 @@ export default function Approach() {
         </div>
 
         <div className="@4xl:col-span-4 @4xl:col-start-9">
-          <p className="t-caption text-fog">Who holds what</p>
+          <p className="t-caption text-ink-3">Who holds what</p>
           <dl className="mt-2">
             {accountability.map((a) => (
-              <div key={a.term} className="border-t border-white/12 py-3">
-                <dt className="t-small text-fog">{a.term}</dt>
-                <dd className="t-body text-cloud">{a.held}</dd>
+              <div key={a.term} className="border-t border-hairline py-3">
+                <dt className="t-small text-ink-3">{a.term}</dt>
+                <dd className="t-body text-ink">{a.held}</dd>
               </div>
             ))}
           </dl>

@@ -52,10 +52,10 @@ function Ledger({
       <caption className="sr-only">{caption}</caption>
       <thead className="sr-only md:not-sr-only">
         <tr className="block md:table-row">
-          <th scope="col" className="t-mono-xs block pb-3 text-left text-fog md:table-cell md:w-1/2 md:pr-6">
+          <th scope="col" className="t-mono-xs block pb-3 text-left text-ink-3 md:table-cell md:w-1/2 md:pr-6">
             {termHead}
           </th>
-          <th scope="col" className="t-mono-xs block pb-3 text-left text-fog md:table-cell md:pr-6">
+          <th scope="col" className="t-mono-xs block pb-3 text-left text-ink-3 md:table-cell md:pr-6">
             {valueHead}
           </th>
         </tr>
@@ -65,15 +65,15 @@ function Ledger({
           <tr key={r.term} className="rule-t block py-5 md:table-row md:py-0">
             <th
               scope="row"
-              className="t-body block text-left font-normal text-fog md:table-cell md:w-1/2 md:py-6 md:pr-6 md:align-top"
+              className="t-body block text-left font-normal text-ink-3 md:table-cell md:w-1/2 md:py-6 md:pr-6 md:align-top"
             >
               {r.term}
             </th>
             <td className="block pt-2 md:table-cell md:py-6 md:align-top">
-              <span aria-hidden="true" className="t-mono-xs block text-fog md:hidden">
+              <span aria-hidden="true" className="t-mono-xs block text-ink-3 md:hidden">
                 {valueHead}
               </span>
-              <span className="t-body block text-cloud">{r.value}</span>
+              <span className="t-body block text-ink">{r.value}</span>
             </td>
           </tr>
         ))}
@@ -219,7 +219,7 @@ export default function Governance() {
         <dl>
           {conflicts.map((c) => (
             <div key={c.h} className="rule-t py-8">
-              <dt className="t-mono text-cloud">{c.h}</dt>
+              <dt className="t-mono text-ink">{c.h}</dt>
               <dd className="t-body measure-body mt-3">{c.p}</dd>
             </div>
           ))}
@@ -261,11 +261,11 @@ export default function Governance() {
         standfirst="The question behind every governance page is what stops one person from blowing this up. This is the answer: who sets the limits, who can cut a position without asking, whose mark is final, and what happens if someone is not there."
       />
 
-      {/* Same band rhythm as /firm and /diligence: obsidian and abyss alternate
+      {/* Same band rhythm as /firm and /diligence: ground and ground-2 alternate
           so the page has cadence without a rule under every section. Heading
           pure 19.05:1 / 19.81:1, body ash 7.20:1 / 7.49:1, fog 4.61:1 / 4.80:1. */}
       {blocks.map((b, i) => (
-        <section key={b.id} id={b.id} className={`scroll-mt-24 ${i % 2 ? "bg-abyss" : ""}`}>
+        <section key={b.id} id={b.id} className={`scroll-mt-24 ${i % 2 ? "bg-ground-2" : ""}`}>
           <Container>
             {/* No 01-06 numerals on these headings. Six governance topics are
                 not an ordered sequence, and EVERY-SCREEN.md 0.2 item 4 takes
@@ -291,9 +291,9 @@ export default function Governance() {
       ))}
 
       {fund.updatedAt && (
-        <section className={blocks.length % 2 ? "bg-abyss" : ""}>
+        <section className={blocks.length % 2 ? "bg-ground-2" : ""}>
           <Container>
-            <p className="t-mono-xs rule-t py-8 text-fog">Last updated {fund.updatedAt}</p>
+            <p className="t-mono-xs rule-t py-8 text-ink-3">Last updated {fund.updatedAt}</p>
           </Container>
         </section>
       )}
