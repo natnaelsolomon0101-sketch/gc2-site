@@ -38,7 +38,7 @@ function Arrow() {
   return (
     <svg
       aria-hidden="true" viewBox="0 0 20 20" width="20" height="20" fill="none"
-      className="shrink-0 text-fog transition-transform duration-200 group-hover:translate-x-1 group-hover:text-cloud"
+      className="shrink-0 text-fog transition-transform duration-[var(--dur-fast)] ease-[var(--ease)] group-hover:translate-x-1 group-hover:text-cloud"
     >
       <path
         d="M3.5 10h13M11.5 5l5 5-5 5" stroke="currentColor" strokeWidth="1.25"
@@ -84,7 +84,7 @@ export default function ContactBand() {
                 <div key={c.email} className="border-b border-white/12">
                   <a
                     href={`mailto:${c.email}`}
-                    className={`group flex min-h-[92px] items-center justify-between gap-6 py-7 transition-colors duration-200 hover:bg-white/5 ${focusRing}`}
+                    className={`group flex min-h-[92px] items-center justify-between gap-6 py-7 transition-colors duration-[var(--dur-fast)] ease-[var(--ease)] hover:bg-white/5 ${focusRing}`}
                   >
                     {/* Label sits above the address until lg. Side by side at
                         768 the address column is ~230px and the serif broke
