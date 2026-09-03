@@ -1,12 +1,13 @@
 import { css } from "@/lib/css";
 import YieldSurfaceCanvas, { type SurfaceRow } from "./YieldSurfaceCanvas";
+import YieldLandscapeCanvas from "./YieldLandscapeCanvas";
 import {
   fetchYieldHistory, asOf, TREASURY_SOURCE, TREASURY_ATTRIBUTION,
 } from "./treasury";
 
 /**
  * The term-structure landscape: the last ninety published U.S. Treasury par
- * yield curves, as one wireframe surface, turning slowly.
+ * yield curves, as one surface, turning slowly.
  *
  * x is tenor on the SAME log mapping <YieldCurve/> uses — a linear tenor axis
  * puts eight of thirteen points inside the first sixth and the front end, which
@@ -15,100 +16,102 @@ import {
  * today, but how the shape has been moving — the front end lifting, the belly
  * rolling, the long end standing still.
  *
+ * TWO MATERIALS, ONE SURFACE. `mode="wire"` is the original drawing: ink
+ * polylines at low alpha, a mesh you see through, fitted inside a slot.
+ * `mode="painted"` (hero r9) is the same rows rendered as filled, lit, depth-
+ * fogged strips — a landscape that fills its box and the page stands on. Same
+ * fetch, same projection, same rock; the difference is entirely in the canvas
+ * component that receives the numbers. See YieldLandscapeCanvas.tsx.
+ *
  * SERVER-FETCHED, ISR 6h, PASSED AS PROPS. The island never talks to Treasury.
  * If the fetch fails this renders nothing — no placeholder mesh, no last-known
  * surface. The same rule every data component here follows, and it matters more
  * on this one: an invented landscape is a much bigger lie than an invented line.
  *
  * MOTION. The surface ROCKS rather than revolves: the yaw is a sine through
- * 45°±30°, forty seconds from one extreme to the other. A full revolution — the
- * first version — spent a quarter of its cycle edge-on, which is the one angle
- * at which a landscape reads as a chart, and another quarter showing the back
- * of the surface with today's curve hidden behind ninety days of history. The
+ * yawCenter ± yawRange, forty seconds from one extreme to the other. A full
+ * revolution spent a quarter of its cycle edge-on, which is the one angle at
+ * which a landscape reads as a chart, and another quarter showing the back of
+ * the surface with today's curve hidden behind ninety days of history. The
  * rock never reaches either: the surface is always oblique and today is always
- * at the front. The sine is also the ease-in-out for free, slowing into each
- * extreme instead of turning a corner.
- *
- * This is continuous ambient motion, which is NOT what the --dur-* tokens are
- * for — they time transitions and one-shot reveals, and EVERY-SCREEN.md §8.2's
- * list of what moves does not include this. It is here because the owner asked
- * for it directly, and it is logged as the deviation it is. It is gated
- * entirely under prefers-reduced-motion, it stops when the tab is hidden, and
- * it stops on a phone whose main thread is measurably blocking.
- *
- * COLOUR. Ink at 20-35% for the ninety days of history, depth-faded so the far
- * edge recedes; today's curve in deep-iris at full alpha. That accent is the
- * section's whole ration (DESIGN.md principle 2) and it is spent on the one
- * line that is a statement about now. No fills, no gradients, no shadows — the
- * surface sits on transparent and the hero owns the ground.
+ * at the front. This is continuous ambient motion, here because the owner
+ * asked for it directly; it is gated under prefers-reduced-motion, it stops
+ * when the tab is hidden, and it stops on a phone whose main thread is
+ * measurably blocking.
  */
 
 export type YieldSurfaceProps = {
-  /** CSS height of the canvas. Default 520. */
+  /** CSS height of the canvas (wire mode only; painted fills its box). Default 520. */
   height?: number;
   /** Camera tilt above the horizon, in degrees. Defaults per `fit`. */
   tilt?: number;
-  /** Middle of the rock, in degrees of yaw. Default 45. */
+  /** Middle of the rock, in degrees of yaw. Default 45 (wire), 14 (painted). */
   yawCenter?: number;
-  /** Half-width of the rock: the yaw runs yawCenter ± yawRange. Default 30. */
+  /** Half-width of the rock: the yaw runs yawCenter ± yawRange. Default 30 (wire), 9 (painted). */
   yawRange?: number;
   /**
-   * "band" is the hero: a shallow slab shaped to fill a wide short slot, and
-   * anchored into the right two-thirds so the headline keeps the left.
-   * "natural" is the deeper landscape, centred, for a slot nearer square.
+   * "band" is the wire hero: a shallow slab shaped to fill a wide short slot,
+   * anchored into the right two-thirds. "natural" is the deeper landscape,
+   * centred, for a slot nearer square. "landscape" is the painted shape.
    */
-  fit?: "band" | "natural";
-  /** Alpha ceiling for the history strokes. Default 0.45 — it has to hold its
-   *  own behind type on paper. */
+  fit?: "band" | "natural" | "landscape";
+  /** Alpha ceiling for the history strokes (wire only). Default 0.45. */
   opacity?: number;
+  /** "wire" strokes a mesh; "painted" fills a landscape. Default "wire". */
+  mode?: "wire" | "painted";
+  /** Painted only: fallback horizon as a fraction of the box height when
+   *  --ys-horizon is not set in CSS. Default 0.44. */
+  horizon?: number;
   /** Force the single static frame — no rAF, no observer. */
   static?: boolean;
   className?: string;
 };
 
-/* The two shapes, and why they differ.
+/* The shapes, and why they differ.
  *
  * A rock through 45°±30° sweeps an envelope whose width barely changes (about
  * 9%) while its height changes by half. Width is therefore free and height is
  * what the slot has to pay for, so the only way to fill a wide short band is to
  * flatten the model: less tilt, a shallower time axis, a smaller yield
- * amplitude. Measured envelope ratios: "natural" 1.9:1, "band" 3.1:1.
+ * amplitude. "band" and "natural" are the wire shapes, measured in r6–r8.
  *
- * The band shape was tuned by measuring the drawn ink, not by eye. At the two
- * slots the Conductor named it fills 88% of the width at 1920x520 and 79% at
- * 3440x520, against targets of 80% and 70%. Flatter shapes fill more — 89% at
- * both — but at 520px of slot the surface becomes a 134px ribbon with no
- * vertical presence, so the extra fill is bought with the thing the surface is
- * for. This is the flattest shape that still reads as depth.
- *
- * None of these numbers are claims about the data: the surface prints no y
- * axis and no z axis, so its proportions are composition, exactly like the
- * yield curve's aspect. What would be dishonest is a non-uniform scale, and
- * there isn't one. */
+ * "landscape" is the painted shape: a little more tilt and a longer time axis
+ * so the ninety strips stack into visible hills rather than a ribbon, and an
+ * amplitude that puts a real skyline on the range. None of these numbers are
+ * claims about the data: the surface prints no y axis and no z axis, so its
+ * proportions are composition, exactly like the yield curve's aspect. What
+ * would be dishonest is a non-uniform scale, and there isn't one. */
 const SHAPE = {
-  band:    { tilt: 16, depth: 0.95, amplitude: 0.52 },
-  natural: { tilt: 22, depth: 1.0,  amplitude: 0.62 },
+  band:      { tilt: 16, depth: 0.95, amplitude: 0.52 },
+  natural:   { tilt: 22, depth: 1.0,  amplitude: 0.62 },
+  landscape: { tilt: 21, depth: 1.15, amplitude: 0.78 },
 } as const;
 
 export default async function YieldSurface({
   height = 520,
   tilt,
-  yawCenter = 45,
-  yawRange = 30,
-  fit = "band",
+  yawCenter,
+  yawRange,
+  fit,
   opacity = 0.45,
+  mode = "wire",
+  horizon = 0.44,
   static: isStatic = false,
   className = "",
 }: YieldSurfaceProps) {
-  const shape = SHAPE[fit];
+  const painted = mode === "painted";
+  const shapeKey = fit ?? (painted ? "landscape" : "band");
+  const shape = SHAPE[shapeKey];
+  const yc = yawCenter ?? (painted ? 14 : 45);
+  const yr = yawRange ?? (painted ? 9 : 30);
+
   const history = await fetchYieldHistory(90);
   if (!history || history.length < 2) return null;
 
   /* Project into model space HERE, on the server, so the island receives
      numbers and not a parsing problem: x in [-1, 1] across log tenor, y in
-     [-0.5, 0.5] across the ninety-day range of yields. The vertical scale is
-     deliberately shallow — a surface scaled to fill its box vertically reads as
-     a mountain range and claims a drama the data does not have. */
+     [-0.5, 0.5] across the ninety-day range of yields, scaled by the shape's
+     amplitude. */
   const tenors = history[history.length - 1].points.map((p) => p.years);
   const lo = Math.log(tenors[0]);
   const hi = Math.log(tenors[tenors.length - 1]);
@@ -141,22 +144,34 @@ export default async function YieldSurface({
 
   return (
     <figure
-      className={`ys ${className}`}
+      className={`ys ${painted ? "ys-painted " : ""}${className}`}
       data-source={TREASURY_SOURCE}
       data-asof={asOfDate}
     >
       <style>{CSS}</style>
-      <YieldSurfaceCanvas
-        rows={rows}
-        height={height}
-        tilt={tilt ?? shape.tilt}
-        depth={shape.depth}
-        yawCenter={yawCenter}
-        yawRange={yawRange}
-        fit={fit}
-        opacity={opacity}
-        isStatic={isStatic}
-      />
+      {painted ? (
+        <YieldLandscapeCanvas
+          rows={rows}
+          tilt={tilt ?? shape.tilt}
+          depth={shape.depth}
+          yawCenter={yc}
+          yawRange={yr}
+          horizon={horizon}
+          isStatic={isStatic}
+        />
+      ) : (
+        <YieldSurfaceCanvas
+          rows={rows}
+          height={height}
+          tilt={tilt ?? shape.tilt}
+          depth={shape.depth}
+          yawCenter={yc}
+          yawRange={yr}
+          fit={shapeKey === "natural" ? "natural" : "band"}
+          opacity={opacity}
+          isStatic={isStatic}
+        />
+      )}
       <figcaption className="t-caption ys-source">
         {TREASURY_ATTRIBUTION} par yield curves, last {rows.length} days · as of{" "}
         {asOf(asOfDate)} · Public market data. Not fund performance.
@@ -168,4 +183,7 @@ export default async function YieldSurface({
 const CSS = css`
   .ys { margin: 0; }
   .ys-source { display: block; margin-top: 14px; hyphens: none; }
+  /* Painted fills whatever box the caller positions it in; it sets no
+     position of its own so the caller's absolute/inset wins. */
+  .ys-painted canvas { position: absolute; inset: 0; }
 `;
