@@ -119,7 +119,7 @@ BASELINE = {
     "src/components/HairlineList.tsx":           (1, "sec-allocators"),
     "src/components/PinnedStrategies.tsx":       (2, "sec-strategies"),
     "src/components/sections/Atmosphere.tsx":    (4, "sec-hero"),
-    "src/components/sections/ContactBand.tsx":   (2, "sec-firm"),
+    "src/components/sections/ContactBand.tsx":   (0, "sec-firm"),
     "src/components/sections/Feature.tsx":       (5, "sec-framework"),
     "src/components/sections/ForAllocators.tsx": (2, "sec-allocators"),
     "src/components/sections/HeroV2.tsx":       (14, "sec-hero"),
