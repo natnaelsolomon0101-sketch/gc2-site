@@ -100,8 +100,13 @@ const CSS = css`
    for the whole life of the animation, which is how the phone step silently
    did nothing and the headline measured against a surface at full strength. */
 .hv2-surface{position:absolute;inset:0;z-index:0;overflow:hidden;
-  pointer-events:none;opacity:var(--hv2-surface-o, .85);}
-.hv2-surface .ys{position:absolute;top:50%;left:0;right:0;
+  pointer-events:none;opacity:var(--hv2-surface-o, 1);}
+/* The canvas, and NOT ".hv2-surface .ys": YieldSurface puts className on the
+   figure itself, so the figure IS .ys.hv2-surface and every descendant rule
+   written against .ys matched nothing at all. That is why the canvas sat at the
+   top of the box and the phone's lower-third mask had no ink to reveal — the
+   poster's missing picture was one selector, not a tuning problem. */
+.hv2-surface canvas{position:absolute;top:50%;left:0;right:0;
   transform:translateY(-50%);}
 /* THE MASK, and it is the composition and not a patch. Measured with the
    canvas pixels composited over paper, ink-2 in the lead ran 1.56-3.27:1
@@ -115,9 +120,9 @@ const CSS = css`
    citation along with the drawing. */
 .hv2-surface canvas{
   -webkit-mask-image:linear-gradient(90deg,
-    transparent 0%, rgba(0,0,0,.10) 26%, rgba(0,0,0,.55) 48%, #000 70%);
+    transparent 0%, transparent 30%, rgba(0,0,0,.35) 50%, #000 66%);
   mask-image:linear-gradient(90deg,
-    transparent 0%, rgba(0,0,0,.10) 26%, rgba(0,0,0,.55) 48%, #000 70%);}
+    transparent 0%, transparent 30%, rgba(0,0,0,.35) 50%, #000 66%);}
 /* The attribution is the one part of the figure that is content, so it leaves
    the clipped canvas box and pins to the foot of the frame on the column-1
    line, in ink-3 like every other caption on the page. */
@@ -235,12 +240,17 @@ const CSS = css`
      sentence, and it can stay strong enough to be worth having. It also puts
      something behind the glass CTA, which on a phone is the only place there
      was anything for it to refract. */
-  .hv2{--hv2-surface-o:.62;}
-  .hv2-surface canvas{
+  .hv2{--hv2-surface-o:.92;}
+  /* The figure is bottom-anchored here, not centred. Centred, the slab's ink
+     sits in the middle of a 900px canvas and therefore in the middle of the
+     screen — exactly where the vertical mask is transparent — so the phone
+     poster had a mask over nothing and no picture at all. Anchored low, the
+     ink lands in the lower third where the mask lets it through. */
+  .hv2-surface canvas{top:auto;bottom:-180px;transform:none;
     -webkit-mask-image:linear-gradient(180deg,
-      transparent 0%, transparent 50%, rgba(0,0,0,.45) 66%, #000 82%);
+      transparent 0%, transparent 38%, rgba(0,0,0,.55) 48%, #000 58%);
     mask-image:linear-gradient(180deg,
-      transparent 0%, transparent 50%, rgba(0,0,0,.45) 66%, #000 82%);}
+      transparent 0%, transparent 38%, rgba(0,0,0,.55) 48%, #000 58%);}
   @supports (height: 100dvh){
     .hv2{min-height:min(calc(100dvh - var(--nav-h, 56px)), 820px);}
   }
@@ -270,8 +280,11 @@ const CSS = css`
   /* 15px of side padding and a 10px gap are what fit both inside a 312px
      measure at 360. Below that they wrap and stay left-aligned. */
   .hv2-btn{flex:0 1 auto;padding:12px 15px;}
-  .hv2-gap{min-height:20px;}
-  .hv2-gap-b{min-height:16px;}
+  /* .45 against 1, not even halves: the surface needs a band of frame with no
+     text over it, and on a phone that band can only come from below the
+     actions. The message sits high and the lower third is the picture. */
+  .hv2-gap{flex:.45 1 0;min-height:20px;}
+  .hv2-gap-b{flex:1 1 0;min-height:16px;}
   /* No cue on a phone. The attribution wraps to four lines at 393 and runs the
      width of the frame; a second caption pinned to the same foot collided with
      it. The source line is the one that has to be there. */
@@ -283,6 +296,16 @@ const CSS = css`
    are the last thing in it, and an action you have to scroll to find is not an
    action. */
 @media (max-width:767px) and (max-height:700px){
+  /* At 320x568 the hero is 512px and the content ends at ~485: there is no
+     clear band under the actions for the surface to live in, so it goes quiet
+     and late rather than running under the sentence — measured, ink-2 hit
+     1.55:1 before this. A phone this short is type and nothing else. */
+  .hv2{--hv2-surface-o:.45;}
+  .hv2-surface canvas{
+    -webkit-mask-image:linear-gradient(180deg,
+      transparent 0%, transparent 66%, rgba(0,0,0,.5) 78%, #000 88%);
+    mask-image:linear-gradient(180deg,
+      transparent 0%, transparent 66%, rgba(0,0,0,.5) 78%, #000 88%);}
   .hv2-h1{margin-block:0 14px;}
   .hv2-gap{min-height:12px;}
   .hv2-gap-b{min-height:10px;}
@@ -311,12 +334,15 @@ const CSS = css`
      stacked, so a lead across eight of twelve columns reaches the band's
      right-anchored mass and ink-2 measured 3.76:1 there. The mask turns 90
      degrees and the surface takes the lower third, clear of the sentence. */
-  .hv2{--hv2-surface-o:.6;}
+  .hv2{--hv2-surface-o:.8;}
+  .hv2-surface canvas{top:auto;bottom:-180px;transform:none;}
+  .hv2-gap{flex:.45 1 0;}
+  .hv2-gap-b{flex:1 1 0;}
   .hv2-surface canvas{
     -webkit-mask-image:linear-gradient(180deg,
-      transparent 0%, transparent 50%, rgba(0,0,0,.45) 66%, #000 82%);
+      transparent 0%, transparent 44%, rgba(0,0,0,.55) 54%, #000 64%);
     mask-image:linear-gradient(180deg,
-      transparent 0%, transparent 50%, rgba(0,0,0,.45) 66%, #000 82%);}
+      transparent 0%, transparent 44%, rgba(0,0,0,.55) 54%, #000 64%);}
 }
 
 /* ---- short desktop frames (1280x720, 1366x768) --------------------------- */
@@ -397,7 +423,7 @@ const CSS = css`
 @keyframes hv2Rise{from{transform:translate3d(0,24px,0)}to{transform:none}}
 @keyframes hv2Grow{from{transform:scaleY(0)}to{transform:none}}
 @keyframes hv2CueOut{from{opacity:1}to{opacity:0}}
-@keyframes hv2SurfaceIn{from{opacity:0}to{opacity:var(--hv2-surface-o, .85)}}
+@keyframes hv2SurfaceIn{from{opacity:0}to{opacity:var(--hv2-surface-o, 1)}}
 
 @media (prefers-reduced-motion: no-preference){
   .hv2-facts > *,.hv2-l > span,.hv2-lead,.hv2-cta{
@@ -453,7 +479,7 @@ export default function HeroV2() {
 
       {/* Not inside .hv2-bg: this figure carries the page's data-source and its
           attribution, and aria-hidden furniture is no place for a citation. */}
-      <YieldSurface height={900} fit="band" opacity={0.45} className="hv2-surface" />
+      <YieldSurface height={900} fit="band" opacity={0.6} className="hv2-surface" />
 
       <div className="hv2-fg">
         <div className="hv2-row hv2-facts">
