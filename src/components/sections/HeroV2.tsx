@@ -92,8 +92,7 @@ const CSS = css`
   color:var(--color-ink-2);max-width:34em;text-wrap:pretty;}
 .hv2-cta{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:30px;}
 .hv2-btn{justify-content:center;min-height:50px;padding:12px 26px;border-radius:999px;}
-.hv2-btn.btn-ghost{background:color-mix(in srgb, var(--color-ground) 70%, transparent);
-  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);}
+.hv2-btn.btn-ghost{background:color-mix(in srgb, var(--color-ground) 70%, transparent);}
 
 .hv2-gap{flex:1 1 0;min-height:24px;}
 
@@ -107,7 +106,7 @@ const CSS = css`
 
 /* ---- narrow ---------------------------------------------------------------- */
 @media (max-width:767px){
-  .hv2{--hv2-copy-top:3vh;--hv2-chart-h:54%;--hv2-foot-h:136px;
+  .hv2{--hv2-copy-top:3vh;--hv2-chart-h:60%;--hv2-foot-h:136px;
        margin-top:calc(-1 * var(--nav-h, 56px));min-height:min(100vh, 900px);}
   @supports (height: 100dvh){ .hv2{min-height:min(100dvh, 900px);} }
   .hv2-fg{padding-inline:20px;}

@@ -221,6 +221,16 @@ export default function YieldSurfaceCanvas({
       ctx.fillStyle = `rgba(${colour}, ${alpha})`;
       ctx.fillText(text, x, y);
     };
+    /* Axis labels are queued during the floor pass and drawn last, over the
+       mesh, so no line runs through a numeral. */
+    type Queued = { text: string; x: number; y: number; align: CanvasTextAlign };
+    let queued: Queued[] = [];
+    const queue = (text: string, x: number, y: number, align: CanvasTextAlign) =>
+      queued.push({ text, x, y, align });
+    const flush = () => {
+      for (const q of queued) label(q.text, q.x, q.y, q.align, .66);
+      queued = [];
+    };
 
     const drawChartFloor = (theta: number) => {
       if (!chart) return;
@@ -248,25 +258,29 @@ export default function YieldSurfaceCanvas({
       const c2 = project(rows[0].xs[0], floorY, zOf(0), theta);
       ctx.beginPath(); ctx.moveTo(c0.sx, c0.sy); ctx.lineTo(c1.sx, c1.sy); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(c0.sx, c0.sy); ctx.lineTo(c2.sx, c2.sy); ctx.stroke();
+      /* The yield axis stands on the NEAR-left corner. The far corner
+         already projects near the top of the box under the tilt, so an axis
+         there runs out of the frame and its upper ticks never print. */
       const top = chart.ticks[chart.ticks.length - 1].y + 0.04;
-      const ax0 = project(rows[0].xs[0], floorY, zOf(0), theta);
-      const ax1 = project(rows[0].xs[0], top, zOf(0), theta);
+      const ax0 = project(rows[0].xs[0], floorY, zOf(n - 1), theta);
+      const ax1 = project(rows[0].xs[0], top, zOf(n - 1), theta);
       ctx.beginPath(); ctx.moveTo(ax0.sx, ax0.sy); ctx.lineTo(ax1.sx, ax1.sy); ctx.stroke();
       for (const t of chart.ticks) {
-        const p = project(rows[0].xs[0], t.y, zOf(0), theta);
+        const p = project(rows[0].xs[0], t.y, zOf(n - 1), theta);
         ctx.beginPath(); ctx.moveTo(p.sx - 5, p.sy); ctx.lineTo(p.sx, p.sy); ctx.stroke();
-        label(t.label, p.sx - 9, p.sy, "right", .62);
+        queue(t.label, p.sx - 9, p.sy, "right");
       }
       /* Tenor labels along the front edge, every other one where they crowd. */
+      const every = width < 600 ? 3 : 2;
       for (let k = 0; k < tenors; k++) {
-        if (tenors > 9 && k % 2 === 1 && k !== tenors - 1) continue;
+        if (tenors > 9 && k % every !== 0 && k !== tenors - 1) continue;
         const p = project(rows[0].xs[k], floorY, zOf(n - 1), theta);
-        label(chart.tenorLabels[k], p.sx, p.sy + 14, "center", .62);
+        queue(chart.tenorLabels[k], p.sx, p.sy + 14, "center");
       }
       /* The window's first date at the far-right corner. Today's is in the
          attribution, and at the near corner it fought the 30Y label. */
       const d0 = project(rows[0].xs[tenors - 1], floorY, zOf(0), theta);
-      label(chart.firstDate, d0.sx + 10, d0.sy, "left", .62);
+      queue(chart.firstDate, d0.sx + 10, d0.sy, "left");
     };
 
     const drawSeries = (theta: number) => {
@@ -386,6 +400,7 @@ export default function YieldSurfaceCanvas({
       ctx.stroke();
 
       drawSeriesLine(theta);
+      flush();
     };
 
     const frame = (t: number) => {
