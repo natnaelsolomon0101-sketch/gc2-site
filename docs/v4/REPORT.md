@@ -74,7 +74,7 @@ build ✓ · killist (incl. motion-timing gate, 0 pins) ✓ · regime 506(b) ✓
 - Section-height criteria not met where copy-bound: approach at 393 = 3.75 viewports; strategies at 320 = 2.9; tearsheet prints 6–7 pages, not one. Each needs a copy decision, not a layout one.
 
 ## 11. Open items for Nate
-1. **Copy (counsel, medium):** `docs/v4/COUNSEL.md` "Left for Nate" — "when the return arrives" → "if"; partnership "doors stay open" / "rather sell"; questions "underperform" / "Fewer than the market would let us"; a one-line founding caption on /firm and /diligence.
+1. ~~Copy (counsel, medium)~~ — APPLIED 4 Sep 2026 on Nate's instruction and promoted to production: "if the return arrives"; partnership "structures the firm runs" / "which one we would rather run" / "Why there is nothing to download"; questions "would you expect to do badly in?" / capacity opener; diligence "Direct to eligible investors"; founding caption on /firm and /diligence. Still unchanged (not on counsel's list): "has stayed small" on /firm and /questions.
 2. **gc2.fund DNS** — attach the domain to the Vercel project (or point it) so the 308 in `vercel.json` takes effect; emails stay @gc2.fund (facts).
 3. **MotionSites** — complete the OAuth if you want the three prompts spent on hero/footer/strategies choreography.
 4. **FRED key** — not supplied; VIX / 2s10s skipped.
