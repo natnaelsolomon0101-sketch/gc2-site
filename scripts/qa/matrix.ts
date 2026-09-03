@@ -708,16 +708,46 @@ function browserChecks(opts: {
     else results.push({ id: "single-word-last-line", status: "PASS", reason: "no single-word last lines detected" });
   }
 
-  // 7. Text measure — widest RENDERED LINE of p/li/dd wider than 80ch.
-  // The element's own bounding-box width is not the text measure: a <p> can
-  // be a wide box with short wrapped lines. Measure via Range.getClientRects()
-  // over the element's contents (one rect per visual line) and take the max.
+  // 7. Text measure — widest RENDERED LINE of a text-bearing LEAF block wider
+  // than 80ch. The element's own bounding-box width is not the text measure
+  // (a wide box can hold short wrapped lines), so this uses
+  // Range.getClientRects() over an element's contents (one rect per visual
+  // line) and takes the max — but ONLY for a true leaf: an element whose
+  // children are plain text/inline content, never one whose children are
+  // themselves laid out as block/grid/flex items. A grid row like the ECB
+  // rate rows (<li class="eg-row"><span>pair</span><span>rate</span>
+  // <span>change</span></li>, columns side by side) or a legal-index row
+  // (title left, description right) is not one line of prose — selecting
+  // the whole row's contents and measuring its widest rect conflates
+  // unrelated columns. Candidates are p/dd/dt/li/td/th, plus any span whose
+  // computed display is block (a span styled as a block-level leaf).
   {
     const offenders: string[] = [];
-    const candidates = Array.from(document.querySelectorAll("p, li, dd")).slice(0, 400);
+    const blockDisplays = new Set([
+      "block",
+      "flex",
+      "grid",
+      "inline-block",
+      "inline-flex",
+      "inline-grid",
+      "list-item",
+      "table",
+      "table-row",
+      "table-cell",
+    ]);
+    const rawCandidates = Array.from(document.querySelectorAll("p, dd, dt, li, td, th, span")).slice(0, 800);
     const canvas = document.createElement("canvas");
     const ctx2d = canvas.getContext("2d");
-    for (const el of candidates) {
+    for (const el of rawCandidates) {
+      if (el.tagName === "SPAN" && getComputedStyle(el).display !== "block") continue;
+      let hasBlockChild = false;
+      for (const child of Array.from(el.children)) {
+        if (blockDisplays.has(getComputedStyle(child).display)) {
+          hasBlockChild = true;
+          break;
+        }
+      }
+      if (hasBlockChild) continue; // not a leaf — its block/grid/flex children are measured on their own, if candidates
       const r = el.getBoundingClientRect();
       if (r.width === 0 || r.height === 0) continue;
       const cs = getComputedStyle(el);
@@ -737,7 +767,7 @@ function browserChecks(opts: {
         offenders.push(`${el.tagName.toLowerCase()} "${(el.textContent || "").trim().slice(0, 24)}" widest line ~${chWidth.toFixed(0)}ch`);
     }
     if (offenders.length) results.push({ id: "text-measure", status: "FAIL", reason: offenders.slice(0, 5).join("; ") });
-    else results.push({ id: "text-measure", status: "PASS", reason: "no p/li/dd with a rendered line wider than 80ch" });
+    else results.push({ id: "text-measure", status: "PASS", reason: "no text-bearing leaf block with a rendered line wider than 80ch" });
   }
 
   // 8. Font size floor
