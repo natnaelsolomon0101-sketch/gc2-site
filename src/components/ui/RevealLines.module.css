@@ -1,0 +1,10 @@
+@keyframes uiLineUp {
+  from { transform: translate3d(0, 110%, 0); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+.block { display: block; }
+.mask  { display: block; overflow: hidden; padding-bottom: .06em; margin-bottom: -.06em; }
+.line  { display: block; animation: uiLineUp var(--dur-draw) var(--ease) both; }
+@media (prefers-reduced-motion: reduce) {
+  .line { animation: none; }
+}
