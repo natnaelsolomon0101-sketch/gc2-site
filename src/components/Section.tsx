@@ -1,9 +1,14 @@
 type Surface = "paper" | "stone" | "black";
 
+/* Foundation r3, the light canvas. The three surface names were already the
+   paper vocabulary; they now resolve to the semantic tokens that match them.
+   `black` is the one inverted band a paper page is allowed and carries
+   `.on-ink`, which flips the focus ring to ground (the old `on-black` class it
+   carried was never defined in globals.css and did nothing). */
 const bg: Record<Surface, string> = {
-  paper: "bg-obsidian text-ash",
-  stone: "bg-graphite text-ash",
-  black: "bg-black text-cloud on-black",
+  paper: "bg-ground text-ink-2",
+  stone: "bg-ground-2 text-ink-2",
+  black: "bg-ink text-ground on-ink",
 };
 
 export default function Section({

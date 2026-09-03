@@ -1,25 +1,112 @@
 @import "tailwindcss";
 
 /* ===========================================================================
-   ORIGIN — midnight gallery. Dark canvas, whisper-weight serif, chromatic tiles.
+   THE LIGHT CANVAS (3 Sep 2026).
+
+   The site moves off the dark Origin ground onto paper. Warm off-white ground,
+   warm near-black ink, hairlines, the six chromatic accents rationed on paper.
+   ONE theme. There is no toggle, and the site does not change under
+   prefers-color-scheme — `html { color-scheme: light }` below is the whole
+   mechanism, and there is deliberately no `@media (prefers-color-scheme: dark)`
+   rule anywhere in this file. scripts/qa/matrix.ts diffs the dark-scheme render
+   against the light one and fails on a single changed pixel.
+
+   Warm, not white: BUILD100K.md's audience brief asks for warmth that a serious
+   reader would not be embarrassed by. That is bought here with colour
+   TEMPERATURE — an off-white paper, a warm-black ink, warm greys — never with
+   decoration and never with pink.
+
+   TWO LAYERS, and only one of them is for new code:
+
+     SEMANTIC  (--color-ground / -2, --color-surface, --color-ink / -2 / -3,
+               --color-hairline / -strong, --color-accent-*)
+               This is the layer. Everything written from here on uses it.
+
+     LEGACY    (obsidian, abyss, graphite, steel, silver, fog, ash, cloud,
+               pure, void) — the dark Origin names. DEPRECATED. They are still
+               DEFINED so the ten sections keep compiling while they migrate,
+               and they still hold their dark hexes, so anything still using
+               them paints a dark object on a light page. That is the point:
+               the mixed page is the migration checklist. Do not add a new use.
    ========================================================================= */
 @theme {
+  /* -- semantic: ground ---------------------------------------------------
+     Three steps, each visibly separated (1.10 ground->ground-2, 1.10
+     ground-2->surface, 1.21 ground->surface). The dark build's obsidian->
+     graphite step was 1.13 and was described in DESIGN.md as "close to
+     invisible"; these are measured to clear it and are why the shadows that
+     stood in for it can come off. */
+  --color-ground:         #f7f5f0;  /* page ground: warm off-white paper */
+  --color-ground-2:       #eeeae1;  /* full-bleed band, one step darker: stone */
+  --color-surface:        #e5e0d6;  /* card / table surface, one step darker again */
+
+  /* -- semantic: ink ------------------------------------------------------
+     Measured on ground / ground-2 / surface:
+       ink    17.04 / 15.47 / 14.12
+       ink-2   7.55 /  6.85 /  6.25
+       ink-3   5.61 /  5.09 /  4.65
+     ink-3 clears 4.5:1 on all three grounds, so a 14px date or legal line is
+     legal wherever it lands, not only on the page ground. */
+  --color-ink:            #141311;  /* display type, primary stroke, button fill */
+  --color-ink-2:          #544e45;  /* body and secondary text */
+  --color-ink-3:          #67615a;  /* de-emphasized: dates, legal, inactive rows */
+
+  /* -- semantic: hairlines ------------------------------------------------
+     Ink alpha, not a solid grey, so a rule sitting on ground, ground-2 or
+     surface stays the same relationship to whatever is under it. 13% composites
+     to #d9d8d3 on ground (1.31 vs ground); -strong to #b7b6b2 (1.86) and is
+     the control border, table header rule and link underline. */
+  --color-hairline:        rgba(20, 19, 17, .13);
+  --color-hairline-strong: rgba(20, 19, 17, .28);
+
+  /* -- semantic: the six chromatic accents --------------------------------
+     Same six hexes as the dark build; what changes is that on paper they are
+     FILLS, and the foreground is per-tile and paired here so it cannot drift.
+     Five take warm ink; deep-iris is the one dark accent and takes ground.
+     Measured fill/foreground: iris 5.62 · cyan 7.51 · pale-iris 11.95 ·
+     deep-iris 6.80 · orchid 8.01 · periwinkle 9.11.
+
+     THEY ARE NOT TEXT COLOURS. As type on ground they measure iris 3.03,
+     cyan 2.27, pale-iris 1.43, orchid 2.13, periwinkle 1.87 — all fail 4.5:1,
+     pale-iris and periwinkle catastrophically. deep-iris (6.80 on ground,
+     6.18 on ground-2, 5.64 on surface) is the ONLY one that may be set as
+     text on paper. See DESIGN.md. */
+  --color-accent-iris-gleam:      #847dff;
+  --color-accent-iris-gleam-fg:   var(--color-ink);
+  --color-accent-cyan-signal:     #00b3dd;
+  --color-accent-cyan-signal-fg:  var(--color-ink);
+  --color-accent-pale-iris:       #d1c9ff;
+  --color-accent-pale-iris-fg:    var(--color-ink);
+  --color-accent-deep-iris:       #4b49aa;
+  --color-accent-deep-iris-fg:    var(--color-ground);
+  --color-accent-orchid-bloom:    #dd90d8;
+  --color-accent-orchid-bloom-fg: var(--color-ink);
+  --color-accent-periwinkle:      #90b8f0;
+  --color-accent-periwinkle-fg:   var(--color-ink);
+
+  /* -- legacy accent aliases (the bare names the sections still import) ---- */
   --color-iris-gleam:   #847dff;
   --color-cyan-signal:  #00b3dd;
   --color-pale-iris:    #d1c9ff;
   --color-deep-iris:    #4b49aa;
   --color-orchid-bloom: #dd90d8;
   --color-periwinkle:   #90b8f0;
-  --color-obsidian:     #0f1011;
-  --color-abyss:        #090a0b;
-  --color-graphite:     #1c1d21;
-  --color-steel:        #26272b;
-  --color-silver:       #cacaca;
-  --color-fog:          #7c7d7d;
-  --color-ash:          #9f9fa0;
-  --color-cloud:        #f5f5f7;
-  --color-pure:         #ffffff;
-  --color-void:         #000000;
+
+  /* -- DEPRECATED: the dark Origin ground and ink scale --------------------
+     Kept defined only so the ten sections compile while they migrate to the
+     semantic layer above. Every one of these paints a DARK object on a light
+     page. New code uses --color-ground* / --color-ink* / --color-hairline*.
+     When the last section stops referencing these, delete this block. */
+  --color-obsidian:     #0f1011;   /* deprecated -> --color-ground */
+  --color-abyss:        #090a0b;   /* deprecated -> --color-ground-2 */
+  --color-graphite:     #1c1d21;   /* deprecated -> --color-surface */
+  --color-steel:        #26272b;   /* deprecated -> --color-hairline-strong */
+  --color-silver:       #cacaca;   /* deprecated -> --color-surface */
+  --color-fog:          #7c7d7d;   /* deprecated -> --color-ink-3 */
+  --color-ash:          #9f9fa0;   /* deprecated -> --color-ink-2 */
+  --color-cloud:        #f5f5f7;   /* deprecated -> --color-ink */
+  --color-pure:         #ffffff;   /* deprecated -> --color-ink (or -ground on ink) */
+  --color-void:         #000000;   /* deprecated -> --color-ink */
 
   --font-display: var(--font-dmserif), Georgia, serif;
   --font-ui:      var(--font-inter), ui-sans-serif, system-ui, sans-serif;
@@ -29,7 +116,6 @@
   --radius-card:    16px;
   --radius-tile:    30px;
 }
-
 :root {
   --page-max: 1200px; --nav-h: 72px;
   /* Mirrors src/lib/motion.ts — the TS module is the source of truth for
@@ -51,10 +137,17 @@
 @media (max-height: 500px) and (orientation: landscape) { :root { --nav-h: 48px; } }
 
 @layer base {
-  html { -webkit-text-size-adjust:100%; scroll-behavior:smooth; color-scheme: dark; }
+  /* `color-scheme: light`, declared once and never conditionally. This is the
+     whole of the theme mechanism: one theme, no toggle, and nothing in this
+     file reacts to prefers-color-scheme, so the dark-scheme render is
+     pixel-identical to the light one (scripts/qa/matrix.ts gates that). */
+  html { -webkit-text-size-adjust:100%; scroll-behavior:smooth; color-scheme: light; }
   body {
-    background: var(--color-obsidian);
-    color: var(--color-ash);
+    background: var(--color-ground);
+    /* Ink, not ink-2. On paper the default is the primary voice; the tiers
+       below step DOWN to ink-2 for body and secondary copy. Untiered text
+       reads as ink rather than as an anonymous grey. */
+    color: var(--color-ink);
     font-family: var(--font-ui);
     font-size: 16px; line-height: 1.5; font-weight: 400;
     -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
@@ -66,9 +159,15 @@
        explicitly so it can never inherit auto from here or from a future
        ancestor rule. */
   }
-  ::selection { background: var(--color-pure); color: var(--color-void); }
-  :focus-visible { outline: 2px solid var(--color-pure); outline-offset: 3px; border-radius: 8px; }
-  .on-light :focus-visible { outline-color: var(--color-void); }
+  ::selection { background: var(--color-ink); color: var(--color-ground); }
+  :focus-visible { outline: 2px solid var(--color-ink); outline-offset: 3px; border-radius: 8px; }
+  /* Inside an inverted object (.card-invert, an accent tile dark enough to
+     need it) the ink ring disappears; the ground ring is the inverse. */
+  .on-ink :focus-visible { outline-color: var(--color-ground); }
+  /* DEPRECATED. On the dark canvas .on-light marked a light island that needed
+     a black ring. On paper that is now the default, so this is a no-op kept
+     only so the sections still carrying the class do not regress. */
+  .on-light :focus-visible { outline-color: var(--color-ink); }
 }
 
 @layer components {
@@ -107,11 +206,11 @@
   .t-display    { font-family: var(--font-display); font-weight: 400;
                   font-size: clamp(52px, calc(20.57px + 9.82vw), 96px);
                   line-height: .9; hyphens: manual; text-wrap: balance;
-                  letter-spacing: -0.022em; color: var(--color-pure); }
+                  letter-spacing: -0.022em; color: var(--color-ink); }
   .t-display-sm { font-family: var(--font-display); font-weight: 400;
                   font-size: clamp(40px, calc(11.43px + 8.93vw), 80px);
                   line-height: 1; hyphens: manual; text-wrap: balance;
-                  letter-spacing: -0.02em; color: var(--color-pure); }
+                  letter-spacing: -0.02em; color: var(--color-ink); }
   .t-heading-lg { font-family: var(--font-display); font-weight: 400;
                   font-size: clamp(32px, calc(27.71px + 1.34vw), 38px);
                   line-height: 1; hyphens: manual; text-wrap: balance;
@@ -140,12 +239,12 @@
              line-height: 1.5; font-weight: 300;
              hyphens: manual; }
   /* Body stays 16px on every viewport — §7.1 says so explicitly. */
-  .t-body  { font-size: 16px; line-height: 1.5; color: var(--color-ash); overflow-wrap: anywhere; }
+  .t-body  { font-size: 16px; line-height: 1.5; color: var(--color-ink-2); overflow-wrap: anywhere; }
   /* The footer disclosure runs in uppercase mono; `hyphens: manual` here and
      on .t-mono/.t-mono-xs/.t-caption stops "WEB-SITE", "PURPOS-ES" and
      "SECU-RITY" from breaking on phones now that body no longer sets
      `hyphens: auto` for them to (correctly) inherit. */
-  .t-small { font-size: 14px; line-height: 1.67; color: var(--color-ash); overflow-wrap: anywhere;
+  .t-small { font-size: 14px; line-height: 1.67; color: var(--color-ink-2); overflow-wrap: anywhere;
              hyphens: manual; }
   /* Conductor amendment, first matrix run: §6.3's font floor is 13px and it
      is a hard gate, not a target — DESIGN.md's 12px mono tier and 11px
@@ -154,21 +253,26 @@
      final report. */
   .t-mono  { font-family: var(--font-mono); font-size: 13px; line-height: 2;
              text-transform: uppercase; letter-spacing: .182em; font-weight: 500;
-             color: var(--color-ash); hyphens: manual; }
+             color: var(--color-ink-2); hyphens: manual; }
   .t-mono-xs { font-family: var(--font-mono); font-size: 13px; line-height: 2;
                text-transform: uppercase; letter-spacing: .182em; font-weight: 500;
-               color: var(--color-ash); hyphens: manual; }
+               color: var(--color-ink-2); hyphens: manual; }
 
-  /* white-on-black is the only primary action */
+  /* THE one black button: ink fill, ground text, 17.04:1. It is the only
+     primary action on the site, and on paper it is the single heaviest object
+     on the page, which is what makes it read as the one thing to press.
+     Hover and active step the fill UP the ink scale rather than down, so the
+     press reads as the button lightening under the finger; ground-on-ink-2 is
+     7.55 and ground-on-ink-3 is 5.61, both still past 4.5. */
   .btn { display:inline-flex; align-items:center; gap:10px; border-radius: 8px;
          padding: 12px 18px; font-size: 16px; font-weight: 400;
-         background: var(--color-pure); color: var(--color-void);
+         background: var(--color-ink); color: var(--color-ground);
          transition: background var(--dur-fast) var(--ease), opacity var(--dur-fast) var(--ease); }
-  .btn-ghost { background: transparent; color: var(--color-pure);
-               border: 1px solid var(--color-pure); }
+  .btn-ghost { background: transparent; color: var(--color-ink);
+               border: 1px solid var(--color-ink); }
 
-  .nav-glass { min-height: 44px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.28);
-               border-radius: 8px; padding: 9px 12px; font-size: 15px; color: var(--color-pure);
+  .nav-glass { min-height: 44px; background: rgba(20,19,17,.05); border: 1px solid var(--color-hairline-strong);
+               border-radius: 8px; padding: 9px 12px; font-size: 15px; color: var(--color-ink);
                transition: background var(--dur-fast) var(--ease); }
 
   /* §7 rule 5: hover is opt-in for devices that actually have it. Touch
@@ -176,17 +280,17 @@
      discoverable only by hover, so this only changes which input method
      gets which feedback, not what is reachable. */
   @media (hover: hover) and (pointer: fine) {
-    .btn:hover { background: var(--color-cloud); }
-    .btn-ghost:hover { background: rgba(255,255,255,.08); }
-    .nav-glass:hover { background: rgba(255,255,255,.2); }
+    .btn:hover { background: var(--color-ink-2); }
+    .btn-ghost:hover { background: rgba(20,19,17,.06); }
+    .nav-glass:hover { background: rgba(20,19,17,.09); }
   }
-  .btn:active { background: var(--color-silver); }
-  .btn-ghost:active { background: rgba(255,255,255,.14); }
-  .nav-glass:active { background: rgba(255,255,255,.28); }
+  .btn:active { background: var(--color-ink-3); }
+  .btn-ghost:active { background: rgba(20,19,17,.10); }
+  .nav-glass:active { background: rgba(20,19,17,.13); }
 
   .chip { display:inline-flex; align-items:center; border-radius: 9999px;
-          background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.15);
-          padding: 8px 20px; }
+          background: rgba(20,19,17,.05); border: 1px solid var(--color-hairline);
+          padding: 8px 20px; color: var(--color-ink); }
 
   .tile      { border-radius: 30px; padding: 32px; }
 
@@ -213,26 +317,26 @@
   .t-h1   { font-family: var(--font-display); font-weight:400;
             font-size: clamp(44px, calc(18.34px + 8.02vw), 80px);
             line-height: 1; hyphens: manual; text-wrap: balance;
-            letter-spacing:-0.02em; color: var(--color-pure); }
+            letter-spacing:-0.02em; color: var(--color-ink); }
   .t-h2   { font-family: var(--font-display); font-weight:400;
             font-size: clamp(32px, calc(27.72px + 1.34vw), 38px);
             line-height: 1.05; hyphens: manual; text-wrap: balance;
-            letter-spacing:-0.018em; color: var(--color-pure); }
+            letter-spacing:-0.018em; color: var(--color-ink); }
   .t-h3   { font-family: var(--font-display); font-weight:400;
             font-size: clamp(24px, calc(21.15px + .89vw), 28px);
             line-height: 1.2; hyphens: manual; text-wrap: balance;
-            color: var(--color-cloud); }
+            color: var(--color-ink); }
   @media (min-width: 1920px) {
     .t-h1 { font-size: clamp(80px, calc(59.79px + 1.05vw), 96px); }
     .t-h2 { font-size: clamp(38px, calc(30.42px + .39vw), 44px); }
   }
   .t-lead    { font-size: clamp(15px, calc(11.57px + 1.07vw), 18px);
                line-height: 1.5;
-               font-weight:300; color: var(--color-ash); overflow-wrap: anywhere;
+               font-weight:300; color: var(--color-ink-2); overflow-wrap: anywhere;
                hyphens: manual; }
   /* Same §6.3 floor as .t-mono/.t-mono-xs above: 12px -> 13px. */
   .t-caption { font-size:13px; line-height:2; font-family: var(--font-mono);
-               text-transform:uppercase; letter-spacing:.182em; color: var(--color-ash);
+               text-transform:uppercase; letter-spacing:.182em; color: var(--color-ink-2);
                hyphens: manual; }
   /* Foundation r1, deliverable 3: phone variant. 17px/1.65 below 768,
      18px/1.7 at and above 768 — a clamp ramping over that same range rather
@@ -240,10 +344,13 @@
      every viewport; logged in DESIGN.md's type table and Known drift. */
   .t-prose   { font-size: clamp(17px, calc(16.29px + .22vw), 18px);
                line-height: clamp(1.65, calc(1.61429 + .01116vw), 1.7);
-               color: var(--color-ash); overflow-wrap: anywhere; hyphens: auto; }
-  .rule-t { border-top:1px solid rgba(255,255,255,.12); }
-  .rule-b { border-bottom:1px solid rgba(255,255,255,.12); }
-  .rule-t-black { border-top:1px solid rgba(255,255,255,.12); }
+               color: var(--color-ink-2); overflow-wrap: anywhere; hyphens: auto; }
+  /* One hairline, one token. .rule-t-black was the dark build's second name for
+     the same 12% white rule and is kept as an alias for the sections still
+     using it; it is deprecated and resolves to --color-hairline like the rest. */
+  .rule-t { border-top:1px solid var(--color-hairline); }
+  .rule-b { border-bottom:1px solid var(--color-hairline); }
+  .rule-t-black { border-top:1px solid var(--color-hairline); }
   .measure-body{max-width:34em;} .measure-lead{max-width:30em;} .measure-prose{max-width:680px;}
   .measure-hero{max-width:11em;} .measure-head{max-width:16em;} .measure-head-sm{max-width:14em;}
   /* min(60em, 80ch): 60em alone rendered ~93ch on the legal pages, past the
@@ -260,7 +367,7 @@
   .t-article-title{font-family:var(--font-display);font-weight:400;
                    font-size:clamp(40px, calc(28.57px + 3.57vw), 56px);
                    line-height:1.05; hyphens: manual; text-wrap: balance;
-                   letter-spacing:-0.02em;color:var(--color-pure);}
+                   letter-spacing:-0.02em;color:var(--color-ink);}
   /* Conductor amendment, first matrix run: safe-area-bottom warned on every
      iPhone descriptor because nothing referenced env(safe-area-inset-*) at
      all. .nav-frame is the sticky nav's own token — height grows by the top
@@ -290,13 +397,23 @@
   @supports (height: 100dvh) {
     .hero-frame{min-height:min(calc(100dvh - var(--nav-h)),900px);}
   }
-  .link{color:var(--color-pure);border-bottom:1px solid rgba(255,255,255,.35);transition:border-color var(--dur-fast) var(--ease);}
+  .link{color:var(--color-ink);border-bottom:1px solid var(--color-hairline-strong);transition:border-color var(--dur-fast) var(--ease);}
   @media (hover: hover) and (pointer: fine) {
-    .link:hover{border-color:var(--color-pure);}
+    .link:hover{border-color:var(--color-ink);}
   }
-  .link:active{border-color:var(--color-pure);}
-  .card-dark { background: var(--color-graphite); border-radius: 16px; }
-  .card-lite { background: var(--color-silver); color: var(--color-void); border-radius: 30px; padding: 32px; }
+  .link:active{border-color:var(--color-ink);}
+  /* Two cards, and they are opposites. .card-surface is the ordinary one: the
+     third ground step, no border, no shadow -- the 1.21 step off ground does
+     the work the shadows were standing in for. .card-invert is the single
+     inverted object a paper page is allowed, the same role the light tile
+     played on the dark canvas; ground on ink is 17.04, and anything inside it
+     carries .on-ink so the focus ring flips too.
+     .card-dark / .card-lite are the dark build's names for the same two roles,
+     kept as aliases while the sections migrate. DEPRECATED. */
+  .card-surface, .card-dark { background: var(--color-surface); color: var(--color-ink);
+                              border-radius: 16px; }
+  .card-invert, .card-lite  { background: var(--color-ink); color: var(--color-ground);
+                              border-radius: 30px; padding: 32px; }
 }
 
 /* Atmospheric reveal. Opacity and transform are split deliberately: the h1 is
@@ -341,32 +458,48 @@
 }
 
 /* ===========================================================================
-   PRINT — the site is dark, paper is not.
+   PRINT — the canvas is already paper, so this block is much smaller.
 
-   Allocators print /diligence, /governance, /questions and /tearsheet. Before
-   this block the site had no global print styles at all, and it failed in both
-   printer modes at once. With background graphics ON, `body` printed a near
-   black ground (#0f1011) across the full page. With them OFF — the default —
-   171 elements printed white ink on white paper: every .t-h1, .t-h2, the GC2
-   wordmark, every text-pure and text-cloud. Each heading on the site vanished.
+   Before the light canvas this block did two jobs: it INVERTED a dark site
+   (ground to white, every light ink value remapped to black) and it released
+   the things a screen hides. The first job is gone. `.t-h1` is ink, `.t-body`
+   is ink-2, a rule is 13% ink — all of that prints correctly with no override,
+   in both printer modes, because the screen design and the paper design are
+   now the same design. What is left is the second job, plus two things paper
+   still needs that a screen does not.
 
-   /questions was the worst case and the most likely page to be printed: its
-   own print rules flipped the INK to black and left the ground dark, so all 25
-   questions and 51 answer paragraphs printed black on #0f1011 — 1.10:1. A page
-   built to be read before a first conversation printed as a solid black
-   rectangle. This inverts ground and ink together rather than one of them.
+   MEASURED IN BOTH PRINTER MODES, which is why the small amount that remains
+   is here at all (scripts/qa/print.ts, checks P1-P6):
+
+     PAINTED — the reader ticked "Background graphics". A full-sheet warm tint
+               is not paper and it drains a cartridge for nothing, so html/body
+               go to true white. Painted accent tiles keep their fill and their
+               ink foreground, which is legible either way.
+     PAPER   — the default. Chromium drops background colours, so an inverted
+               object loses its ground and its ground-coloured text would print
+               white on white. .card-invert / .on-ink are flipped back to ink
+               below; that is the one colour override the light canvas needs.
+
+   BRIDGE, delete when the sections have migrated: the ten sections still carry
+   hard-coded dark utilities (.text-pure, .text-cloud, .text-silver on
+   /tearsheet, .text-fog on /questions and /tearsheet). Those are white and
+   near-white ink values and they print invisibly on paper. They are remapped
+   below, and that rule comes out with the last of them.
+
+   OWNERSHIP: docs/v4/OWNERSHIP.md gives this block to sec-legal. This rewrite
+   was made by foundation under an explicit round-3 instruction from the
+   Conductor, because the block existed only to undo a dark canvas that no
+   longer exists. sec-legal owns it again from here.
    ======================================================================== */
 @media print {
-  :root { color-scheme: light; }
-
   html, body {
     background: #ffffff !important;
-    color: #000000 !important;
+    color: var(--color-ink) !important;
   }
 
-  /* Every painted ground goes to paper white. Backgrounds are set with tokens
-     and with white/N alpha utilities all over the site, so this is deliberately
-     broad: on paper there is no ground, only ink. */
+  /* On paper there is no ground, only ink. Backgrounds are painted with
+     tokens and with alpha utilities all over the site, so this stays
+     deliberately broad. */
   *, *::before, *::after {
     background-image: none !important;
     box-shadow: none !important;
@@ -377,26 +510,48 @@
     background-color: transparent !important;
   }
 
-  /* Ink. The dark palette's light values are all invisible on white, so every
-     one of them is remapped rather than left to chance. */
-  h1, h2, h3, h4, h5, h6,
-  .t-display, .t-display-sm, .t-heading-lg, .t-heading-sm,
-  .t-h1, .t-h2, .t-h3, .t-article-title, .t-wordmark,
-  .text-pure, .text-cloud, .text-silver,
-  blockquote, summary {
-    color: #000000 !important;
+  /* The one colour override the light canvas needs: an inverted object has
+     lost its ink ground (see PAPER above), so its ground-coloured text has to
+     become ink or it prints white on white. deep-iris is the only accent whose
+     foreground is ground rather than ink, so it flips here too. */
+  .btn, .btn *,
+  .card-invert, .card-lite, .on-ink,
+  .card-invert *, .card-lite *, .on-ink *,
+  [class*="accent-deep-iris-fg"], .text-ground {
+    color: var(--color-ink) !important;
   }
-  p, li, dd, dt, td, th, span, a,
-  .t-body, .t-small, .t-sub, .t-lead, .t-prose, .t-caption,
-  .text-ash, .text-fog {
-    color: #1a1a1a !important;
+  /* .btn keeps its shape without its fill, so a call to action still reads as
+     a control on paper rather than as a stray line of body copy. */
+  .btn, .btn-ghost, .chip, .nav-glass {
+    background: transparent !important;
+    border: 1px solid var(--color-hairline-strong) !important;
   }
-  .t-mono, .t-mono-xs { color: #444444 !important; }
 
-  /* Hairlines were white at 10-12% alpha. On paper that is nothing. */
-  [class*="border-white"], .rule-t, .rule-b,
+  /* BRIDGE — white and near-white ink that unmigrated sections still set for
+     themselves. Each line names the files it is holding up; delete the line
+     when its last owner has moved to the semantic tokens, and delete the whole
+     block when they all have. Verified against scripts/qa/print.ts, which
+     fails any of these at 1.00:1 on paper the moment the rule comes out early.
+
+       .text-pure/.text-cloud/.text-silver, .text-ash/.text-fog
+         — the Tailwind utilities, spread across ~40 files; /tearsheet and
+           /questions are the two print routes that carry them.
+       summary
+         — src/app/questions/page.tsx paints `.qa details[open] > summary`
+           pure white at a higher specificity than its own print override.
+       footer a
+         — src/components/Footer.tsx paints `.gc2-ftr-mark` pure white. Footer
+           NAV is hidden on paper; the wordmark is not. */
+  .text-pure, .text-cloud, .text-silver, summary, footer a {
+    color: var(--color-ink) !important;
+  }
+  .text-ash, .text-fog { color: var(--color-ink-2) !important; }
+
+  /* A 13% hairline is right on a lit screen and thin on a laser printer.
+     Rules print at the strong weight so a table keeps its structure. */
+  [class*="border-white"], [class*="border-hairline"], .rule-t, .rule-b, .rule-t-black,
   table, thead, tbody, tr, td, th {
-    border-color: #cccccc !important;
+    border-color: var(--color-hairline-strong) !important;
   }
 
   /* A cross-reference has to stay distinguishable from body copy once colour
@@ -421,14 +576,14 @@
   details { display: block !important; }
   details > *:not(summary) { display: revert !important; }
   details:not([open]) > *:not(summary) { display: revert !important; }
-  /* These three rules named nothing that ships. `[style*="opacity"]` is an
-     attribute match on the inline style STRING, and the strategy tiles set
+  /* These gates are named explicitly. `[style*="opacity"]` is an attribute
+     match on the inline style STRING, and the strategy tiles set
      background/color/transform/zIndex inline but keep opacity in a stylesheet,
      so five of six printed as blank coloured slivers with the fan transform
      still applied. `[class*="sticky"]` matched only four dead components; the
      two elements that are actually sticky are .stx-panel and .sn-header, whose
      class names contain neither word — so a pinned 240vh track printed about
-     two and a half blank sheets. The gates are named explicitly now. */
+     two and a half blank sheets. */
   [style*="opacity"], .fade-in, .stx-tile, .stx-tile * {
     opacity: 1 !important;
     transform: none !important;
