@@ -2,48 +2,71 @@ import Link from "next/link";
 import { strategies } from "@/content/strategies";
 import FactsRow from "@/components/FactsRow";
 import Statement from "@/components/Statement";
+import Glass from "@/components/ui/Glass";
+import Tilt from "@/components/ui/Tilt";
+import { css } from "@/lib/css";
 
 /* ===========================================================================
-   FEATURE — the risk-framework poster.
+   FEATURE — the thesis frame.
 
-   The section that carries ONE idea: six strategies, one risk framework,
-   because correlated risk does not respect a mandate boundary. Round-0
-   rebuild (Conductor decision, docs/v4/APPENDIX-A.md, EVERY-SCREEN.md
-   §5.3): the section is a full-bleed band. The sentence sets at
-   .t-display-sm — the same scale the site uses everywhere it wants a
-   sentence to carry a section — left-aligned, capped to roughly nine of
-   twelve columns from 1024px so it reads as a headline, not a paragraph.
-   Below it, the firm's own registration data (FactsRow) and the reason the
-   framework exists.
+   TRANSFORM.md's "every section is a frame" (rule 1) applied to the risk
+   framework: a full frame (min-height 80vh from 768px up, natural height on
+   phones — a frame, not a fixed viewport lock, since the content here is
+   longer than a hero's), an iris-haze ground under the hero's own grain
+   (rule 3), one giant Statement across the frame with its one operative word
+   italic in deep iris (rule 2/7, via Statement's new `lines` prop), and the
+   section's two content blocks re-cast as floating <Glass> panes wrapped in
+   <Tilt> (rule 4) rather than plain text blocks — one carries the eyebrow +
+   headline ("Correlated risk does not respect a mandate boundary."), the
+   other the lede and the "how risk is governed" link. Both are the same
+   words Feature has always carried; nothing here is new copy.
 
-   "Risk is not the price of return..." is no longer a second colour card:
-   it is a Statement (src/components/Statement.tsx), the one object the
-   site uses to emphasize a sentence, importable by any other section that
-   needs a pull quote.
+   WHY A FRAME AND NOT A FIXED BAND. The hero locks to ~100vh because it is
+   one screenful by definition. This section carries a statement, two cards
+   and a facts caption — more copy than a hero, so 80vh is a floor the
+   content is free to exceed (`min-height`, not `height`), and phones drop
+   the floor entirely rather than compressing three stacked objects into 80
+   of a short viewport's vh.
 
-   COLOUR is rationed to one chromatic accent — the "Risk framework" eyebrow
-   label, set in `deep-iris` (the one accent that passes as text on paper,
-   6.8:1 on ground — DESIGN.md's chromatic-tiles table) — per DESIGN.md
-   principle 2. No gradient card, no box-shadow: the pre-round-0 version
-   carried both (a three-stop orchid/pale-iris/periwinkle gradient slab and
-   a pulsing box-shadow on the strand-drawing's junction dot) as DESIGN.md's
-   "Known drift" records; both are gone rather than fixed in place, because
-   the two-slab mosaic and six-hue strand drawing they lived on are gone too
-   — a poster does not carry a decorative field AND a chromatic drawing AND
-   a headline and still read as "one idea, slow."
+   THE GROUND. `.ft-wash` is the same pale-iris-at-.34-alpha radial gradient
+   TRANSFORM.md rule 3 specifies, centred behind the statement rather than
+   low on the frame the way the hero's wash sits behind its chart; `.ft-grain`
+   is the hero's own GRAIN data-URI, copied per the same rule ("the grain
+   (copy the hero's GRAIN data-URI)") — HeroV2.tsx does not export it, so it
+   is reproduced verbatim here rather than imported across an ownership
+   boundary sec-hero owns.
 
-   LIGHT PASS (3 Sep 2026): the band is `ground-2` — DESIGN.md's "one step
-   darker: stone" — bounded by a hairline top and bottom (`.rule-t`/
-   `.rule-b`) rather than a colour-value inversion; that is the whole depth
-   mechanism now (ground → ground-2 → surface, all measured ≥1.10, DESIGN.md
-   "Measured — the ground steps"). Facts values are `ink`, labels `ink-3`;
-   the Statement quote below sits on plain `ground`, not the band's stone,
-   so the two read as two objects, not one flat field.
+   THE STATEMENT. Unchanged string, unchanged attribution. The only change is
+   *how* it renders: `lines` splits it at its one sentence break and marks
+   "price" — the counterintuitive word the sentence turns on — italic in deep
+   iris, via Statement's RevealLines path. `transparent` keeps it off its own
+   paper field so the frame's iris ground shows through; `compact` because it
+   now shares the frame with the two cards and the foot caption rather than
+   owning a full section-band's worth of air by itself.
 
-   TABLET (768-1024) gets its own two-column composition: the headline runs
-   full-width (it's already near .t-display-sm's 80px ceiling by 768px), and
-   the reason-and-link sits beside the facts row underneath it — a real
-   two-column row the phone stack never has.
+   THE CARDS. `<Glass>` (no shadow, DESIGN.md principle 4) inside `<Tilt>`
+   (pointer lean + spotlight, off on touch and reduced motion). Beside each
+   other from 768px, stacked on phone — "beside/below the statement".
+
+   THE FOOT. FactsRow, now itself a `.t-caption` line (its own file, same
+   change already recorded there) — the frame's standing facts in the foot,
+   the way the hero's own foot caption carries its standing facts.
+
+   MOTION. Fade-rise on load in four stagger tiers (eyebrow / statement /
+   cards / foot — `.fade-in .fade-N`, the same utility every section uses,
+   itself a no-op under reduced motion sitewide). The two cards carry
+   `.fade-in` on a wrapper *around* `<Tilt>`, never on the element Tilt
+   itself writes its pointer-lean transform to — see the inline comment at
+   the call site. RevealLines drives the Statement's own line-by-line rise.
+   Scroll parallax is additive only, on the decorative ground layer alone,
+   and only inside `@supports (animation-timeline: scroll())` gated by
+   `prefers-reduced-motion: no-preference` — the same double gate HeroV2
+   uses for its own parallax.
+
+   COLOUR is still rationed to the one chromatic accent this section has
+   always used: deep iris, now on two things instead of one — the "Risk
+   framework" eyebrow label and the Statement's italic word — plus the pale
+   iris wash as ground per rule 3. No new colour, no shadows on the cards.
 
    SOURCES — nothing on this section is invented
      "risk framework" / strategy count   strategies.length, content/strategies.ts
@@ -52,54 +75,94 @@ import Statement from "@/components/Statement";
      Formed / Domicile / Structure / Mandate  src/config/site.ts, via FactsRow
      The quote                            firm copy, Investment Committee
 
-   Server component. No client JS, no dependencies, no imagery.
+   Server component. No client JS of its own — Tilt is the only client leaf,
+   already built and owned elsewhere.
    ========================================================================= */
 
 const COUNT = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven"];
 
-const css = `
-.ft { position: relative; background: var(--color-ground-2); }
+/* The hero's own grain, reproduced verbatim (HeroV2.tsx GRAIN, not exported;
+   TRANSFORM.md rule 3 says to copy it, not share a module across the
+   sec-hero / sec-framework ownership boundary). */
+const GRAIN =
+  "<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'>" +
+  "<filter id='g' x='0' y='0' width='100%' height='100%'>" +
+  "<feTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='3' stitchTiles='stitch' result='t'/>" +
+  "<feColorMatrix in='t' type='matrix' values='0 0 0 0 .078 0 0 0 0 .075 0 0 0 0 .067 .42 .42 .42 0 -.60'/>" +
+  "</filter><rect width='140' height='140' filter='url(#g)'/></svg>";
+const GRAIN_URL = `url("data:image/svg+xml,${encodeURIComponent(GRAIN)}")`;
 
-.ft-inner { padding-block: 84px; }
-@media (min-width: 768px) { .ft-inner { padding-block: 120px; } }
-
-/* .t-display-sm now ships hyphens: manual + text-wrap: balance itself
-   (foundation, v4/every-screen) — no local override needed here any more. */
-.ft-head { margin-top: 20px; }
-@media (min-width: 1024px) { .ft-head { max-width: 75%; } }
-/* Phone floor: the fluid .t-display-sm ramp reads as ~40px+ from 320px up,
-   which wraps this sentence to four lines with hyphenation forced off. The
-   section's own done-criteria caps the poster at three lines on phone
-   (.claude/agents/sec-framework.md), so the headline steps down one anchor
-   at the phone breakpoint rather than growing past what three lines hold. */
-@media (max-width: 767px) { .ft-head { font-size: 29px; line-height: 1.08; } }
-
-.ft-lede { max-width: 30em; margin-top: 20px; }
-
-.ft-link { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; margin-top: 24px; }
-.ft-link svg { transition: transform var(--dur-fast) var(--ease); }
-@media (hover: hover) and (pointer: fine) {
-  .ft-link:hover svg { transform: translateX(3px); }
+const CSS = css`
+.ft{
+  position:relative; isolation:isolate; overflow:hidden;
+  background:var(--color-ground);
+  display:flex; flex-direction:column;
+}
+@media (min-width:768px){
+  .ft{min-height:80vh; justify-content:center;}
+}
+@supports (min-height: 80dvh){
+  @media (min-width:768px){ .ft{min-height:80dvh;} }
 }
 
-.ft-facts { margin-top: 48px; }
-@media (min-width: 768px) { .ft-facts { margin-top: 56px; } }
+/* ---- ground: iris haze + the hero's grain -------------------------------- */
+.ft-bg{position:absolute;inset:0;pointer-events:none;contain:layout paint style;}
+.ft-wash{position:absolute;inset:0;
+  background:radial-gradient(64% 56% at 50% 34%,
+    rgba(209,201,255,.34) 0%, rgba(209,201,255,.14) 45%, rgba(247,245,240,0) 78%);}
+.ft-grain{position:absolute;inset:0;background-image:${GRAIN_URL};
+  background-size:140px 140px;opacity:.26;}
 
-/* §7 rule 7: tablets are not big phones. The headline stays full-width (the
-   fluid .t-display-sm ramp is already near its 80px ceiling by 768px, and
-   squeezing it into a fractional column wrapped it to five-plus lines); the
-   reason-and-link and the facts row split into a genuine two-column row
-   underneath, which the phone stack never does. */
-@media (min-width: 768px) and (max-width: 1023px) {
-  .ft-inner {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    column-gap: 40px;
+/* ---- copy ----------------------------------------------------------------- */
+/* .ft is a column flexbox (for the vertical-centering justify-content below).
+   .ft-inner is a flex item that also carries .wrap's margin-inline:auto —
+   an auto margin on a flex item's cross axis (width, here) suppresses the
+   default align-items:stretch per spec, so without an explicit width the
+   item shrinks to its content's min-content width instead of filling the
+   row, which cascades into every child (the blockquote among them)
+   computing a 0px width. HeroV2's own .hv2-fg carries the same
+   width:100% alongside margin-inline:auto for the same reason. */
+.ft-inner{position:relative;z-index:1;width:100%;padding-block:64px;}
+@media (min-width:768px){ .ft-inner{padding-block:96px;} }
+
+.ft-eyebrow{margin:0;}
+
+.ft-statement{margin-top:20px;}
+@media (min-width:768px){ .ft-statement{margin-top:28px;} }
+
+.ft-cards{display:grid;grid-template-columns:1fr;gap:20px;margin-top:40px;}
+@media (min-width:768px){
+  .ft-cards{grid-template-columns:1fr 1fr;gap:24px;margin-top:48px;}
+}
+
+.ft-card-wrap{display:block;}
+.ft-card{display:block;}
+.ft-card-pane{padding:28px;height:100%;}
+@media (min-width:768px){ .ft-card-pane{padding:32px;} }
+
+.ft-card-head{margin:0;}
+.ft-card-lede{margin:0;max-width:34em;}
+
+.ft-link{display:inline-flex;align-items:center;gap:10px;min-height:44px;margin-top:20px;}
+.ft-link svg{transition:transform var(--dur-fast) var(--ease);}
+@media (hover:hover) and (pointer:fine){
+  .ft-link:hover svg{transform:translateX(3px);}
+}
+
+.ft-foot{margin-top:40px;}
+@media (min-width:768px){ .ft-foot{margin-top:56px;} }
+
+/* ---- motion: scroll parallax, ground only ---------------------------------- */
+@keyframes ftPar{from{transform:translate3d(0,-3%,0)}to{transform:translate3d(0,3%,0)}}
+@supports (animation-timeline: scroll()){
+  @media (prefers-reduced-motion: no-preference){
+    .ft-bg{animation:ftPar linear both;animation-timeline:view();animation-range:cover;}
   }
-  .ft-head-block { grid-column: 1 / -1; }
-  .ft-head { max-width: 62%; }
-  .ft-lede-block { grid-column: 1; }
-  .ft-facts { grid-column: 2; margin-top: 0; align-self: start; }
+}
+
+@media print{
+  .ft-bg{display:none !important;}
+  .ft{min-height:0 !important;}
 }
 `;
 
@@ -107,50 +170,81 @@ export default function Feature() {
   const count = COUNT[strategies.length] ?? String(strategies.length);
 
   return (
-    <section id="framework" className="ft rule-t rule-b" aria-labelledby="feature-title">
-      <style dangerouslySetInnerHTML={{ __html: css }} />
+    <section id="framework" className="ft" aria-labelledby="feature-title">
+      <style>{CSS}</style>
+
+      <div className="ft-bg" aria-hidden="true">
+        <div className="ft-wash" />
+        <div className="ft-grain" />
+      </div>
 
       <div className="wrap ft-inner">
-        <div className="ft-head-block">
-          <p className="t-mono-xs text-deep-iris">Risk framework</p>
+        <p className="t-mono-xs text-deep-iris ft-eyebrow fade-in fade-1">Risk framework</p>
 
-          <h2 id="feature-title" className="t-display-sm ft-head">
-            Correlated risk does not respect a mandate boundary.
-          </h2>
+        <div className="ft-statement fade-in fade-2">
+          <Statement
+            transparent
+            compact
+            attribution="Investment Committee"
+            lines={[
+              <>
+                Risk is not the <em>price</em> of return.
+              </>,
+              "It is what we manage so that we are still here if the return arrives.",
+            ]}
+          />
         </div>
 
-        <div className="ft-lede-block">
-          <p className="ft-lede t-body">
-            So the limits are set once, firm-wide, and all {count.toLowerCase()} strategies
-            run inside them. One framework, not six.
-          </p>
+        <div className="ft-cards">
+          {/* fade-in lives on this wrapper, not on <Tilt> itself: Tilt writes
+              its own inline `transform` (perspective + rotateX/Y from the
+              pointer position) on this element, and a CSS animation on
+              `transform` on that SAME node would win the cascade for the
+              length of the animation and then, with fill-mode both, pin the
+              element's rendered transform to the keyframe's end value
+              (`none`) — permanently overriding Tilt's inline style once the
+              load reveal finished. One node per job. */}
+          <div className="ft-card-wrap fade-in fade-4">
+            <Tilt as="article" className="ft-card">
+              <Glass className="ft-card-pane" radius={24}>
+                <h2 id="feature-title" className="t-heading-lg ft-card-head">
+                  Correlated risk does not respect a mandate boundary.
+                </h2>
+              </Glass>
+            </Tilt>
+          </div>
 
-          <Link href="/firm" className="link ft-link">
-            How risk is governed
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 16 16"
-              width="14"
-              height="14"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.25"
-              strokeLinecap="square"
-            >
-              <path d="M2 8h11M9 4l4 4-4 4" />
-            </svg>
-          </Link>
+          <div className="ft-card-wrap fade-in fade-5">
+            <Tilt as="article" className="ft-card">
+              <Glass className="ft-card-pane" radius={24}>
+                <p className="t-body ft-card-lede">
+                  So the limits are set once, firm-wide, and all {count.toLowerCase()} strategies
+                  run inside them. One framework, not six.
+                </p>
+                <Link href="/firm" className="link ft-link">
+                  How risk is governed
+                  <svg
+                    aria-hidden="true"
+                    viewBox="0 0 16 16"
+                    width="14"
+                    height="14"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.25"
+                    strokeLinecap="square"
+                  >
+                    <path d="M2 8h11M9 4l4 4-4 4" />
+                  </svg>
+                </Link>
+              </Glass>
+            </Tilt>
+          </div>
         </div>
 
-        <div className="ft-facts">
+        <div className="ft-foot fade-in fade-7">
           <FactsRow />
         </div>
       </div>
-
-      <Statement attribution="Investment Committee">
-        Risk is not the price of return. It is what we manage so that we are still
-        here if the return arrives.
-      </Statement>
     </section>
   );
 }

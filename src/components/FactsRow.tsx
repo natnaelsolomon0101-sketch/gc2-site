@@ -1,15 +1,17 @@
 import { site } from "@/config/site";
 
 /* ===========================================================================
-   FACTS ROW — the firm's own registration data, four cells, sourced from
-   src/config/site.ts only. A 2x2 grid with a hairline cross below 1024px
-   (verified at the 320 floor and 375), one row of four above it. Labels are
-   short by design so they never wrap; values set in the display face.
+   FACTS ROW — the firm's own registration data, sourced from src/config/
+   site.ts only, set as one foot caption line: TRANSFORM.md rule 6, "a
+   section's standing facts / source / date go in one .t-caption line at its
+   foot, the way a plate carries its caption" — the same pattern HeroV2's
+   `.hv2-foot` already uses for city / structure / mandate. Round-1 shipped
+   this as a 2x2/4x1 bordered grid; the thesis-frame rebuild moves it to the
+   caption line so the frame's foot reads like the hero's, not like a table.
 
-   Light pass: hairlines read var(--color-hairline) (ink at 13% — the same
-   composited relationship on ground, ground-2 or surface, so this grid
-   looks the same whichever ground it lands on). Values are ink, labels
-   ink-3 — the de-emphasized tier, legal on every ground per DESIGN.md.
+   One row, wraps on narrow rather than reflowing into a grid: label then
+   value, ink-3 label / ink value, the same contrast pairing DESIGN.md sets
+   for "de-emphasized: dates, legal, inactive rows" against every ground.
    ========================================================================= */
 
 export type Fact = { label: string; value: string };
@@ -22,52 +24,32 @@ const defaultFacts: Fact[] = [
 ];
 
 const css = `
-.facts-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0,1fr));
-  border-top: 1px solid var(--color-hairline);
-}
-.facts-cell {
-  padding: 20px 20px 20px 0;
-  border-bottom: 1px solid var(--color-hairline);
-}
-.facts-cell:nth-child(2n) {
-  border-left: 1px solid var(--color-hairline);
-  padding-left: 20px;
-  padding-right: 0;
-}
-.facts-cell:nth-last-child(-n+2) { border-bottom: none; }
-.facts-label { white-space: nowrap; }
-.facts-value {
-  font-family: var(--font-display); font-weight: 400;
-  font-size: clamp(22px, 6vw, 28px); line-height: 1.15; letter-spacing: -.01em;
-  margin-top: 6px; color: var(--color-ink);
-  /* Values wrap between words, never mid-word: a display face doesn't
-     hyphenate (see Feature.tsx .ft-head for the same rule on the headline). */
-  hyphens: none;
-}
-@media (min-width: 1024px) {
-  .facts-row { grid-template-columns: repeat(4, minmax(0,1fr)); }
-  .facts-cell { border-bottom: none; padding: 20px; }
-  .facts-cell:nth-child(2n) { border-left: none; padding-left: 20px; padding-right: 20px; }
-  .facts-cell:first-child { padding-left: 0; }
-  .facts-cell:not(:first-child) { border-left: 1px solid var(--color-hairline); }
-}
+.facts-line{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 28px;margin:0;}
+.facts-item{display:inline-flex;align-items:baseline;gap:6px;margin:0;}
+.facts-item dt,.facts-item dd{display:inline;margin:0;}
+.facts-item dt{color:var(--color-ink-3);}
+.facts-item dd{color:var(--color-ink);}
 `;
 
-export default function FactsRow({ items = defaultFacts }: { items?: Fact[] }) {
+export default function FactsRow({
+  items = defaultFacts,
+  className = "",
+}: {
+  items?: Fact[];
+  className?: string;
+}) {
   return (
     <>
       {/* <dl>'s content model permits dt/dd groups (optionally wrapped in a
           div) intermixed only with script-supporting elements (script,
-          template) — not style. It rendered fine nested (browsers are
-          lenient), but it wasn't a valid <dl>; moved out as a sibling. */}
+          template) — not style. Kept as a sibling for the same reason the
+          previous grid version was. */}
       <style dangerouslySetInnerHTML={{ __html: css }} />
-      <dl className="facts-row">
+      <dl className={`facts-line t-caption ${className}`}>
         {items.map((f) => (
-          <div key={f.label} className="facts-cell">
-            <dt className="t-mono-xs facts-label text-ink-3">{f.label}</dt>
-            <dd className="facts-value">{f.value}</dd>
+          <div key={f.label} className="facts-item">
+            <dt>{f.label}</dt>
+            <dd>{f.value}</dd>
           </div>
         ))}
       </dl>
