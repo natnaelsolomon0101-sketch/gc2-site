@@ -139,10 +139,16 @@ const CSS = `
      token: 1200, widening to 1440 above 1920, so the hero grows with the rest
      of the page instead of freezing at a private number. */
   --hv2-meas: min(100vw, var(--page-max, 1200px));
+  /* distance from the viewport's left edge to the content box's left edge --
+     i.e. where column 1 starts. Below 1920 that is the centring gap plus the
+     24px gutter; above it, the left-anchor rule at the foot of this block. */
   --hv2-side: calc((100vw - var(--hv2-meas)) / 2 + 24px);
-  /* distance from the wrap's content box to the viewport edge, so grid items
-     can bleed out of the measure without leaving the grid */
-  --hv2-bleed: var(--hv2-side);
+  /* The two bleeds are separate because above 1920 the container is no longer
+     centred: at 3440 the left margin is pinned at 240px and the right absorbs
+     all 1784px of the extra ground. One formula covers both cases -- below
+     1920 it evaluates back to --hv2-side, so nothing changes there. */
+  --hv2-bleed-l: var(--hv2-side);
+  --hv2-bleed-r: calc(100vw - var(--hv2-side) - (var(--hv2-meas) - 48px));
   --hv2-col: calc((var(--hv2-meas) - 48px - 264px) / 12);
   --hv2-c9: calc(var(--hv2-side) + 8 * (var(--hv2-col) + 24px));
   --hv2-pt: 28px; --hv2-pb: 40px;
@@ -206,7 +212,7 @@ const CSS = `
 .hv2-mast{position:relative;align-items:baseline;padding-bottom:14px;}
 .hv2-mast::before{content:"";position:absolute;z-index:-1;
   top:calc(-1 * var(--hv2-pt));bottom:0;
-  left:calc(-1 * var(--hv2-bleed));right:calc(-1 * var(--hv2-bleed));
+  left:calc(-1 * var(--hv2-bleed-l));right:calc(-1 * var(--hv2-bleed-r));
   background:rgba(9,10,11,.94);}
 .hv2-mast > *{grid-row:1;}
 .hv2-m1{grid-column:1 / span 3;}
@@ -243,8 +249,7 @@ const CSS = `
    1920: computed line-height 144.138px against a 96.092px font. Reported to
    the Conductor for foundation; until it is fixed the hero states its own,
    because a 1.5 display line-height is not a hero. */
-.hv2-h1{grid-column:1 / span 7;margin-block:34px 30px;line-height:.9;
-  text-wrap:balance;}
+.hv2-h1{grid-column:1 / span 7;margin-block:34px 30px;}
 .hv2-l{display:block;}
 /* Each display line is one line by construction. nowrap makes that structural:
    a webfont swap, a metric change or a rounding error can no longer break
@@ -288,7 +293,7 @@ const CSS = `
 .hv2-ledger{display:none;}
 
 .hv2-curve{position:relative;grid-row:1 / span 2;grid-column:6 / span 7;
-  margin-right:calc(-1 * var(--hv2-bleed));align-self:end;
+  margin-right:calc(-1 * var(--hv2-bleed-r));align-self:end;
   padding:20px 0 0;}
 .hv2-curve::before{content:"";position:absolute;z-index:0;
   top:0;bottom:-100vh;left:0;right:0;
@@ -352,7 +357,7 @@ const CSS = `
      the headline stack four deep is gone: it is the thing that broke. */
   .hv2-h1{grid-column:1 / -1;
           font-size:clamp(2.5rem, calc(15.318vw - 7.83px), 96px);
-          line-height:.9;letter-spacing:-.03em;margin-block:16px 0;}
+          letter-spacing:-.03em;margin-block:16px 0;}
   .hv2-lead{grid-row:1;grid-column:1 / -1;font-size:15px;line-height:1.5;
     color:#7c7d7d;max-width:none;}
   /* On a phone the poster wants its block high and its air at the foot, not a
@@ -464,11 +469,26 @@ const CSS = `
   .hv2-foot{padding-top:16px;row-gap:18px;}
   .hv2-curve{padding-top:14px;}
 }
-/* Above 1920 .t-display climbs to 128px, which is 60px more headline than the
-   ceiling it replaced. The hero is capped at 900px tall, so the margins around
-   the headline pay for it rather than the cap being broken. */
+/* ---- above 1920: anchor left, exactly as .wrap does ---------------------
+   Foundation r1 deliverable 9 stopped centring the page container above 1920
+   and pinned its left margin to the gap it would have had at exactly 1920
+   ((1920 - --page-max) / 2 = 240px), so the extra ground is all on the right.
+   The hero ran its own margin-inline: auto and so drifted right of every
+   section below it -- 1024px of left margin at 3440 against the page's 240px.
+   Same rule here, same expression, so the two cannot fall out of step; and
+   --hv2-side follows, which is what carries the column-9 line and both bleeds.
+
+   .t-display also climbs to 128px here, 32px more headline than at 1920. The
+   hero is capped at 900px tall, so the margins around the headline pay for it
+   rather than the cap being broken. Line-height is no longer stated locally:
+   foundation r1 replaced the invalid clamp(.9, calc(.9857 - .01116vw), .95)
+   -- calc() cannot subtract a length from a number, so every display tier was
+   silently rendering at body's 1.5 -- with a constant .9, which is what this
+   hero was overriding to anyway. The token carries it now. */
 @media (min-width:1920px){
-  .hv2-h1{margin-block:24px 20px;line-height:.86;}
+  .hv2{--hv2-side: calc((1920px - var(--page-max)) / 2 + 24px);}
+  .hv2-fg{margin-inline: calc((1920px - var(--page-max)) / 2) auto;}
+  .hv2-h1{margin-block:24px 20px;}
 }
 
 /* ---- landscape phones: a letterbox, composed as one (§7 rule 8) --------
