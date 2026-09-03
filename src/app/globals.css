@@ -1,25 +1,112 @@
 @import "tailwindcss";
 
 /* ===========================================================================
-   ORIGIN — midnight gallery. Dark canvas, whisper-weight serif, chromatic tiles.
+   THE LIGHT CANVAS (3 Sep 2026).
+
+   The site moves off the dark Origin ground onto paper. Warm off-white ground,
+   warm near-black ink, hairlines, the six chromatic accents rationed on paper.
+   ONE theme. There is no toggle, and the site does not change under
+   prefers-color-scheme — `html { color-scheme: light }` below is the whole
+   mechanism, and there is deliberately no `@media (prefers-color-scheme: dark)`
+   rule anywhere in this file. scripts/qa/matrix.ts diffs the dark-scheme render
+   against the light one and fails on a single changed pixel.
+
+   Warm, not white: BUILD100K.md's audience brief asks for warmth that a serious
+   reader would not be embarrassed by. That is bought here with colour
+   TEMPERATURE — an off-white paper, a warm-black ink, warm greys — never with
+   decoration and never with pink.
+
+   TWO LAYERS, and only one of them is for new code:
+
+     SEMANTIC  (--color-ground / -2, --color-surface, --color-ink / -2 / -3,
+               --color-hairline / -strong, --color-accent-*)
+               This is the layer. Everything written from here on uses it.
+
+     LEGACY    (obsidian, abyss, graphite, steel, silver, fog, ash, cloud,
+               pure, void) — the dark Origin names. DEPRECATED. They are still
+               DEFINED so the ten sections keep compiling while they migrate,
+               and they still hold their dark hexes, so anything still using
+               them paints a dark object on a light page. That is the point:
+               the mixed page is the migration checklist. Do not add a new use.
    ========================================================================= */
 @theme {
+  /* -- semantic: ground ---------------------------------------------------
+     Three steps, each visibly separated (1.10 ground->ground-2, 1.10
+     ground-2->surface, 1.21 ground->surface). The dark build's obsidian->
+     graphite step was 1.13 and was described in DESIGN.md as "close to
+     invisible"; these are measured to clear it and are why the shadows that
+     stood in for it can come off. */
+  --color-ground:         #f7f5f0;  /* page ground: warm off-white paper */
+  --color-ground-2:       #eeeae1;  /* full-bleed band, one step darker: stone */
+  --color-surface:        #e5e0d6;  /* card / table surface, one step darker again */
+
+  /* -- semantic: ink ------------------------------------------------------
+     Measured on ground / ground-2 / surface:
+       ink    17.04 / 15.47 / 14.12
+       ink-2   7.55 /  6.85 /  6.25
+       ink-3   5.61 /  5.09 /  4.65
+     ink-3 clears 4.5:1 on all three grounds, so a 14px date or legal line is
+     legal wherever it lands, not only on the page ground. */
+  --color-ink:            #141311;  /* display type, primary stroke, button fill */
+  --color-ink-2:          #544e45;  /* body and secondary text */
+  --color-ink-3:          #67615a;  /* de-emphasized: dates, legal, inactive rows */
+
+  /* -- semantic: hairlines ------------------------------------------------
+     Ink alpha, not a solid grey, so a rule sitting on ground, ground-2 or
+     surface stays the same relationship to whatever is under it. 13% composites
+     to #d9d8d3 on ground (1.31 vs ground); -strong to #b7b6b2 (1.86) and is
+     the control border, table header rule and link underline. */
+  --color-hairline:        rgba(20, 19, 17, .13);
+  --color-hairline-strong: rgba(20, 19, 17, .28);
+
+  /* -- semantic: the six chromatic accents --------------------------------
+     Same six hexes as the dark build; what changes is that on paper they are
+     FILLS, and the foreground is per-tile and paired here so it cannot drift.
+     Five take warm ink; deep-iris is the one dark accent and takes ground.
+     Measured fill/foreground: iris 5.62 · cyan 7.51 · pale-iris 11.95 ·
+     deep-iris 6.80 · orchid 8.01 · periwinkle 9.11.
+
+     THEY ARE NOT TEXT COLOURS. As type on ground they measure iris 3.03,
+     cyan 2.27, pale-iris 1.43, orchid 2.13, periwinkle 1.87 — all fail 4.5:1,
+     pale-iris and periwinkle catastrophically. deep-iris (6.80 on ground,
+     6.18 on ground-2, 5.64 on surface) is the ONLY one that may be set as
+     text on paper. See DESIGN.md. */
+  --color-accent-iris-gleam:      #847dff;
+  --color-accent-iris-gleam-fg:   var(--color-ink);
+  --color-accent-cyan-signal:     #00b3dd;
+  --color-accent-cyan-signal-fg:  var(--color-ink);
+  --color-accent-pale-iris:       #d1c9ff;
+  --color-accent-pale-iris-fg:    var(--color-ink);
+  --color-accent-deep-iris:       #4b49aa;
+  --color-accent-deep-iris-fg:    var(--color-ground);
+  --color-accent-orchid-bloom:    #dd90d8;
+  --color-accent-orchid-bloom-fg: var(--color-ink);
+  --color-accent-periwinkle:      #90b8f0;
+  --color-accent-periwinkle-fg:   var(--color-ink);
+
+  /* -- legacy accent aliases (the bare names the sections still import) ---- */
   --color-iris-gleam:   #847dff;
   --color-cyan-signal:  #00b3dd;
   --color-pale-iris:    #d1c9ff;
   --color-deep-iris:    #4b49aa;
   --color-orchid-bloom: #dd90d8;
   --color-periwinkle:   #90b8f0;
-  --color-obsidian:     #0f1011;
-  --color-abyss:        #090a0b;
-  --color-graphite:     #1c1d21;
-  --color-steel:        #26272b;
-  --color-silver:       #cacaca;
-  --color-fog:          #7c7d7d;
-  --color-ash:          #9f9fa0;
-  --color-cloud:        #f5f5f7;
-  --color-pure:         #ffffff;
-  --color-void:         #000000;
+
+  /* -- DEPRECATED: the dark Origin ground and ink scale --------------------
+     Kept defined only so the ten sections compile while they migrate to the
+     semantic layer above. Every one of these paints a DARK object on a light
+     page. New code uses --color-ground* / --color-ink* / --color-hairline*.
+     When the last section stops referencing these, delete this block. */
+  --color-obsidian:     #0f1011;   /* deprecated -> --color-ground */
+  --color-abyss:        #090a0b;   /* deprecated -> --color-ground-2 */
+  --color-graphite:     #1c1d21;   /* deprecated -> --color-surface */
+  --color-steel:        #26272b;   /* deprecated -> --color-hairline-strong */
+  --color-silver:       #cacaca;   /* deprecated -> --color-surface */
+  --color-fog:          #7c7d7d;   /* deprecated -> --color-ink-3 */
+  --color-ash:          #9f9fa0;   /* deprecated -> --color-ink-2 */
+  --color-cloud:        #f5f5f7;   /* deprecated -> --color-ink */
+  --color-pure:         #ffffff;   /* deprecated -> --color-ink (or -ground on ink) */
+  --color-void:         #000000;   /* deprecated -> --color-ink */
 
   --font-display: var(--font-dmserif), Georgia, serif;
   --font-ui:      var(--font-inter), ui-sans-serif, system-ui, sans-serif;
@@ -29,7 +116,6 @@
   --radius-card:    16px;
   --radius-tile:    30px;
 }
-
 :root {
   --page-max: 1200px; --nav-h: 72px;
   /* Mirrors src/lib/motion.ts — the TS module is the source of truth for
