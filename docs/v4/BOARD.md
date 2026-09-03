@@ -5,9 +5,9 @@
 | foundation | 4 | r3 merged (d85bc3b: semantic light tokens, measured contrast, DESIGN.md); r4 running (ui primitives, TextLink) | — | closed after r4 |
 | viewport-runner | 1 | DONE (tool merged 2639fec→recommitted) | — | rerun baseline-full against a healthy :3000 |
 | sec-chrome | 3 | LIGHT PASS merged (1731c65 + r4 d30db1b); grep clean; dark-scheme identical | — | lock after light matrix + thumb-critic |
-| sec-hero | 3 | LIGHT PASS running | — | merge, then full light matrix |
+| sec-hero | 3 | LIGHT PASS merged (5c8572f): re-lit for paper, 22s drift removed (broke the dark-scheme diff), landscape grid fix, field capped 980 above 1920, motion props consumed | — | lock after light matrix + thumb-critic |
 | sec-framework | 3 | LIGHT PASS merged (53e0e72); grep clean; dark-scheme identical | — | lock after light matrix + thumb-critic |
-| sec-strategies | 3 | LIGHT PASS running | — | merge, then full light matrix |
+| sec-strategies | 3 | LIGHT PASS merged (53c6388); strip 51px targets; print clip fixed | — | lock after light matrix + thumb-critic |
 | sec-approach | 3 | LIGHT PASS merged (3357edb); grep clean; dark-scheme identical | — | lock after light matrix + thumb-critic |
 | sec-insights | 3 | LIGHT PASS merged (d8c7682); grep clean; dark-scheme identical | — | lock after light matrix + thumb-critic |
 | sec-allocators | 3 | LIGHT PASS merged (cd74e3a); grep clean; dark-scheme identical | — | lock after light matrix + thumb-critic |
