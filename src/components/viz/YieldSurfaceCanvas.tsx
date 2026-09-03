@@ -183,15 +183,23 @@ export default function YieldSurfaceCanvas({
       }
       const padX = chart ? 44 : 8;
       const padY = chart ? 30 : 6;
+      /* On a phone the chart is width-bound and would be a postage stamp;
+         let it run 22% past the edges there — the floor's corners bleed, the
+         axis and the marker stay inside. */
+      const fitW = chart && width < 600 ? width * 1.22 : width;
       scale = Math.min(
-        (width / 2 - padX) / (maxX || 1),
+        (fitW / 2 - padX) / (maxX || 1),
         (boxH / 2 - padY) / (maxY || 1)
       );
       const half = maxX * scale + padX;
+      /* The phone overscan above pushes the near-left axis labels off the
+         edge; the whole object shifts right by their width to bring them
+         back. The far right corner bleeds instead, which has no label. */
+      const nudge = chart && width < 600 ? 30 : 0;
       originX =
         fit === "band"
           ? Math.min(width - half, Math.max(half, width * 0.62))
-          : width / 2;
+          : width / 2 + nudge;
     };
 
     let bob = 0;
@@ -279,8 +287,10 @@ export default function YieldSurfaceCanvas({
       }
       /* The window's first date at the far-right corner. Today's is in the
          attribution, and at the near corner it fought the 30Y label. */
-      const d0 = project(rows[0].xs[tenors - 1], floorY, zOf(0), theta);
-      queue(chart.firstDate, d0.sx + 10, d0.sy, "left");
+      if (width >= 600) {
+        const d0 = project(rows[0].xs[tenors - 1], floorY, zOf(0), theta);
+        queue(chart.firstDate, d0.sx + 10, d0.sy, "left");
+      }
     };
 
     const drawSeries = (theta: number) => {
