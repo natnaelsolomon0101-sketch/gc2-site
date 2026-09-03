@@ -47,16 +47,16 @@ const SUBJECT = `Introduction — ${site.mark}`;
 const MAILTO = `mailto:${site.emails.investors}?subject=${encodeURIComponent(SUBJECT)}`;
 
 const CSS = `
-.ac-block{ border-top:1px solid rgba(255,255,255,.12); }
+.ac-block{ border-top:1px solid var(--color-hairline); }
 /* An unordered list without bullets: these are things to include in a note,
    not a form to fill in, and a bulleted checklist reads like one. */
 .ac-list{ list-style:none; margin:0; padding:0; }
 .ac-list li{
-  border-top:1px solid rgba(255,255,255,.12);
+  border-top:1px solid var(--color-hairline);
   padding:16px 0;
-  font-size:16px; line-height:1.6; color:var(--color-ash);
+  font-size:16px; line-height:1.6; color:var(--color-ink-2);
 }
-.ac-list li:last-child{ border-bottom:1px solid rgba(255,255,255,.12); }
+.ac-list li:last-child{ border-bottom:1px solid var(--color-hairline); }
 `;
 
 const blocks: { n: string; h: string; p: string[] }[] = [
@@ -109,7 +109,7 @@ export default function Access() {
             {blocks.map((b) => (
               <div key={b.n} className="ac-block grid-gc2 py-12 md:py-16">
                 <div className="col-span-4 md:col-span-3">
-                  <p className="t-mono-xs text-fog">{b.n}</p>
+                  <p className="t-mono-xs text-ink-3">{b.n}</p>
                   <h2 className="t-h3 mt-3">{b.h}</h2>
                 </div>
                 <div className="col-span-4 md:col-span-8 md:col-start-5">
@@ -133,7 +133,7 @@ export default function Access() {
                           <li key={t}>{t}</li>
                         ))}
                       </ul>
-                      <p className="t-small measure-body mt-8 text-fog">
+                      <p className="t-small measure-body mt-8 text-ink-3">
                         Nothing confidential, and nothing long. A short note is
                         enough; we are not scoring it.
                       </p>
@@ -147,18 +147,18 @@ export default function Access() {
       </section>
 
       {/* ---- The address. A mailto, and nothing that behaves like a form. --- */}
-      <section className="bg-abyss">
+      <section className="bg-ground-2">
         <Container>
           <div className="grid-gc2 py-16 md:py-24">
             <div className="col-span-4 md:col-span-3">
-              <p className="t-mono-xs text-fog">04</p>
+              <p className="t-mono-xs text-ink-3">04</p>
               <h2 className="t-h3 mt-3">Introductions</h2>
             </div>
             <div className="col-span-4 md:col-span-8 md:col-start-5">
               <a href={MAILTO} className="btn min-h-11 text-lg">
                 {site.emails.investors}
               </a>
-              <p className="t-small measure-body mt-6 text-fog">
+              <p className="t-small measure-body mt-6 text-ink-3">
                 The subject line arrives pre-filled as “{SUBJECT}”. If your mail
                 client does not open, the address is {site.emails.investors} and
                 a plain email works exactly as well.

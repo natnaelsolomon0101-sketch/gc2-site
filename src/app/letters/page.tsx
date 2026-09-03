@@ -57,10 +57,10 @@ function Ledger({
       <caption className="sr-only">{caption}</caption>
       <thead className="sr-only md:not-sr-only">
         <tr className="block md:table-row">
-          <th scope="col" className="t-caption block pb-3 text-left text-fog md:table-cell md:w-1/2 md:pr-6">
+          <th scope="col" className="t-caption block pb-3 text-left text-ink-3 md:table-cell md:w-1/2 md:pr-6">
             {termHead}
           </th>
-          <th scope="col" className="t-caption block pb-3 text-left text-fog md:table-cell md:pr-6">
+          <th scope="col" className="t-caption block pb-3 text-left text-ink-3 md:table-cell md:pr-6">
             {valueHead}
           </th>
         </tr>
@@ -73,15 +73,15 @@ function Ledger({
           <tr key={r.term} className="rule-t grid gap-y-1 py-5 md:table-row md:gap-y-0 md:py-0">
             <th
               scope="row"
-              className="t-body block text-left font-normal text-fog md:table-cell md:w-1/2 md:py-6 md:pr-6 md:align-top"
+              className="t-body block text-left font-normal text-ink-3 md:table-cell md:w-1/2 md:py-6 md:pr-6 md:align-top"
             >
               {r.term}
             </th>
             <td className="block md:table-cell md:py-6 md:align-top">
-              <span aria-hidden="true" className="t-caption block text-fog md:hidden">
+              <span aria-hidden="true" className="t-caption block text-ink-3 md:hidden">
                 {valueHead}
               </span>
-              <span className="t-body block text-cloud">{r.value}</span>
+              <span className="t-body block text-ink">{r.value}</span>
             </td>
           </tr>
         ))}
@@ -224,7 +224,7 @@ export default function Letters() {
       <dl>
         {sections.map((s) => (
           <div key={s.h} className="rule-t py-8">
-            <dt className="t-mono text-cloud">{s.h}</dt>
+            <dt className="t-mono text-ink">{s.h}</dt>
             <dd className="t-body measure-body mt-3">{s.p}</dd>
           </div>
         ))}
@@ -308,17 +308,17 @@ export default function Letters() {
         standfirst="A letter is where a manager has to write down what they did, what it cost and where they were wrong. This page sets out what ours carry, what governs when they go out, and the structural reason none of them is readable on a public page."
       />
 
-      {/* Bands alternate obsidian / abyss, matching /firm, /diligence and
+      {/* Bands alternate ground / ground-2, matching /firm, /diligence and
           /governance, so an inner page reads as the same site. Ordinals come
           from the RENDERED index rather than a fixed list, so the collapsed
-          cadence block leaves no gap in the numbering. Heading pure 19.05:1 /
-          19.81:1, body ash 7.20:1 / 7.49:1, fog labels 4.61:1 / 4.80:1. */}
+          cadence block leaves no gap in the numbering. Heading ink 17.04:1 /
+          15.47:1, body ink-2 7.55:1 / 6.85:1, ink-3 labels 5.61:1 / 5.09:1. */}
       {blocks.map((b, i) => (
-        <section key={b.id} id={b.id} className={`scroll-mt-24 ${i % 2 ? "bg-abyss" : ""}`}>
+        <section key={b.id} id={b.id} className={`scroll-mt-24 ${i % 2 ? "bg-ground-2" : ""}`}>
           <Container>
             <div className={`grid-gc2 py-16 md:py-24 ${i === 0 ? "rule-t" : ""}`}>
               <div className="col-span-4 md:col-span-4">
-                <p className="t-mono-xs text-fog">{String(i + 1).padStart(2, "0")}</p>
+                <p className="t-mono-xs text-ink-3">{String(i + 1).padStart(2, "0")}</p>
                 <h2 className="t-h2 mt-3">{b.title}</h2>
                 {b.kicker && <p className="t-small measure-body mt-6">{b.kicker}</p>}
               </div>
@@ -330,9 +330,9 @@ export default function Letters() {
 
       {/* Stamped only when there is a date to stamp. */}
       {fund.updatedAt && (
-        <section className={blocks.length % 2 ? "bg-abyss" : ""}>
+        <section className={blocks.length % 2 ? "bg-ground-2" : ""}>
           <Container>
-            <p className="t-mono-xs rule-t py-8 text-fog">Last updated {fund.updatedAt}</p>
+            <p className="t-mono-xs rule-t py-8 text-ink-3">Last updated {fund.updatedAt}</p>
           </Container>
         </section>
       )}

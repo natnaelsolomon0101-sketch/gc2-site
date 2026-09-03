@@ -116,19 +116,24 @@ function Arrow() {
    the horizontal hairlines aligned across a row even though the two decks
    are rarely the same length. */
 const CSS = `
-.fa-grid{ border-top:1px solid rgba(255,255,255,.12); }
+.fa-grid{ border-top:1px solid var(--color-hairline); }
 @media (min-width:768px){
   .fa-grid{ display:grid; grid-template-columns:1fr 1fr; }
 }
-.fa-item{ border-bottom:1px solid rgba(255,255,255,.12); }
+.fa-item{ border-bottom:1px solid var(--color-hairline); }
 @media (min-width:768px){
-  .fa-item:nth-child(even){ border-left:1px solid rgba(255,255,255,.12); }
+  .fa-item:nth-child(even){ border-left:1px solid var(--color-hairline); }
+}
+/* Achromatic hover tint, not a chromatic fill — an ink wash at 4%, gated to
+   devices that actually have hover so a tap does not stick it "on". */
+@media (hover:hover) and (pointer:fine){
+  .fa-item:hover{ background:rgba(20,19,17,.04); }
 }
 `;
 
 export default function ForAllocators() {
   return (
-    <section className="bg-abyss" aria-labelledby="allocators-title">
+    <section className="bg-ground-2" aria-labelledby="allocators-title">
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
       <div className="wrap band">
         <div className="max-w-[46em]">
@@ -136,7 +141,7 @@ export default function ForAllocators() {
           <h2 id="allocators-title" className="t-heading-lg mt-5">
             {count(allocatorNav.length, true)} pages, {count(allocatorNav.length)} questions.
           </h2>
-          <p className="t-sub mt-7 max-w-[34ch] text-ash">
+          <p className="t-sub mt-7 max-w-[34ch] text-ink-2">
             Written to be read before a first conversation rather than sent after
             one. Where a fact is not yet published, the page says so instead of
             filling the space.
@@ -150,11 +155,11 @@ export default function ForAllocators() {
               <Link
                 key={n.href}
                 href={n.href}
-                className="fa-item group flex min-h-14 flex-col justify-center gap-2 py-6 transition-colors duration-[var(--dur-fast)] hover:bg-white/5 md:px-8 md:py-10"
+                className="fa-item group flex min-h-14 flex-col justify-center gap-2 py-6 transition-colors duration-[var(--dur-fast)] md:px-8 md:py-10"
               >
                 <span className="t-h3">{q}</span>
                 <span className="t-body max-w-[34ch]">{a}</span>
-                <span className="mt-2 inline-flex items-center gap-2 text-fog">
+                <span className="mt-2 inline-flex items-center gap-2 text-ink-3">
                   <span className="t-mono-xs">{n.label}</span>
                   <Arrow />
                 </span>

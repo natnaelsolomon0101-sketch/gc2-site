@@ -49,10 +49,13 @@ const CSS = `
   list-style:none;
   font-family:var(--font-display); font-weight:400;
   font-size:19px; line-height:1.3; letter-spacing:-0.01em;
-  color:var(--color-cloud);
-  /* The affordance. The hairline itself is the marker: 12% white closed,
-     pure white open. Nothing rotates, nothing appears, nothing is drawn. */
-  border-bottom:1px solid rgba(255,255,255,.12);
+  color:var(--color-ink);
+  /* The affordance. The hairline itself is the marker: hairline closed,
+     hairline-strong open. Nothing rotates, nothing appears, nothing is
+     drawn. Text stays ink throughout — on paper there is no state brighter
+     than ink to step up to on open/hover, unlike the dark canvas's near-
+     white heading tier that used to brighten further on open. */
+  border-bottom:1px solid var(--color-hairline);
   transition:color var(--dur-fast) var(--ease), border-bottom-color var(--dur-fast) var(--ease);
 }
 @media (min-width:769px){ .qa summary{ font-size:22px; } }
@@ -60,17 +63,16 @@ const CSS = `
 @media (max-width:768px){ .qa summary{ min-height:56px; padding:18px 0; } }
 .qa summary::-webkit-details-marker{ display:none; }
 .qa summary::marker{ content:""; }
-.qa summary:hover{ color:var(--color-pure); border-bottom-color:rgba(255,255,255,.24); }
+.qa summary:hover{ border-bottom-color:var(--color-hairline-strong); }
 .qa details[open] > summary{
-  color:var(--color-pure);
-  border-bottom-color:var(--color-pure);
+  border-bottom-color:var(--color-hairline-strong);
 }
 .qa summary:focus-visible{
-  outline:2px solid var(--color-pure); outline-offset:4px;
+  outline:2px solid var(--color-ink); outline-offset:4px;
   border-radius:var(--radius-control);
 }
 .qa-a{ padding:20px 0 28px; max-width:34em; }
-.qa-a p{ font-size:16px; line-height:1.6; color:var(--color-ash); }
+.qa-a p{ font-size:16px; line-height:1.6; color:var(--color-ink-2); }
 .qa-a p + p{ margin-top:16px; }
 
 /* Print: everything open. Chromium gates closed content behind
@@ -315,7 +317,7 @@ export default function Questions() {
       />
 
       {groups.map((g, gi) => (
-        <section key={g.n} className={gi % 2 ? "bg-abyss" : ""}>
+        <section key={g.n} className={gi % 2 ? "bg-ground-2" : ""}>
           <Container>
             <div className={`grid-gc2 py-14 md:py-20 ${gi === 0 ? "rule-t" : ""}`}>
               <div className="col-span-4 md:col-span-3">
@@ -344,7 +346,7 @@ export default function Questions() {
         <Container>
           <div className="grid-gc2 pb-16 md:pb-24">
             <div className="col-span-4 md:col-span-8 md:col-start-5">
-              <p className="t-small measure-body rule-t pt-8 text-fog">
+              <p className="t-small measure-body rule-t pt-8 text-ink-3">
                 A question that is not here is not a question we are avoiding.
                 Send it, and the answer comes back in writing. Where the answer
                 is a term or a figure, it comes back with the documents rather
