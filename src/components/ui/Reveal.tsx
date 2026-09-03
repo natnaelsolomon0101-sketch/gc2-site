@@ -32,7 +32,7 @@ export type RevealProps = {
    * exists to prevent.
    */
   delay?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
-  as?: "div" | "section" | "article" | "li" | "p" | "span" | "figure";
+  as?: "div" | "section" | "article" | "li" | "p" | "span" | "figure" | "h2";
   className?: string;
   children: React.ReactNode;
 } & Omit<React.HTMLAttributes<HTMLElement>, "className" | "children">;
