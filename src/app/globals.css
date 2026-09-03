@@ -30,7 +30,15 @@
   --radius-tile:    30px;
 }
 
-:root { --page-max: 1200px; --nav-h: 72px; }
+:root {
+  --page-max: 1200px; --nav-h: 72px;
+  /* Mirrors src/lib/motion.ts — the TS module is the source of truth for
+     JS-driven animation, these are the same numbers for CSS. Keep both in
+     sync by hand; there is no build step that generates one from the other. */
+  --dur-fast: 150ms; --dur-base: 500ms; --dur-draw: 900ms; --dur-menu: 200ms;
+  --stagger: 70ms;
+  --ease: cubic-bezier(.22,.61,.36,1);
+}
 /* §7.6: above 1920 the text container may widen past 1200 since the type
    ceilings are rising too (see the fluid-type block below); left-aligned
    grid, so this just gives the same composition more room on the right. */
@@ -222,16 +230,27 @@
    the LCP element, and gating it behind a 2.5s ease-in-out left the page
    looking blank for ~2s (measured: FCP 140ms, h1 still at opacity .37 after
    2s). Opacity now lands fast on an ease-out; the 14px rise keeps the slow
-   atmospheric feel the spec asks for. */
+   atmospheric feel the spec asks for.
+
+   Retimed to src/lib/motion.ts's tokens: both halves were 620ms / 1600ms on
+   two different curves (ease-out for opacity, a separate slow atmospheric
+   curve for the rise) — neither number nor either curve traced back to a
+   shared source. Both now run --dur-base (500ms) on --ease, the one curve
+   the whole site uses, and the stagger delays move from 0/90/180ms to
+   0/70/140ms (--stagger and its multiples) instead of an untokenized 90ms
+   step. This is a visible change to the hero's load choreography — the rise
+   finishes noticeably sooner (500ms vs 1600ms) — logged per APPENDIX-A
+   Motion, which leaves it to sec-motion to decide whether the hero keeps
+   this token or reverts to a documented one-time exception. */
 @keyframes originFadeIn { from { opacity: 0 } to { opacity: 1 } }
 @keyframes originRise   { from { transform: translate3d(0,14px,0) } to { transform: none } }
 .fade-in {
-  animation: originFadeIn 620ms cubic-bezier(.22,.61,.36,1) both,
-             originRise  1600ms cubic-bezier(.455,.03,.515,.955) both;
+  animation: originFadeIn var(--dur-base) var(--ease) both,
+             originRise  var(--dur-base) var(--ease) both;
 }
-.fade-1 { animation-delay: 0ms,  0ms;  }
-.fade-2 { animation-delay: 90ms, 90ms; }
-.fade-3 { animation-delay: 180ms,180ms;}
+.fade-1 { animation-delay: 0ms, 0ms; }
+.fade-2 { animation-delay: var(--stagger), var(--stagger); }
+.fade-3 { animation-delay: calc(var(--stagger) * 2), calc(var(--stagger) * 2); }
 
 @media (prefers-reduced-motion: reduce) {
   .fade-in { animation: none; opacity: 1; transform: none; }
