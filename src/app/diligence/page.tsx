@@ -411,11 +411,7 @@ export default function Diligence() {
         eyebrow="Diligence"
         title="Diligence."
         standfirst="What an allocator needs before a first call, in one place: who keeps the books, what we are registered as, which documents are released and on what terms, and how the operating controls are built."
-        quickLink={
-          <p className="t-caption">
-            {`The firm was formed in ${site.foundedLabel}. What is described here is the policy the firm operates under, not a record of periods it has run.`}
-          </p>
-        }
+        caption={`The firm was formed in ${site.foundedLabel}. What is described here is the policy the firm operates under, not a record of periods it has run.`}
       />
 
       {/* Bands alternate ground / ground-2, matching /firm, so an inner page
