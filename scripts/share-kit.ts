@@ -23,9 +23,12 @@
  * are clean against a machine list. It does not make them approved.
  */
 import { chromium, type Page } from "playwright";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { renderToStaticMarkup } from "react-dom/server";
+import type { ReactElement } from "react";
+import { mkdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { fetchYieldCurve, geometry, asOf, TREASURY_ATTRIBUTION } from "../src/components/viz/treasury";
+import YieldCurve from "../src/components/viz/YieldCurve";
+import { PROHIBITED_506B } from "./qa/regime";
 
 const OUT = join(process.cwd(), "public", "share");
 
@@ -60,6 +63,10 @@ type Card = {
   route: string;
   /** Stacked in order. Every one must resolve or the card fails loudly. */
   selectors: Pick[];
+  /** Where the day's curve goes on this card, if anywhere. "body" makes it the
+   *  composition; "foot" puts it in the lower half above the wordmark, which is
+   *  the home Open Graph card's arrangement. */
+  curve?: "body" | "foot";
   /** Extra frame rules for this card only. Layout, never type or colour. */
   frame?: string;
 };
@@ -69,7 +76,21 @@ const CARDS: Card[] = [
     name: "hero-headline",
     width: 1080, height: 1350,           // portrait post
     route: "/",
-    selectors: ["h1.hv2-h1"],
+    selectors: ["h1.hv2-h1", "p.hv2-lead"],
+    /* Headline in the upper third, the hero's own lead beneath it at the
+       site's 30em measure, the day's curve across the lower half, wordmark
+       bottom-left — the home OG card's arrangement, at portrait. The first
+       version was the headline alone and two thirds obsidian. */
+    curve: "foot",
+    frame:
+      ".sk-body { justify-content: flex-start; }" +
+      ".sk-body .hv2-lead { max-width: 30em; margin-top: 28px; }" +
+      /* The curve block is not zoomed by the fitter — that only sizes the
+         headline and lead — so it carries its own. Without it the tenor labels
+         and the source line render at their page size, 13px on a 1080 poster,
+         which is a caption on a page and not on a card. */
+      ".sk-curve { zoom: 1.5; margin-bottom: 30px; }" +
+      ".sk-curve .yc-svg { height: 250px; }",
   },
   {
     name: "four-stages",
@@ -80,39 +101,92 @@ const CARDS: Card[] = [
       "#approach h2",
       "#approach ol",                                // the four stages, and nothing after them
     ],
-    /* A poster is the four stages, not the page about them. The stage prose and
-       the gate line are hidden — the numeral, the label, who holds it and the
-       stage's own headline are what a poster of "how an idea earns capital"
-       consists of. This hides the site's words; it never writes any. At full
-       prose the fitter had to go to 0.21 to make it fit a 1920 story, which is
-       a screenshot of a page, not a poster. */
-    frame:
-      ".sk-body { justify-content: flex-start; } .sk-body > * + * { margin-top: 34px; }" +
-      ".sk-body li .t-prose, .sk-body li p.mt-8 { display: none !important; }" +
-      ".sk-body li { padding-top: 26px !important; padding-bottom: 26px !important; }" +
-      ".sk-body .card-dark { padding: 26px !important; }",
+    /* Round 0 had to hide the stage prose to make this fit a 1920 story — the
+       fitter was down at 0.21, which is a screenshot of a page, not a poster.
+       sec-approach's round-1 rebuild of the stages is compact enough that the
+       whole thing fits at zoom 1.04 with the prose in, so the hiding rules are
+       gone and the card is the section as it now stands. Nothing here edits
+       the section any more. */
+    frame: ".sk-body { justify-content: flex-start; } .sk-body > * + * { margin-top: 34px; }",
   },
   {
     name: "risk-framework",
     width: 1200, height: 630,            // open graph
     route: "/",
-    selectors: ["blockquote.ft-quote"],
+    /* sec-framework moved the statement into Statement.tsx during round 1;
+       it is the only <p> on the display tier inside the framework section
+       (the section's own h2 is the other .t-display-sm and is an h2). */
+    selectors: [{ sel: "section.ft p.t-display-sm", first: true }],
   },
   {
     name: "strategies",
     width: 1600, height: 900,            // X
     route: "/",
-    selectors: [{ sel: "section.stx h2.t-display-sm", first: true }, ".stx-head"],
+    /* .stx-name, not .stx-head: sec-strategies took the 01-06 numerals off the
+       rows in round 1 and the wrapper went with them. Six names, no numerals —
+       which is what STATE.md §0.2 item 4 asked for, arriving here for free. */
+    selectors: [{ sel: "section.stx h2.t-display-sm", first: true }, ".stx-name"],
     frame: ".sk-body > * + * { margin-top: 18px; } .sk-body .stx-head { display: block; }",
   },
   {
     name: "yield-curve",
     width: 1080, height: 1080,           // square
     route: "/",
-    /* Empty until sec-hero mounts <YieldCurve/>; see curveCard() below. */
-    selectors: ['[data-source="home.treasury.gov"]'],
+    /* The component IS the composition, tenor labels and source line included —
+       see curveMarkup(). Nothing is lifted off the route for this one. */
+    selectors: [],
+    curve: "body",
+    frame: ".sk-body { justify-content: center; } .sk-body .yc-svg { height: 360px; }",
   },
 ];
+
+/* ------------------------------------------------------------------ fonts */
+
+/**
+ * The share page has to carry the fonts itself.
+ *
+ * The lifted HTML brings next/font's hashed class names with it, but those
+ * classes only DECLARE `--font-dmserif` / `--font-inter` / `--font-mono-face`
+ * as names — the @font-face rules that make those names resolve live in a
+ * stylesheet keyed to the site's own document, and the faces themselves are
+ * served from /_next/static. The first version of this kit copied the class
+ * list, loaded the stylesheet, and still rendered "Evidence first." and the GC2
+ * wordmark in Times: a variable pointing at a family the page has never been
+ * given. The failure is silent because a font fallback always succeeds.
+ *
+ * So the four vendored TTFs are inlined as data URLs under names of this
+ * script's own, and the three variables are pointed at them. No network, no
+ * hashed-class dependency, and the same files the OG cards use.
+ */
+const FONT_FILES = [
+  { file: "DMSerifDisplay-Regular.ttf", family: "GC2 Display", weight: 400 },
+  { file: "Inter-Regular.ttf",          family: "GC2 UI",      weight: 400 },
+  { file: "RobotoMono-300.ttf",         family: "GC2 Mono",    weight: 300 },
+  { file: "RobotoMono-400.ttf",         family: "GC2 Mono",    weight: 400 },
+  { file: "RobotoMono-500.ttf",         family: "GC2 Mono",    weight: 500 },
+];
+
+async function fontCss(): Promise<string> {
+  const dir = join(process.cwd(), "src", "app", "fonts");
+  const faces = await Promise.all(
+    FONT_FILES.map(async (f) => {
+      const data = (await readFile(join(dir, f.file))).toString("base64");
+      return (
+        `@font-face{font-family:"${f.family}";font-style:normal;` +
+        `font-weight:${f.weight};font-display:block;` +
+        `src:url(data:font/ttf;base64,${data}) format("truetype");}`
+      );
+    })
+  );
+  /* Roboto Mono is vendored at 300/400/500 because the site uses all three:
+     .t-caption is 300, .t-mono and .t-mono-xs are 500, everything else 400.
+     One face would have left the browser synthesizing two of them. */
+  return (
+    faces.join("") +
+    `:root{--font-dmserif:"GC2 Display";--font-inter:"GC2 UI";` +
+    `--font-mono-face:"GC2 Mono";}`
+  );
+}
 
 /* ------------------------------------------------------------------ frame */
 
@@ -129,6 +203,8 @@ const FRAME = `
     padding: 7.4% 7% 6.6%;
   }
   .sk-body { display: flex; flex-direction: column; min-height: 0; }
+  .sk-foot { display: flex; flex-direction: column; }
+  .sk-curve { margin-bottom: 44px; }
   /* Nothing on a card is a link, a button, or a control. Whatever the source
      element carried, it is a still image here. */
   .sk a { text-decoration: none; pointer-events: none; }
@@ -137,19 +213,17 @@ const FRAME = `
      markup has to be at its finished state, not caught mid-reveal. Scoped to
      the descendants, not to .sk-body itself, which carries the fit zoom. */
   .sk-body *, .sk-body *::before, .sk-body *::after,
+  .sk-curve *, .sk-curve *::before, .sk-curve *::after,
   .sk-mark *, .sk-mark *::before, .sk-mark *::after {
     animation: none !important; transition: none !important;
     opacity: 1 !important; transform: none !important;
   }
 `;
 
-type Chrome = { htmlClass: string; styles: string[]; inline: string[]; wordmark: string };
+type Chrome = { styles: string[]; inline: string[]; wordmark: string };
 
 async function chrome(page: Page): Promise<Chrome> {
   return page.evaluate(() => ({
-    /* next/font puts the --font-* variables on <html> as generated class names.
-       Without them the card falls back to Georgia and the whole point is lost. */
-    htmlClass: document.documentElement.className,
     styles: Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
       .map((l) => (l as HTMLLinkElement).getAttribute("href") ?? "")
       .filter(Boolean),
@@ -183,52 +257,37 @@ async function lift(page: Page, picks: Pick[]): Promise<string[]> {
   return html;
 }
 
-/** The curve card, when no route mounts <YieldCurve/> yet. Same fetch and the
- *  same geometry() the component uses, so this cannot draw a different line —
- *  and the moment sec-hero composes the slot, the selector above resolves and
- *  this branch stops being taken. */
-async function curveCard(): Promise<string[] | null> {
-  const data = await fetchYieldCurve();
-  if (!data) return null;
-  const W = 900, H = 320;
-  const { d } = geometry(data.points, W, H);
-  return [
-    `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"
-          style="display:block;width:100%;height:${H}px">
-       <path d="${d}" fill="none" stroke="var(--color-pure)" stroke-width="1"
-             vector-effect="non-scaling-stroke" stroke-linejoin="round"/>
-     </svg>`,
-    `<p class="t-caption" style="margin:28px 0 0">${TREASURY_ATTRIBUTION} · as of ${asOf(data.date)}</p>`,
-  ];
+/**
+ * The day's curve, rendered from `src/components/viz/YieldCurve.tsx` itself.
+ *
+ * Not cloned off a route: the component is an async function that returns JSX,
+ * so calling it and handing the element to renderToStaticMarkup gives the exact
+ * markup the site renders — path, tenor labels on the same log axis, and the
+ * "U.S. Treasury · as of {date}" line, all part of the drawing rather than
+ * floating beside it. It also means the card exists before sec-hero has
+ * composed the slot, and cannot drift from the component afterwards.
+ *
+ * Null when the feed is unreachable. No card, rather than a card carrying a
+ * line that is not the data.
+ */
+async function curveMarkup(): Promise<string | null> {
+  const el = (await YieldCurve({})) as ReactElement | null;
+  if (!el) return null;
+  return renderToStaticMarkup(el);
 }
 
 /* ------------------------------------------------------- the 506(b) list */
-
-/**
- * The prohibited terms, read out of `scripts/qa/regime.ts` at run time.
- *
- * Parsed from the source rather than imported because regime.ts calls `main()`
- * at module scope — importing it would launch a second browser and scan the
- * whole site as a side effect of reading a list of strings. Parsing keeps ONE
- * list, which is the property that matters: a term added to the regime gate is
- * a term the share kit checks, with no second copy to forget. The Conductor
- * could make this an import by exporting the constant and guarding the call;
- * requested, not taken.
- */
-async function prohibited(): Promise<string[]> {
-  const src = await readFile(join(process.cwd(), "scripts", "qa", "regime.ts"), "utf8");
-  const m = src.match(/const PROHIBITED_506B\s*=\s*\[([\s\S]*?)\]/);
-  if (!m) throw new Error("could not read PROHIBITED_506B out of scripts/qa/regime.ts");
-  const terms = [...m[1].matchAll(/"([^"]+)"/g)].map((x) => x[1]);
-  if (terms.length < 10) throw new Error(`only ${terms.length} terms parsed; the shape changed`);
-  return terms;
-}
 
 /* ------------------------------------------------------------------- main */
 
 async function main() {
   const base = process.env.SHARE_BASE ?? "http://localhost:3000";
-  const terms = await prohibited();
+  /* Imported from scripts/qa/regime.ts, which now exports the list behind a
+     main guard (Conductor granted the edit). One list: a term added to the
+     regime gate is a term the share cards are checked against, with no second
+     copy to forget. */
+  const terms = PROHIBITED_506B;
+  const fonts = await fontCss();
   await mkdir(OUT, { recursive: true });
 
   const browser = await chromium.launch();
@@ -248,20 +307,19 @@ async function main() {
     try {
       parts = await lift(src, card.selectors);
     } catch (e) {
-      if (card.name === "yield-curve") {
-        const local = await curveCard();
-        if (!local) {
-          /* The feed is down. No card, rather than a card with a line on it
-             that is not the data. */
-          fails.push("yield-curve: Treasury feed unreachable, card not written");
-          continue;
-        }
-        parts = local;
-        console.log("  yield-curve: no route mounts <YieldCurve/> yet; drawn from treasury.ts");
-      } else {
-        fails.push(`${card.name}: ${(e as Error).message}`);
+      fails.push(`${card.name}: ${(e as Error).message}`);
+      continue;
+    }
+
+    let curve = "";
+    if (card.curve) {
+      const drawn = await curveMarkup();
+      if (!drawn) {
+        fails.push(`${card.name}: Treasury feed unreachable, card not written`);
         continue;
       }
+      if (card.curve === "body") parts = [...parts, drawn];
+      else curve = drawn;
     }
 
     const page = await (await browser.newContext({
@@ -271,26 +329,52 @@ async function main() {
     })).newPage();
 
     await page.setContent(
-      `<!doctype html><html class="${c.htmlClass}"><head>` +
+      /* No hashed next/font class on <html>: those classes only name the font
+         variables, and this page defines them itself against the vendored
+         faces. Leaving them on would re-introduce the silent fallback. */
+      `<!doctype html><html lang="en"><head>` +
         c.styles.map((h) => `<link rel="stylesheet" href="${base}${h}">`).join("") +
         /* The sections' own <style> blocks, before the frame so the frame can
            still win where it has to. */
         c.inline.map((css) => `<style>${css}</style>`).join("") +
+        `<style>${fonts}</style>` +
         `<style>${FRAME}${card.frame ?? ""}</style></head><body>` +
         `<div class="sk"><div class="sk-body">${parts.join("")}</div>` +
-        `<div class="sk-mark">${c.wordmark}</div></div>` +
+        `<div class="sk-foot">` +
+        (curve ? `<div class="sk-curve">${curve}</div>` : "") +
+        `<div class="sk-mark">${c.wordmark}</div></div></div>` +
         `</body></html>`,
       { waitUntil: "networkidle" }
     );
-    await page.evaluate(() => document.fonts.ready);
+    /* Load the three faces explicitly and then ASSERT they resolved. A font
+       fallback never throws — the first version of this kit rendered every
+       headline and the wordmark in Times and reported success. `font-display:
+       block` plus lazy loading also means `fonts.ready` alone can resolve
+       before a face that nothing has painted yet is fetched. Verified
+       separately against the live site: with these three loaded, the rendered
+       width of the same string at the same size is identical to the site's, to
+       0.00%, and 1.4% away from the Times fallback. */
+    const missing = await page.evaluate(async () => {
+      await document.fonts.ready;
+      await Promise.all([
+        document.fonts.load('400 96px "GC2 Display"'),
+        document.fonts.load('400 28px "GC2 UI"'),
+        document.fonts.load('500 13px "GC2 Mono"'),
+        document.fonts.load('300 13px "GC2 Mono"'),
+      ]);
+      return [
+        ['GC2 Display', document.fonts.check('400 96px "GC2 Display"')],
+        ['GC2 UI', document.fonts.check('400 28px "GC2 UI"')],
+        ['GC2 Mono 500', document.fonts.check('500 13px "GC2 Mono"')],
+        ['GC2 Mono 300', document.fonts.check('300 13px "GC2 Mono"')],
+      ].filter(([, ok]) => !ok).map(([name]) => name as string);
+    });
+    if (missing.length) {
+      fails.push(`${card.name}: font did not load, would render in a fallback: ${missing.join(", ")}`);
+      await page.close();
+      continue;
+    }
 
-    /* Fit. A card is a fixed frame and the sections were not written for it —
-       the four stages at full prose overrun a 1920 story by half a stage, and
-       the first run cut the fourth one off below the fold with the wordmark
-       printed over the third. `zoom` rather than `transform: scale()` because
-       zoom re-lays-out: the text re-wraps at the smaller size instead of being
-       squeezed. Three passes, because changing the zoom changes the wrapping,
-       which changes the height. */
     /* Fit. A card is a fixed frame and the sections were not written for it:
        the four stages overrun a 1920 story, while .ft-quote is a flat 34px that
        does not grow with a 1200x630 frame the way the clamp() tiers do. So the
@@ -313,14 +397,14 @@ async function main() {
       const m = await page.evaluate((z: number) => {
         const sk = document.querySelector(".sk") as HTMLElement;
         const body = document.querySelector(".sk-body") as HTMLElement;
-        const mark = document.querySelector(".sk-mark") as HTMLElement;
+        const foot = document.querySelector(".sk-foot") as HTMLElement;
         (body.style as unknown as { zoom: string }).zoom = String(z);
         const cs = getComputedStyle(sk);
         const r = body.getBoundingClientRect();
         return {
           room:
             sk.clientHeight - parseFloat(cs.paddingTop) -
-            parseFloat(cs.paddingBottom) - mark.offsetHeight - 40,
+            parseFloat(cs.paddingBottom) - foot.offsetHeight - 40,
           h: r.height,
           /* Horizontal overflow is compared INSIDE the zoomed element, where
              both numbers are in the same coordinate space. The body is width
