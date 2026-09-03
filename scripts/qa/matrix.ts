@@ -470,6 +470,7 @@ function browserChecks(opts: {
     if (stickyEl && window.scrollY === 0) {
       const navRect = stickyEl.getBoundingClientRect();
       let hit = false;
+      let hitDetail = "";
       const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
       let n: Node | null;
       let checked = 0;
@@ -478,21 +479,43 @@ function browserChecks(opts: {
         const text = n.textContent?.trim();
         if (!text) continue;
         const parent = n.parentElement;
-        if (!parent || stickyEl.contains(parent)) continue;
+        if (!parent) continue;
+        // Exclude anything inside the nav/header itself (by detected sticky
+        // element AND by tag, in case the detected sticky wrapper differs
+        // from the semantic nav/header), and anything screen-reader-only,
+        // invisible, or fully transparent — those aren't visual overlaps.
+        if (stickyEl.contains(parent) || parent.closest("header, nav")) continue;
+        let skip = false;
+        let anc: HTMLElement | null = parent;
+        while (anc && anc !== document.body) {
+          if (anc.classList.contains("sr-only")) {
+            skip = true;
+            break;
+          }
+          const acs = getComputedStyle(anc);
+          if (acs.visibility === "hidden" || parseFloat(acs.opacity) === 0) {
+            skip = true;
+            break;
+          }
+          anc = anc.parentElement;
+        }
+        if (skip) continue;
         const range = document.createRange();
         range.selectNodeContents(n);
         const r = range.getBoundingClientRect();
-        if (r.width === 0 && r.height === 0) continue;
-        const intersects = !(r.right < navRect.left || r.left > navRect.right || r.bottom < navRect.top || r.top > navRect.bottom);
-        if (intersects) {
+        if (r.width === 0 || r.height === 0) continue;
+        const vOverlap = Math.min(r.bottom, navRect.bottom) - Math.max(r.top, navRect.top);
+        const hOverlap = Math.min(r.right, navRect.right) - Math.max(r.left, navRect.left);
+        if (vOverlap > 2 && hOverlap > 0) {
           hit = true;
+          hitDetail = text.slice(0, 30);
           break;
         }
       }
       results.push({
         id: "sticky-nav-text-overlap",
         status: hit ? "FAIL" : "PASS",
-        reason: hit ? "a text node intersects the sticky/fixed nav box at scrollY=0" : "no overlap detected",
+        reason: hit ? `a text node intersects the sticky/fixed nav box by >2px at scrollY=0: "${hitDetail}"` : "no overlap detected",
       });
     } else {
       results.push({ id: "sticky-nav-text-overlap", status: "PASS", reason: "no sticky/fixed header element identified — nothing to overlap" });
@@ -501,17 +524,40 @@ function browserChecks(opts: {
     results.push({ id: "sticky-nav-text-overlap", status: "PASS", reason: `check errored, treated as non-fatal: ${(e as Error).message}` });
   }
 
-  // 3. overflow:hidden clipping text
+  // 3. overflow:hidden clipping text — only when an actual TEXT node's rect
+  // extends past the clipping ancestor's own rect. scrollHeight>clientHeight
+  // alone is not enough: decorative non-text children (a background layer,
+  // an oversized icon) trip that ratio without any text being clipped.
   {
     let clipped: string[] = [];
     const els = Array.from(document.body.querySelectorAll<HTMLElement>("*")).slice(0, 3000);
     for (const el of els) {
+      if (el.classList.contains("sr-only") || el.closest(".sr-only")) continue; // meant to be clipped
       const cs = getComputedStyle(el);
       if (cs.overflow !== "hidden" && cs.overflowY !== "hidden") continue;
       const text = el.innerText?.trim();
       if (!text || text.length < 2) continue;
-      if (el.scrollHeight > el.clientHeight + 2 && el.clientHeight > 0) {
-        clipped.push(`${el.tagName.toLowerCase()}.${(el.className || "").toString().slice(0, 30)}`);
+      if (!(el.scrollHeight > el.clientHeight + 2 && el.clientHeight > 0)) continue;
+      const elRect = el.getBoundingClientRect();
+      const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+      let tn: Node | null;
+      let offender = "";
+      while ((tn = walker.nextNode())) {
+        const t = (tn.textContent || "").trim();
+        if (!t) continue;
+        const range = document.createRange();
+        range.selectNodeContents(tn);
+        const r = range.getBoundingClientRect();
+        if (r.width === 0 || r.height === 0) continue;
+        const extendsPast =
+          r.bottom > elRect.bottom + 1 || r.top < elRect.top - 1 || r.right > elRect.right + 1 || r.left < elRect.left - 1;
+        if (extendsPast) {
+          offender = t.slice(0, 30);
+          break;
+        }
+      }
+      if (offender) {
+        clipped.push(`${el.tagName.toLowerCase()}.${(el.className || "").toString().slice(0, 30)} — "${offender}"`);
         if (clipped.length >= 5) break;
       }
     }
@@ -521,22 +567,26 @@ function browserChecks(opts: {
 
   // 4. Tap targets (touch devices only)
   if (opts.touch) {
+    // sr-only elements (e.g. a "Skip to content" link) are deliberately
+    // collapsed to ~1×1px until focused — that is the accessible pattern
+    // working as intended, not a tap-target defect.
     const targets = Array.from(
       document.body.querySelectorAll<HTMLElement>('a, button, summary, [role="button"]'),
     ).filter((el) => {
+      if (el.classList.contains("sr-only")) return false;
       const r = el.getBoundingClientRect();
       return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== "hidden";
     });
     const rects = targets.map((el) => el.getBoundingClientRect());
-    const small: string[] = [];
+    // De-duplicated by element index (a Set), not by pair/occurrence, so one
+    // small or crowded link is reported once per shot, not once per neighbor.
+    const smallIdx = new Set<number>();
     for (let i = 0; i < targets.length; i++) {
       const r = rects[i];
-      if (r.width < 44 || r.height < 44) {
-        small.push(`${targets[i].tagName.toLowerCase()}"${(targets[i].textContent || "").trim().slice(0, 20)}"`);
-      }
+      if (r.width < 44 || r.height < 44) smallIdx.add(i);
     }
-    const tooClose: string[] = [];
-    for (let i = 0; i < rects.length && tooClose.length < 5; i++) {
+    const gapIdx = new Set<number>();
+    for (let i = 0; i < rects.length; i++) {
       for (let j = i + 1; j < rects.length; j++) {
         const a = rects[i];
         const b = rects[j];
@@ -545,16 +595,36 @@ function browserChecks(opts: {
         const overlapping = dx === 0 && dy === 0;
         const gap = Math.hypot(dx, dy);
         if (!overlapping && gap < 8 && gap > 0) {
-          tooClose.push(`${targets[i].tagName.toLowerCase()}~${targets[j].tagName.toLowerCase()}`);
-          break;
+          gapIdx.add(i);
+          gapIdx.add(j);
         }
       }
     }
-    if (small.length)
-      results.push({ id: "tap-target-size", status: "FAIL", reason: `${small.length} target(s) under 44×44: ${small.slice(0, 5).join(", ")}` });
+    if (smallIdx.size)
+      results.push({
+        id: "tap-target-size",
+        status: "FAIL",
+        reason: `${smallIdx.size} target(s) under 44×44: ${Array.from(smallIdx)
+          .slice(0, 5)
+          .map(
+            (i) =>
+              `${targets[i].tagName.toLowerCase()} "${(targets[i].textContent || "").trim().slice(0, 20)}" ${rects[i].width.toFixed(0)}×${rects[i].height.toFixed(0)}px`,
+          )
+          .join(", ")}`,
+      });
     else results.push({ id: "tap-target-size", status: "PASS", reason: `${targets.length} tap targets, all ≥44×44` });
-    if (tooClose.length)
-      results.push({ id: "tap-target-gap", status: "FAIL", reason: `${tooClose.length} target pair(s) under 8px apart` });
+    if (gapIdx.size)
+      results.push({
+        id: "tap-target-gap",
+        status: "FAIL",
+        reason: `${gapIdx.size} target(s) under 8px from a neighbor: ${Array.from(gapIdx)
+          .slice(0, 5)
+          .map(
+            (i) =>
+              `${targets[i].tagName.toLowerCase()} "${(targets[i].textContent || "").trim().slice(0, 20)}" ${rects[i].width.toFixed(0)}×${rects[i].height.toFixed(0)}px`,
+          )
+          .join(", ")}`,
+      });
     else results.push({ id: "tap-target-gap", status: "PASS", reason: "no adjacent targets under 8px apart" });
   }
 
@@ -577,68 +647,84 @@ function browserChecks(opts: {
     else results.push({ id: "headline-lines", status: "PASS", reason: "headline line counts within limits" });
   }
 
-  // 6. Single-word last line on h1/h2/h3
+  // 6. Single-word last line on h1/h2/h3 — verified via per-word Range rects:
+  // the last word is alone on its line only if its line-top differs from the
+  // second-to-last word's line-top. The detail prints the actual last line's
+  // text (every trailing word sharing that line-top) so a false positive is
+  // obvious at a glance rather than trusting a width-ratio heuristic.
   {
     const offenders: string[] = [];
     const heads = Array.from(document.querySelectorAll("h1, h2, h3"));
     for (const h of heads) {
       const text = (h.textContent || "").trim();
-      const words = text.split(/\s+/).filter(Boolean);
-      if (words.length < 2) continue;
-      // Find the client rect of the last word via Range over the last text node.
+      if (text.split(/\s+/).filter(Boolean).length < 2) continue;
+      const wordRects: { word: string; top: number }[] = [];
       const walker = document.createTreeWalker(h, NodeFilter.SHOW_TEXT);
-      let lastTextNode: Text | null = null;
       let n: Node | null;
-      while ((n = walker.nextNode())) lastTextNode = n as Text;
-      if (!lastTextNode || !lastTextNode.textContent) continue;
-      const full = lastTextNode.textContent;
-      const lastSpace = full.trimEnd().lastIndexOf(" ");
-      const lastWordStart = lastSpace >= 0 ? lastSpace + 1 : 0;
-      const range = document.createRange();
-      try {
-        range.setStart(lastTextNode, lastWordStart);
-        range.setEnd(lastTextNode, full.trimEnd().length);
-        const wordRect = range.getBoundingClientRect();
-        const fullRange = document.createRange();
-        fullRange.selectNodeContents(h);
-        const allRects = Array.from(fullRange.getClientRects());
-        const lineTops = new Set(allRects.map((r) => Math.round(r.top)));
-        if (lineTops.size > 1) {
-          const lastLineRects = allRects.filter((r) => Math.round(r.top) === Math.round(wordRect.top));
-          // crude: if the last line's total text width roughly equals the last word's width, it's a single-word line
-          const lastLineWidth = lastLineRects.reduce((a, r) => a + r.width, 0);
-          if (lastLineWidth > 0 && wordRect.width / lastLineWidth > 0.85) {
-            offenders.push(`${h.tagName} "${text.slice(0, 30)}"`);
+      while ((n = walker.nextNode())) {
+        const tn = n as Text;
+        const content = tn.textContent || "";
+        const re = /\S+/g;
+        let m: RegExpExecArray | null;
+        while ((m = re.exec(content))) {
+          const range = document.createRange();
+          try {
+            range.setStart(tn, m.index);
+            range.setEnd(tn, m.index + m[0].length);
+            const rect = range.getBoundingClientRect();
+            if (rect.width > 0 || rect.height > 0) wordRects.push({ word: m[0], top: rect.top });
+          } catch {
+            /* ignore range errors on odd DOM shapes */
           }
         }
-      } catch {
-        /* ignore range errors on odd DOM shapes */
+      }
+      if (wordRects.length < 2) continue;
+      const last = wordRects[wordRects.length - 1];
+      const prev = wordRects[wordRects.length - 2];
+      const sameLine = Math.abs(last.top - prev.top) < 2;
+      if (!sameLine) {
+        const lastLineWords: string[] = [];
+        for (let i = wordRects.length - 1; i >= 0; i--) {
+          if (Math.abs(wordRects[i].top - last.top) < 2) lastLineWords.unshift(wordRects[i].word);
+          else break;
+        }
+        offenders.push(`${h.tagName} "${text.slice(0, 30)}" — last line: "${lastLineWords.join(" ")}"`);
       }
     }
     if (offenders.length) results.push({ id: "single-word-last-line", status: "WARN", reason: offenders.slice(0, 5).join("; ") });
     else results.push({ id: "single-word-last-line", status: "PASS", reason: "no single-word last lines detected" });
   }
 
-  // 7. Text measure — p wider than 80ch
+  // 7. Text measure — widest RENDERED LINE of p/li/dd wider than 80ch.
+  // The element's own bounding-box width is not the text measure: a <p> can
+  // be a wide box with short wrapped lines. Measure via Range.getClientRects()
+  // over the element's contents (one rect per visual line) and take the max.
   {
     const offenders: string[] = [];
-    const ps = Array.from(document.querySelectorAll("p")).slice(0, 200);
+    const candidates = Array.from(document.querySelectorAll("p, li, dd")).slice(0, 400);
     const canvas = document.createElement("canvas");
     const ctx2d = canvas.getContext("2d");
-    for (const p of ps) {
-      const r = p.getBoundingClientRect();
-      if (r.width === 0) continue;
-      const cs = getComputedStyle(p);
+    for (const el of candidates) {
+      const r = el.getBoundingClientRect();
+      if (r.width === 0 || r.height === 0) continue;
+      const cs = getComputedStyle(el);
       let chPx = 8; // fallback
       if (ctx2d) {
         ctx2d.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
         chPx = ctx2d.measureText("0").width || chPx;
       }
-      const chWidth = r.width / chPx;
-      if (chWidth > 80) offenders.push(`p "${(p.textContent || "").slice(0, 24)}" ~${chWidth.toFixed(0)}ch`);
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      const lineRects = Array.from(range.getClientRects()).filter((lr) => lr.width > 0 && lr.height > 0);
+      if (!lineRects.length) continue;
+      let widest = lineRects[0];
+      for (const lr of lineRects) if (lr.width > widest.width) widest = lr;
+      const chWidth = widest.width / chPx;
+      if (chWidth > 80)
+        offenders.push(`${el.tagName.toLowerCase()} "${(el.textContent || "").trim().slice(0, 24)}" widest line ~${chWidth.toFixed(0)}ch`);
     }
     if (offenders.length) results.push({ id: "text-measure", status: "FAIL", reason: offenders.slice(0, 5).join("; ") });
-    else results.push({ id: "text-measure", status: "PASS", reason: "no <p> wider than 80ch" });
+    else results.push({ id: "text-measure", status: "PASS", reason: "no p/li/dd with a rendered line wider than 80ch" });
   }
 
   // 8. Font size floor
@@ -654,9 +740,9 @@ function browserChecks(opts: {
       const size = parseFloat(getComputedStyle(el).fontSize);
       if (Number.isNaN(size)) continue;
       if (size < 13) {
-        underFail.push(`${el.tagName.toLowerCase()} ${size.toFixed(1)}px`);
+        underFail.push(`${el.tagName.toLowerCase()}.${(el.className || "").toString().trim().slice(0, 40)} ${size.toFixed(1)}px`);
       } else if (size < 15 && opts.deviceClass === "phone" && /^(p|li|span|div)$/i.test(el.tagName)) {
-        underWarn.push(`${el.tagName.toLowerCase()} ${size.toFixed(1)}px`);
+        underWarn.push(`${el.tagName.toLowerCase()}.${(el.className || "").toString().trim().slice(0, 40)} ${size.toFixed(1)}px`);
       }
     }
     if (underFail.length) results.push({ id: "font-floor", status: "FAIL", reason: `${underFail.length} node(s) under 13px: ${underFail.slice(0, 5).join(", ")}` });
@@ -734,6 +820,19 @@ function browserChecks(opts: {
 // press, NOT a screenshot-region heuristic (per task instructions, this is
 // a deliberate simplification of the spec's literal "focus ring is not
 // visible in the screenshot region" — we ask the CSSOM instead of the pixels).
+//
+// Round-2 fix: `getComputedStyle(el, ":focus-visible")` was a bug — the
+// second argument to getComputedStyle names a PSEUDO-ELEMENT (::before,
+// ::marker, …), not a pseudo-CLASS, so ":focus-visible" is not a real
+// pseudo-element and the browser silently returned an empty/default
+// declaration, reading outline-style as "none" on every element regardless
+// of globals.css. When an element is focused via a real Tab keypress its
+// :focus-visible state is already reflected in its OWN computed style, so
+// this now calls getComputedStyle(el) with no second argument, and confirms
+// the state actually applies via el.matches(':focus-visible') before
+// counting a miss. The "Skip to content" link is a special case: it is
+// legitimately sr-only when not focused, and its accessible affordance IS
+// becoming visible on focus, so it always passes.
 async function focusCheck(page: Page): Promise<CheckResult> {
   const offenders: string[] = [];
   let count = 0;
@@ -743,21 +842,34 @@ async function focusCheck(page: Page): Promise<CheckResult> {
       const info = await page.evaluate(() => {
         const el = document.activeElement as HTMLElement | null;
         if (!el || el === document.body) return null;
-        const cs = getComputedStyle(el, ":focus-visible") || getComputedStyle(el);
+        const isSkipLink =
+          el.tagName === "A" && /skip to content/i.test((el.textContent || "").trim());
+        const matchesFocusVisible = (() => {
+          try {
+            return el.matches(":focus-visible");
+          } catch {
+            return true; // engine without :focus-visible support — don't penalize
+          }
+        })();
+        const cs = getComputedStyle(el);
         const outlineStyle = cs.outlineStyle;
         const outlineWidth = parseFloat(cs.outlineWidth || "0");
         const boxShadow = cs.boxShadow;
-        const visible =
-          (outlineStyle !== "none" && outlineWidth > 0) || (boxShadow && boxShadow !== "none");
+        const hasVisibleOutline = outlineStyle !== "none" && outlineWidth > 0;
+        const hasBoxShadow = !!boxShadow && boxShadow !== "none";
+        // Fails only if it IS in :focus-visible state AND has neither an
+        // outline nor a box-shadow. Not matching :focus-visible (e.g. a
+        // mouse-focus fallback edge case) is not a failure of this check.
+        const failing = matchesFocusVisible && !hasVisibleOutline && !hasBoxShadow && !isSkipLink;
         return {
           tag: el.tagName.toLowerCase(),
           text: (el.textContent || "").trim().slice(0, 24),
-          visible,
+          failing,
         };
       });
       if (!info) break;
       count++;
-      if (!info.visible) offenders.push(`${info.tag} "${info.text}"`);
+      if (info.failing) offenders.push(`${info.tag} "${info.text}"`);
       await page.keyboard.press("Tab");
     }
   } catch (e) {
@@ -768,7 +880,7 @@ async function focusCheck(page: Page): Promise<CheckResult> {
     return {
       id: "focus-visible",
       status: "FAIL",
-      reason: `${offenders.length}/${count} focusable elements have no visible focus outline: ${offenders.slice(0, 5).join(", ")}`,
+      reason: `${offenders.length}/${count} focusable elements match :focus-visible with no outline/box-shadow: ${offenders.slice(0, 5).join(", ")}`,
     };
   return { id: "focus-visible", status: "PASS", reason: `${count} focusable elements all show a focus outline` };
 }
