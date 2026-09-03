@@ -174,6 +174,11 @@ const CSS = `
 .hv2-grain{position:absolute;inset:0;background-image:${GRAIN_URL};
   background-size:140px 140px;opacity:.30;}
 
+/* ---- phone-only: the wedge on its side, and the record ------------------
+   Both are off above 767px. See the block at the mobile breakpoint for why
+   the phone gets a different composition rather than a narrowed desktop one. */
+.hv2-band,.hv2-ledger{display:none;}
+
 /* ---- foreground ------------------------------------------------------- */
 .hv2-fg{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;
   max-width:1200px;width:100%;margin-inline:auto;padding-inline:24px;
@@ -294,12 +299,41 @@ const CSS = `
      ledger goes vertical instead, city and clock across the top rule, the two
      standing facts stacked under it, flush to the same left edge as everything
      else. Line-height tightens to 1.75 so three rows cost ~58px, not 66. */
+  /* The masthead is one line again — city left, clock right. The two standing
+     facts are not dropped this time, they MOVE: they become the numbered record
+     below the headline, where they read as evidence rather than as chrome. That
+     also buys back the ~38px a three-row ledger up here was costing, and the
+     display type spends it. */
   .hv2-mast{row-gap:0;}
   .hv2-mono{line-height:1.75;}
   .hv2-m1{grid-row:1;grid-column:1 / span 2;}
   .hv2-m4{grid-row:1;grid-column:3 / span 2;}
-  .hv2-m2{display:block;grid-row:2;grid-column:1 / -1;}
-  .hv2-m3{display:block;grid-row:3;grid-column:1 / -1;}
+  .hv2-m2,.hv2-m3{display:none;}
+
+  /* The vertical wedge is off on the phone. With the headline set to fill the
+     whole measure there is no column left beside it, and parking the light
+     above the type was what kept putting it on top of the type. Turned on its
+     side it gets a job instead of a corner: it is the rule between the argument
+     and the evidence, still five graded steps, still cut by the louvre, still
+     running off the right edge. */
+  .hv2-measure{display:none;}
+  .hv2-band{display:flex;gap:12px;height:44px;margin:22px 0 0;
+    margin-right:-24px;}
+  .hv2-bandstrip{position:relative;overflow:hidden;flex:1 1 0;
+    transform-origin:0 50%;}
+
+  /* The record. Numbered, hairline-ruled, key left and value hard right, the
+     way a tearsheet sets a fact. */
+  .hv2-ledger{display:block;margin:20px 0 0;}
+  .hv2-lrow{display:flex;align-items:baseline;justify-content:space-between;
+    gap:16px;padding:11px 0;border-top:1px solid #3f4041;}
+  .hv2-lrow:last-child{border-bottom:1px solid #3f4041;}
+  .hv2-ledger dt,.hv2-ledger dd{margin:0;font-family:var(--font-mono);
+    font-size:11px;line-height:1.6;letter-spacing:.182em;text-transform:uppercase;
+    font-weight:500;}
+  .hv2-ledger dt{color:#7c7d7d;}
+  .hv2-ledger dd{color:#cacaca;text-align:right;margin-right:-.182em;}
+  .hv2-lx{color:#4b49aa;margin-right:10px;}
   /* Same promise as the desktop rule, measured against the phone's grid: here
      the headline spans all four columns, so it is sized to fill the whole
      measure (100vw - 48px) rather than eight-twelfths of it. DM Serif Display
@@ -314,8 +348,11 @@ const CSS = `
      evaluated at 768px, so the two clamps meet across the breakpoint instead
      of stepping. */
   .hv2-h1{grid-column:1 / -1;font-size:clamp(2.4rem, calc(16.312vw - 7.83px), 4.9rem);
-          margin-block:26px 22px;}
-  .hv2-lead{grid-row:1;grid-column:1 / -1;font-size:17px;}
+          margin-block:20px 0;}
+  .hv2-lead{grid-row:1;grid-column:1 / -1;font-size:15px;line-height:1.5;
+    color:#7c7d7d;max-width:none;}
+  .hv2-gap{min-height:20px;}
+  .hv2-gap-b{min-height:12px;}
   .hv2-cta{grid-row:2;grid-column:1 / -1;justify-content:flex-start;}
   /* Content-width buttons on one row, exactly as on desktop, rather than two
      identical full-width pills with centred labels. Everything else in this
@@ -327,6 +364,45 @@ const CSS = `
      stay left-aligned. Height stays 48px, so the touch targets are unchanged. */
   .hv2-cta{gap:10px;}
   .hv2-btn{flex:0 1 auto;padding:12px 15px;}
+  .hv2-foot{padding-top:16px;}
+}
+/* ---- tall phones: the cover treatment ----------------------------------
+   Everything above fits any phone. This block is the part that needs room,
+   so it is gated on height rather than shipped everywhere and then clipped:
+   a 390x844 screen can carry it, a 375x667 cannot, and the difference is
+   ~200px of display type. Below 820px tall the hero keeps the two-line
+   headline and the content-width actions, which is the same composition at a
+   quieter volume, not a different one.
+   820 and not 780: measured, a 360x800 screen still ran 45px past the fold with
+   the cover type, and an action you have to scroll to is not an action. */
+@media (max-width:767px) and (min-height:820px){
+  /* Sized to the longest WORD rather than the longest line, so each span breaks
+     in two and the headline stacks four deep, filling the measure edge to edge.
+     "Evidence" sets at 3.7802x its font-size, so 98% of the measure is
+     25.925vw - 12.44px. nowrap comes off because here the wrap IS the
+     composition. Past about 617px wide "Evidence first." fits on one line again
+     and the headline settles back to two by itself, so the tablet case needs no
+     extra breakpoint. */
+  .hv2-l > span{white-space:normal;}
+  .hv2-h1{font-size:clamp(2.4rem, calc(25.925vw - 12.44px), 6rem);
+          line-height:.84;letter-spacing:-.038em;margin-block:8px 0;}
+  /* the cover type is worth ~40px of surrounding air on a 844 screen */
+  .hv2-band{margin-top:14px;}
+  .hv2-ledger{margin-top:14px;}
+  .hv2-lrow{padding:8px 0;}
+  /* Actions as full-bleed stamps, not pills floating on a field. They continue
+     the ledger's rhythm: same hairlines, label left, mono arrow hard right, so
+     the foot of the screen reads as one ruled stack rather than as a form. */
+  .hv2-foot{padding-top:16px;row-gap:0;}
+  .hv2-cta{gap:0;flex-direction:column;align-items:stretch;
+    margin-inline:-24px;margin-top:16px;}
+  .hv2-btn{flex:0 0 auto;justify-content:space-between;min-height:56px;
+    padding:16px 24px;border-radius:0;border:0;border-top:1px solid #3f4041;
+    font-size:15px;letter-spacing:.02em;background:transparent;color:#fff;}
+  .hv2-btn::after{content:"\\2192";font-family:var(--font-mono);color:#7c7d7d;}
+  .hv2-btn:first-child{background:#f5f5f7;color:#000;border-top-color:#f5f5f7;}
+  .hv2-btn:first-child::after{color:#000;}
+  .hv2-btn:last-child{border-bottom:1px solid #3f4041;}
 }
 /* Short phones (iPhone SE 1st gen and the 320x568 class). The hero is allowed
    to be exactly one screen and no more: the actions are the last thing in it,
@@ -344,16 +420,18 @@ const CSS = `
   .hv2-h1{margin-block:14px 12px;}
   .hv2-gap{min-height:12px;}
   .hv2-gap-b{min-height:8px;}
-  .hv2-foot{padding-top:16px;row-gap:18px;}
-  .hv2-lead{font-size:16px;}
+  .hv2-foot{padding-top:12px;row-gap:14px;}
+  .hv2-lead{font-size:14px;}
 }
-/* The light gets its own, tighter height threshold (600px rather than 640px).
-   Squeezing the content upward is what pushes the headline into the block, so
-   the two cannot share a breakpoint: at 360x640 the tightened layout still
-   leaves the type 16px clear at 28%, but at 320x568 it does not, and only that
-   class of screen needs the light cut this far back. */
+/* Very short screens (the 320x568 class). The band and the record are the two
+   blocks that cost real height, and they are the two whose content survives
+   elsewhere: the standing facts fold back into the masthead line, and the light
+   is atmosphere. Cut them here rather than push the actions off the screen.
+   Measured: 718px -> 552px against a 568px viewport. */
 @media (max-width:767px) and (max-height:600px){
-  .hv2-strip{height:15%;}
+  .hv2-band,.hv2-ledger{display:none;}
+  .hv2-m2{display:block;grid-row:2;grid-column:1 / -1;}
+  .hv2-m3{display:block;grid-row:3;grid-column:1 / -1;}
 }
 @media (min-width:768px) and (max-width:1023px){
   /* the two middle masthead facts wrap to two lines and collide once the
@@ -504,6 +582,30 @@ export default function HeroV2() {
             </span>
           </h1>
         </div>
+
+        {/* Phone only. The wedge turns on its side and becomes the rule between
+            the argument and the evidence, and the two standing facts become a
+            numbered record under it. Both are display:none above 767px, where
+            the vertical wedge and the four-across masthead already do this job. */}
+        <div className="hv2-band" aria-hidden="true">
+          {WEDGE.map((s, i) => (
+            <div key={i} data-s={i} className="hv2-bandstrip">
+              <div className="hv2-strip-light" style={{ opacity: s.o }} />
+              <div className="hv2-strip-louvre" style={{ background: louvre(s.pitch) }} />
+            </div>
+          ))}
+        </div>
+
+        <dl className="hv2-ledger">
+          <div className="hv2-lrow">
+            <dt><span className="hv2-lx">01</span>Structure</dt>
+            <dd>{site.structure}</dd>
+          </div>
+          <div className="hv2-lrow">
+            <dt><span className="hv2-lx">02</span>Mandate</dt>
+            <dd>{site.mandate}</dd>
+          </div>
+        </dl>
 
         <div className="hv2-row hv2-foot">
           <p className="hv2-lead">
