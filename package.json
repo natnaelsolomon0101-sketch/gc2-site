@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "share-kit": "tsx scripts/share-kit.ts"
+    "share-kit": "tsx scripts/share-kit.ts",
+    "sources": "tsx scripts/qa/sources.ts"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.1.1",

@@ -11,9 +11,15 @@
  * NOT LEGAL ADVICE. This encodes public commentary so counsel can be handed one
  * file and one page list instead of a whole website.
  */
+import { basename } from "node:path";
 import { chromium } from "playwright";
 
-const PROHIBITED_506B = [
+/**
+ * Exported so scripts/share-kit.ts checks the share cards against exactly this
+ * list rather than a second copy of it. §5.10: the cards travel further than
+ * the pages they came from, so they are held to the same words.
+ */
+export const PROHIBITED_506B = [
   "invest now", "invest with us", "investment opportunity", "now raising",
   "currently raising", "open for subscription", "subscribe", "minimum investment",
   "minimum commitment", "target return", "targeted return", "expected return",
@@ -89,4 +95,7 @@ async function main() {
       (skipped ? ` (${skipped} disclaimer route${skipped > 1 ? "s" : ""} excluded)` : "")
   );
 }
-main();
+/* Run only when this file IS the entry point. Without the guard, importing
+   PROHIBITED_506B from anywhere would launch a browser and scan every public
+   route as a side effect of reading an array of strings. */
+if (basename(process.argv[1] ?? "") === "regime.ts") main();

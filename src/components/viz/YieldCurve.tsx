@@ -73,21 +73,27 @@ export default async function YieldCurve({ className = "" }: { className?: strin
           />
         </svg>
         {/* Tenor labels sit on the same log x as the path. The first is pinned
-            to the left edge and the last to the right so neither can overhang
-            the plot at 320. */}
+            to the left edge and the last to the RIGHT EDGE — `right: 0`, not
+            `left: 100%` with a translate. A transform does not change layout,
+            so the translated version left the last label's box starting at the
+            container's right edge and genuinely overflowing it by its own
+            width. Nothing looked wrong, but the element was outside its box,
+            which the share kit's overflow check caught the first time it tried
+            to fit the curve into a square card. */}
         <div className="yc-axis" aria-hidden="true">
           {ticks.map((p, i) => (
             <span
               key={p.label}
               data-t={p.label}
               className="t-caption yc-tick"
-              style={{
-                left: `${(x(p.years) / VIEW.w) * 100}%`,
-                transform:
-                  i === 0 ? "none"
-                  : i === ticks.length - 1 ? "translateX(-100%)"
-                  : "translateX(-50%)",
-              }}
+              style={
+                i === ticks.length - 1
+                  ? { right: 0 }
+                  : {
+                      left: `${(x(p.years) / VIEW.w) * 100}%`,
+                      transform: i === 0 ? "none" : "translateX(-50%)",
+                    }
+              }
             >
               {p.label}
             </span>
