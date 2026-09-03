@@ -90,8 +90,8 @@
    ========================================================================= */
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { site } from "@/config/site";
+import SessionClock from "@/components/viz/SessionClock";
 
 /* -- grain ---------------------------------------------------------------
    Turbulence pushed into the alpha channel over a fixed pale fill: sparse
@@ -209,7 +209,7 @@ const CSS = `
 /* masthead — real facts only. It carries its own full-bleed dark bar so the
    light stops at the rule underneath it: the mono line stays legible over the
    wedge, and the lit field gains a top edge instead of running off the page. */
-.hv2-mast{position:relative;align-items:baseline;padding-bottom:14px;}
+.hv2-mast{position:relative;align-items:start;padding-bottom:14px;}
 .hv2-mast::before{content:"";position:absolute;z-index:-1;
   top:calc(-1 * var(--hv2-pt));bottom:0;
   left:calc(-1 * var(--hv2-bleed-l));right:calc(-1 * var(--hv2-bleed-r));
@@ -218,11 +218,25 @@ const CSS = `
 .hv2-m1{grid-column:1 / span 3;}
 .hv2-m2{grid-column:4 / span 3;}
 .hv2-m3{grid-column:7 / span 3;}
-.hv2-m4{grid-column:10 / span 3;text-align:right;margin-right:-.182em;}
+/* The masthead's fourth cell is the session clock (sec-motion's
+   src/components/viz/SessionClock.tsx), not a single local time. Three columns
+   is 330px at 1920 and 270px at 1280, both under the component's own 420px
+   container query, so it paints the running session only — which is what a
+   masthead wants. The note under it ("Scheduled cash sessions · exchange
+   holidays not shown") is the caption scripts/qa/sources.ts checks for and is
+   never hidden while the strip is painted; it wraps to two lines at this width
+   and that is why the masthead aligns to start rather than to a baseline. */
+.hv2-clock{grid-column:10 / span 3;}
+/* The session row is 44px tall in the component, which is nav and menu
+   density: in a masthead it opens a blank line between the row and its own
+   caption. Here the row is not a tap target -- three spans, no link -- so it
+   collapses to the mono line box the facts beside it use, and the band reads
+   as one set of rules rather than as a control. Reaching into another
+   section's component to say so; reported to the Conductor. */
+.hv2-clock .sc-row{min-height:0;}
 /* .t-mono carries the family, the 13px §6.3 floor, the tracking and the case;
-   only the two colour variants and the tabular clock are local. */
+   only the colour variant is local. */
 .hv2-mono-lit{color:#cacaca;}          /* anything sitting over the aperture */
-.hv2-clock{font-variant-numeric:tabular-nums;}
 
 /* The free space is split ABOVE and BELOW the message, never inside it. Both
    spacers sit outside the headline / record / lead / actions group, so that
@@ -288,10 +302,6 @@ const CSS = `
    the top of the frame. No gradient touches it (APPENDIX-A: no gradient on a
    data component), and the placeholder claims nothing, so there is no source
    line until YieldCurve lands with one. */
-/* the ruled record is a phone-only block; above 767px the same two facts
-   sit in the masthead. */
-.hv2-ledger{display:none;}
-
 .hv2-curve{position:relative;grid-row:1 / span 2;grid-column:6 / span 7;
   margin-right:calc(-1 * var(--hv2-bleed-r));align-self:end;
   padding:20px 0 0;}
@@ -337,14 +347,21 @@ const CSS = `
      tap away on /firm, and the alternative is an action below the fold). */
   .hv2-mast{display:flex;flex-wrap:wrap;align-items:baseline;
     column-gap:12px;row-gap:0;}
+  /* 1.75 rather than the tier's 2: five mono lines at 26px is 130px of a
+     795px poster, and these are labels, not reading copy. */
+  .hv2-mast .t-mono,.hv2-clock .t-caption{line-height:1.75;}
   /* CSS order, and not source order: the two standing facts are full-width flex
      items, so in DOM order they sit BETWEEN the city and the clock and push
      the clock onto a fourth line (measured at 360x740 before this). City and
      clock share line one; the standing facts take a line each below. */
-  .hv2-m1{order:1;flex:0 1 auto;min-width:0;}
-  .hv2-m4{order:2;flex:0 0 auto;margin-left:auto;text-align:right;}
-  .hv2-m2{order:3;flex:1 0 100%;}
-  .hv2-m3{order:4;flex:1 0 100%;}
+  .hv2-m1{order:1;flex:1 0 100%;}
+  .hv2-m2{order:2;flex:1 0 100%;}
+  .hv2-m3{order:3;flex:1 0 100%;}
+  /* The session strip is a block, not a word: it takes its own full-width line
+     under the three facts. flex-basis 100% and not auto on purpose — the
+     component sets container-type: inline-size, and an inline-size container
+     with an indefinite basis has no content-derived width to resolve to. */
+  .hv2-clock{order:4;flex:1 0 100%;margin-top:6px;}
 
   /* Two lines, at every phone width, in both engines. Sized off the measure
      rather than off a guess: DM Serif Display sets "Evidence first." at
@@ -379,31 +396,6 @@ const CSS = `
   .hv2-btn{flex:0 1 auto;padding:12px 15px;}
 }
 
-/* Tall phones (393x852, 412x915, 430x932 — and the same devices with browser
-   chrome on, above 760px). Here there is room for the record: the two standing
-   facts leave the masthead and become a hairline-ruled tearsheet block under
-   the headline, with the founding month, where they read as evidence rather
-   than as chrome. Unnumbered: three standing facts are not a sequence
-   (EVERY-SCREEN §0.2 item 4). A value never breaks mid-phrase — if it does not
-   fit beside its label the ROW wraps and the value takes its own line whole,
-   which is what "LIQUID MARKETS, / GLOBAL" at 360 was.
-   Gated on height, not width, and additive rather than a second composition:
-   below 760 the same three facts are simply mono lines in the masthead. */
-@media (max-width:767px) and (min-height:760px){
-  .hv2-m2,.hv2-m3{display:none;}
-  .hv2-ledger{display:block;margin:18px 0 0;}
-  .hv2-lrow{display:flex;flex-wrap:wrap;align-items:baseline;
-    justify-content:space-between;gap:4px 16px;padding:8px 0;
-    border-top:1px solid rgba(255,255,255,.12);}
-  .hv2-lrow:last-child{border-bottom:1px solid rgba(255,255,255,.12);}
-  .hv2-ledger dt,.hv2-ledger dd{margin:0;font-family:var(--font-mono);
-    font-size:13px;line-height:1.6;letter-spacing:.182em;text-transform:uppercase;
-    font-weight:500;}
-  .hv2-ledger dt{color:#7c7d7d;}
-  .hv2-ledger dd{color:#cacaca;text-align:right;margin-right:-.182em;
-    white-space:nowrap;}
-}
-
 /* Short phones: the 320x568 floor, and every phone measured with the browser
    chrome actually on screen (Galaxy S9+ reports 658px of viewport, iPhone 15
    Pro 659, iPhone SE 667). The hero is allowed to be exactly one screen and no
@@ -428,7 +420,7 @@ const CSS = `
      columns get this narrow — city and time only */
   .hv2-m2,.hv2-m3{display:none;}
   .hv2-m1{grid-column:1 / span 6;}
-  .hv2-m4{grid-column:7 / span 6;}
+  .hv2-clock{grid-column:7 / span 6;}
 }
 @media (min-width:768px) and (max-width:1024px) and (orientation:portrait){
   /* A portrait tablet is a tall frame, not a wide one: the headline takes the
@@ -509,12 +501,16 @@ const CSS = `
   .hv2-fg{padding-block:var(--hv2-pt) var(--hv2-pb);}
   .hv2-mast{padding-bottom:10px;}
   .hv2-m2,.hv2-m3{display:none;}
-  .hv2-m1{grid-column:1 / span 6;}
-  .hv2-m4{grid-column:7 / span 6;}
+  .hv2-m1{grid-column:1 / span 12;}
+  /* 345px of letterbox cannot carry a 106px session strip on top of a
+     headline, a lead and two actions -- measured, the stack would run 401px.
+     It comes off here for the same reason the record and the curve do, and the
+     same strip is one tap away in the menu and the footer (sec-chrome). */
+  .hv2-clock{display:none;}
   .hv2-h1{grid-column:1 / span 8;
           font-size:clamp(2rem, calc(15.318vw - 7.83px), 44px);
           line-height:.92;letter-spacing:-.028em;margin-block:14px 0;}
-  .hv2-ledger,.hv2-curve{display:none;}
+  .hv2-curve{display:none;}
   .hv2-gap{min-height:8px;}
   .hv2-gap-b{min-height:8px;}
   .hv2-foot{padding-top:12px;row-gap:12px;}
@@ -554,7 +550,7 @@ const CSS = `
   .hv2-l2 > span{animation-delay:var(--stagger),var(--stagger);}
   .hv2-m2{animation-delay:var(--stagger),var(--stagger);}
   .hv2-m3{animation-delay:var(--stagger),var(--stagger);}
-  .hv2-m4{animation-delay:calc(var(--stagger) * 2),calc(var(--stagger) * 2);}
+  .hv2-clock{animation-delay:calc(var(--stagger) * 2),calc(var(--stagger) * 2);}
   .hv2-lead{animation-delay:calc(var(--stagger) * 2),calc(var(--stagger) * 2);}
   .hv2-cta{animation-delay:calc(var(--stagger) * 3),calc(var(--stagger) * 3);}
   .hv2-curve{animation-delay:calc(var(--stagger) * 4),calc(var(--stagger) * 4);}
@@ -576,55 +572,6 @@ const CSS = `
 @keyframes hv2Wipe{from{transform:scaleY(0)}to{transform:none}}
 @keyframes hv2Drift{from{transform:translate3d(0,-7%,0)}to{transform:translate3d(0,7%,0)}}
 `;
-
-/** The real current time in the firm's stated city, not a decorative counter.
- *  Nothing renders until it hydrates — EVERY-SCREEN §0.2 item 6: the server
- *  HTML used to ship `--:--:-- ET`, which is a placeholder standing in for a
- *  fact, and this site does not print those. The cell sits in a grid row whose
- *  height is set by the masthead's other mono cells, so an empty cell costs
- *  nothing and shifts nothing (CLS stays 0).
- *
- *  The zone and its label are derived from site.city rather than written in.
- *  When the city moved from Austin to Miami this clock kept running on
- *  America/Chicago and kept printing "CT". A hardcoded zone is a fact that
- *  cannot follow the fact it describes. */
-const ZONES: Record<string, { tz: string; label: string }> = {
-  "Miami, Florida": { tz: "America/New_York", label: "ET" },
-  "Austin, Texas": { tz: "America/Chicago", label: "CT" },
-};
-
-function zoneFor(city: string) {
-  const z = ZONES[city];
-  if (!z) {
-    throw new Error(
-      `HeroV2: no time zone mapped for site.city "${city}". Add it to ZONES ` +
-        `rather than letting the masthead show another city's clock.`
-    );
-  }
-  return z;
-}
-
-function useCityTime() {
-  const [t, setT] = useState<string | null>(null);
-  useEffect(() => {
-    const still =
-      typeof window.matchMedia === "function" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const fmt = new Intl.DateTimeFormat("en-US", {
-      timeZone: zoneFor(site.city).tz,
-      hour12: false,
-      hour: "2-digit",
-      minute: "2-digit",
-      ...(still ? {} : { second: "2-digit" }),
-    });
-    const tick = () => setT(fmt.format(new Date()));
-    tick();
-    if (still) return;
-    const id = window.setInterval(tick, 1000);
-    return () => window.clearInterval(id);
-  }, []);
-  return t;
-}
 
 /** The slot's stand-in until src/components/viz/YieldCurve.tsx (sec-motion)
  *  lands. Deliberately NOT data: one 1px stroke, no fill, no axes, no tenor
@@ -658,9 +605,6 @@ function CurvePlaceholder() {
 }
 
 export default function HeroV2() {
-  const time = useCityTime();
-  const zone = zoneFor(site.city);
-
   return (
     <section className="hv2">
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
@@ -683,13 +627,12 @@ export default function HeroV2() {
           <span className="t-mono hv2-m1">{site.city}</span>
           <span className="t-mono hv2-m2">{site.structure}</span>
           <span className="t-mono hv2-m3 hv2-mono-lit">{site.mandate}</span>
-          <span className="t-mono hv2-m4 hv2-mono-lit">
-            {time ? (
-              <>
-                <span className="hv2-clock">{time}</span> {zone.label}
-              </>
-            ) : null}
-          </span>
+          {/* Cross-section object (OWNERSHIP.md): sec-motion builds it,
+              sec-chrome places it in the nav and the footer, the hero shows it
+              where its own local clock used to be. It renders nothing until it
+              hydrates, so the server HTML carries no time-shaped placeholder --
+              which is what STATE.md §0.2 item 6 was about. */}
+          <SessionClock className="hv2-clock" />
         </div>
 
         <div className="hv2-gap" />
@@ -705,28 +648,6 @@ export default function HeroV2() {
           </h1>
         </div>
 
-        {/* Phone only: the two standing facts and the founding month as a
-            ruled record, where they read as evidence rather than as chrome.
-            Above 767px they are back in the masthead. */}
-        <dl className="hv2-ledger">
-          <div className="hv2-lrow">
-            {/* "Vehicle" rather than "Structure": it is the word a tearsheet
-                uses for this row, and the record should read like one. */}
-            <dt>Vehicle</dt>
-            <dd>{site.structure}</dd>
-          </div>
-          <div className="hv2-lrow">
-            <dt>Mandate</dt>
-            <dd>{site.mandate}</dd>
-          </div>
-          {/* The month, not the year. site.foundedLabel exists precisely because
-              "2026" alone would let a reader assume January, and the firm is
-              weeks old. */}
-          <div className="hv2-lrow">
-            <dt>Formed</dt>
-            <dd>{site.foundedLabel}</dd>
-          </div>
-        </dl>
 
         <div className="hv2-row hv2-foot">
           <p className="hv2-lead">
