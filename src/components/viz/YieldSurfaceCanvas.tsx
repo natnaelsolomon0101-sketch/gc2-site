@@ -82,6 +82,16 @@ const HALF_CYCLE_MS = 40_000;
    never phase-locks with the rock. */
 const BOB_MS = 9_000;
 const BOB_PX = 6;
+/* Pointer parallax (chart mode, hover devices only): the object leans up to
+   ±PARALLAX_DEG of yaw toward the pointer and rides ±PARALLAX_PX with it,
+   eased at PARALLAX_EASE per frame, so it floats with you rather than
+   snapping. Measured into the scale so it never clips. */
+const PARALLAX_DEG = 7;
+const PARALLAX_PX = 10;
+const PARALLAX_EASE = 0.045;
+/* The ten-year line draws in over REVEAL_MS from the first frame; the marker
+   arrives when the line does. */
+const REVEAL_MS = 1400;
 const CAMERA_DISTANCE = 3.2;        // in model units, from the origin
 
 export default function YieldSurfaceCanvas({
@@ -113,6 +123,12 @@ export default function YieldSurfaceCanvas({
     let boxH = height;
     let dpr = 1;
     let mono = "monospace";
+    let reveal = 1;
+    let tx = 0, ty = 0, cx = 0, cy = 0;   // pointer parallax: target, current
+    const hover =
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    const parallax = !!chart && hover && !isStatic && !reduced;
 
     const yawAt = (ms: number) =>
       ((yawCenter + yawRange * Math.sin((ms / HALF_CYCLE_MS) * Math.PI)) * Math.PI) / 180;
@@ -166,8 +182,10 @@ export default function YieldSurfaceCanvas({
       let maxX = 0;
       let maxY = 0;
       const ys = chart ? [floorY] : [];
+      const extra = parallax ? (PARALLAX_DEG * Math.PI) / 180 : 0;
       for (let a = 0; a <= 48; a++) {
-        const theta = yawAt((a / 48) * HALF_CYCLE_MS);
+        const base = yawAt((a / 48) * HALF_CYCLE_MS);
+        for (const theta of extra ? [base - extra, base + extra] : [base]) {
         for (let i = 0; i < rows.length; i++) {
           const z = zOf(i);
           for (let k = 0; k < rows[i].xs.length; k++) {
@@ -179,6 +197,7 @@ export default function YieldSurfaceCanvas({
               if (Math.abs(q.uy) > maxY) maxY = Math.abs(q.uy);
             }
           }
+        }
         }
       }
       const padX = chart ? 44 : 8;
@@ -289,14 +308,14 @@ export default function YieldSurfaceCanvas({
          attribution, and at the near corner it fought the 30Y label. */
       if (width >= 600) {
         const d0 = project(rows[0].xs[tenors - 1], floorY, zOf(0), theta);
-        queue(chart.firstDate, d0.sx + 10, d0.sy, "left");
+        if (d0.sx + 64 < width) queue(chart.firstDate, d0.sx + 10, d0.sy, "left");
       }
     };
 
     const drawSeries = (theta: number) => {
       if (!chart) return;
       const k = chart.seriesIndex;
-      const n = rows.length;
+      const n = Math.max(2, Math.round(rows.length * reveal));
       /* The area ribbon: the ten-year line with its drop to the floor, filled
          in the accent at low alpha. Painted before the mesh so the mesh's
          lines stay crisp over it. */
@@ -317,7 +336,7 @@ export default function YieldSurfaceCanvas({
     const drawSeriesLine = (theta: number) => {
       if (!chart) return;
       const k = chart.seriesIndex;
-      const n = rows.length;
+      const n = Math.max(2, Math.round(rows.length * reveal));
       ctx.beginPath();
       for (let i = 0; i < n; i++) {
         const p = project(rows[i].xs[k], rows[i].ys[k], zOf(i), theta);
@@ -326,6 +345,7 @@ export default function YieldSurfaceCanvas({
       ctx.strokeStyle = DEEP_IRIS;
       ctx.lineWidth = 2.25;
       ctx.stroke();
+      if (reveal < 1) return;
       /* The marker on the last value: a paper halo, an accent dot, a label. */
       const last = project(rows[n - 1].xs[k], rows[n - 1].ys[k], zOf(n - 1), theta);
       ctx.beginPath(); ctx.arc(last.sx, last.sy, 8, 0, Math.PI * 2);
@@ -415,10 +435,20 @@ export default function YieldSurfaceCanvas({
 
     const frame = (t: number) => {
       if (!start) start = t;
-      bob = bobAt(t - start);
-      draw(yawAt(t - start));
+      const ms = t - start;
+      const u = Math.min(1, ms / REVEAL_MS);
+      reveal = 1 - (1 - u) * (1 - u) * (1 - u);   // ease-out cubic
+      cx += (tx - cx) * PARALLAX_EASE;
+      cy += (ty - cy) * PARALLAX_EASE;
+      bob = bobAt(ms) + cy * PARALLAX_PX;
+      draw(yawAt(ms) + (cx * PARALLAX_DEG * Math.PI) / 180);
       raf = requestAnimationFrame(frame);
     };
+    const onPointer = (e: PointerEvent) => {
+      tx = (e.clientX / window.innerWidth - 0.5) * 2;
+      ty = (e.clientY / window.innerHeight - 0.5) * 2;
+    };
+    if (parallax) window.addEventListener("pointermove", onPointer, { passive: true });
 
     const stop = () => {
       if (raf) cancelAnimationFrame(raf);
@@ -431,6 +461,7 @@ export default function YieldSurfaceCanvas({
       measure();
       if (!animate) {
         bob = 0;
+        reveal = 1;
         draw(yawAt(0));
         return;
       }
@@ -473,6 +504,7 @@ export default function YieldSurfaceCanvas({
       ro?.disconnect();
       observer?.disconnect();
       window.removeEventListener("resize", onResize);
+      window.removeEventListener("pointermove", onPointer);
       document.removeEventListener("visibilitychange", onVisibility);
     };
   }, [rows, height, tilt, depth, yawCenter, yawRange, fit, opacity, isStatic, chart]);

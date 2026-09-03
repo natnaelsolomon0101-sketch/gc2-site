@@ -70,27 +70,39 @@ const CSS = css`
   background-size:140px 140px;opacity:.26;}
 
 /* ---- the picture: the floating chart ------------------------------------ */
-.hv2-chart{position:absolute;left:0;right:0;bottom:var(--hv2-foot-h);
-  height:calc(var(--hv2-chart-h) - var(--hv2-foot-h));z-index:0;pointer-events:none;}
+/* Desktop: the chart floats in the right half, beside the words, from under
+   the nav to the foot band, bleeding a little past the right edge. Under
+   1024 it drops below the copy as a band (the phone stack). */
+.hv2-chart{position:absolute;left:49%;right:-10%;
+  top:calc(var(--nav-h, 72px) + 2vh);bottom:var(--hv2-foot-h);
+  height:auto;z-index:0;pointer-events:none;}
+@media (max-width:1023px){
+  .hv2-chart{left:0;right:0;top:auto;bottom:var(--hv2-foot-h);
+    height:calc(var(--hv2-chart-h) - var(--hv2-foot-h));}
+}
 .hv2-chart canvas{position:absolute;inset:0;}
 .hv2-chart .ys-source{position:absolute;margin:0;
   bottom:calc(20px - var(--hv2-foot-h));
-  right:var(--hv2-side);left:auto;max-width:calc((var(--hv2-meas) - 48px) * .46);
+  /* The figure box overhangs the right edge by 10%; the caption comes back
+     to the container's right edge. */
+  right:calc(var(--hv2-side) + 10vw);left:auto;max-width:calc((var(--hv2-meas) - 48px) * .46);
   text-align:right;color:var(--color-ink-3);pointer-events:auto;}
 
 /* ---- the copy ------------------------------------------------------------- */
 .hv2-fg{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;
-  align-items:center;text-align:center;
+  align-items:flex-start;text-align:left;
   max-width:var(--page-max, 1200px);width:100%;margin-inline:auto;
   padding:calc(var(--nav-h, 72px) + var(--hv2-copy-top)) 24px 0;}
-.hv2-copy{display:flex;flex-direction:column;align-items:center;width:100%;}
-.hv2-h1{margin:0 0 24px;max-width:14em;
-  font-size:clamp(44px, 6.4vw, 104px);letter-spacing:-.025em;line-height:1.02;
-  text-wrap:balance;}
+.hv2-gap-t{flex:1 1 0;min-height:8px;}
+.hv2-copy{display:flex;flex-direction:column;align-items:flex-start;width:100%;
+  max-width:54%;}
+.hv2-h1{margin:0 0 24px;
+  font-size:clamp(44px, 6.6vw, 108px);letter-spacing:-.025em;line-height:.98;}
+.hv2-l{display:block;white-space:nowrap;}
 .hv2-h1 em{font-style:italic;color:var(--color-accent-deep-iris);}
 .hv2-lead{margin:0;font-size:19px;line-height:1.5;font-weight:300;
-  color:var(--color-ink-2);max-width:34em;text-wrap:pretty;}
-.hv2-cta{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:30px;}
+  color:var(--color-ink-2);max-width:30em;text-wrap:pretty;}
+.hv2-cta{display:flex;flex-wrap:wrap;gap:12px;justify-content:flex-start;margin-top:30px;}
 .hv2-btn{justify-content:center;min-height:50px;padding:12px 26px;border-radius:999px;}
 .hv2-btn.btn-ghost{background:color-mix(in srgb, var(--color-ground) 70%, transparent);}
 
@@ -110,6 +122,8 @@ const CSS = css`
        margin-top:calc(-1 * var(--nav-h, 56px));min-height:min(100vh, 900px);}
   @supports (height: 100dvh){ .hv2{min-height:min(100dvh, 900px);} }
   .hv2-fg{padding-inline:20px;}
+  .hv2-gap-t{flex:0 0 auto;min-height:0;}
+  .hv2-copy{max-width:none;}
   .hv2-h1{font-size:clamp(2.4rem, calc(15.318vw - 6.6px), 72px);
           margin-bottom:16px;letter-spacing:-.03em;line-height:1.0;}
   .hv2-lead{font-size:15.5px;line-height:1.5;max-width:26em;}
@@ -130,6 +144,8 @@ const CSS = css`
 /* ---- tablets are not big phones ------------------------------------------- */
 @media (min-width:768px) and (max-width:1023px){
   .hv2{--hv2-chart-h:56%;--hv2-foot-h:92px;}
+  .hv2-gap-t{flex:0 0 auto;min-height:0;}
+  .hv2-copy{max-width:none;}
   .hv2-f2{display:none;}
   .hv2-foot{padding-right:0;padding-bottom:62px;}
   .hv2-chart .ys-source{left:var(--hv2-side);right:var(--hv2-side);bottom:calc(16px - var(--hv2-foot-h));text-align:left;max-width:none;}
@@ -147,6 +163,8 @@ const CSS = css`
   .hv2{--hv2-copy-top:2vh;--hv2-chart-h:46%;--hv2-foot-h:40px;
        margin-top:calc(-1 * var(--nav-h, 48px));min-height:100vh;}
   @supports (height: 100dvh){ .hv2{min-height:100dvh;} }
+  .hv2-gap-t{flex:0 0 auto;min-height:0;}
+  .hv2-copy{max-width:none;}
   .hv2-h1{font-size:clamp(2rem, 6vw, 44px);margin-bottom:10px;}
   .hv2-lead{font-size:15px;line-height:1.4;}
   .hv2-cta{margin-top:14px;gap:10px;}
@@ -212,15 +230,17 @@ export default function HeroV2() {
         fit="natural"
         height={0}
         opacity={0.5}
-        yawCenter={38}
-        yawRange={16}
+        yawCenter={40}
+        yawRange={14}
         className="hv2-chart"
       />
 
       <div className="hv2-fg">
+        <div className="hv2-gap-t" />
         <div className="hv2-copy">
           <h1 className="t-display hv2-h1">
-            Evidence <em>first</em>. Then <em>capital</em>.
+            <span className="hv2-l">Evidence <em>first</em>.</span>
+            <span className="hv2-l">Then <em>capital</em>.</span>
           </h1>
           <p className="hv2-lead">
             Concentrated systematic strategies in liquid global markets. One research
