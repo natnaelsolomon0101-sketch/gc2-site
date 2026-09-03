@@ -27,6 +27,15 @@ export type YieldSurfaceCanvasProps = {
   height: number;
   /** Camera tilt above the horizon, in degrees. */
   tilt: number;
+  /** Half-depth of the time axis in model units: z runs -depth..+depth. */
+  depth: number;
+  /** Middle of the rock, in degrees of yaw. */
+  yawCenter: number;
+  /** Half-width of the rock. The yaw runs yawCenter ± yawRange. */
+  yawRange: number;
+  /** "band" anchors the surface into the right two-thirds of a wide slot;
+   *  "natural" centres it. */
+  fit: "band" | "natural";
   /** Alpha ceiling for the history strokes; the near edge gets this, the far
    *  edge gets 60% of it. */
   opacity: number;
@@ -36,11 +45,15 @@ export type YieldSurfaceCanvasProps = {
 
 const INK = "20, 19, 17";           // --color-ink, as channels for rgba()
 const DEEP_IRIS = "#4b49aa";        // the one accent, spent on today's curve
-const REVOLUTION_MS = 90_000;       // one turn; the owner asked for "very slow"
+/* Half a cycle — one extreme to the other — takes 40s, so a full there-and-back
+   is 80s. The yaw is a sine of time rather than a ramp, which gives the
+   ease-in-out for free: the surface slows as it reaches each extreme and never
+   turns a corner. */
+const HALF_CYCLE_MS = 40_000;
 const CAMERA_DISTANCE = 3.2;        // in model units, from the origin
 
 export default function YieldSurfaceCanvas({
-  rows, height, tilt, opacity, isStatic,
+  rows, height, tilt, depth, yawCenter, yawRange, fit, opacity, isStatic,
 }: YieldSurfaceCanvasProps) {
   const ref = useRef<HTMLCanvasElement | null>(null);
 
@@ -64,9 +77,11 @@ export default function YieldSurfaceCanvas({
     let animate = !isStatic && !reduced;
     let raf = 0;
     let start = 0;
-    let angle = 0;
     let width = 0;
     let dpr = 1;
+
+    const yawAt = (ms: number) =>
+      ((yawCenter + yawRange * Math.sin((ms / HALF_CYCLE_MS) * Math.PI)) * Math.PI) / 180;
 
     const resize = () => {
       dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -98,27 +113,30 @@ export default function YieldSurfaceCanvas({
       return { ux: rx * f, uy: ry * f, depth: dz };
     };
 
-    const zOf = (i: number) => (i / (rows.length - 1)) * 2 - 1;
+    const zOf = (i: number) => ((i / (rows.length - 1)) * 2 - 1) * depth;
 
-    /* ONE scale for the whole revolution, not one per frame.
+    /* ONE scale for the whole rock, not one per frame.
      *
-     * The surface is widest when it is broadside to the camera and narrowest
-     * when it is edge-on, so a scale fitted to the current angle would make the
-     * whole thing breathe in and out as it turned — which reads as a zoom, and
-     * a zoom on a data component reads as emphasis. Instead the extent is
-     * measured across a full turn once, and the scale that fits the worst angle
-     * is used at every angle. The first version fitted nothing at all and the
-     * surface ran off both edges of the canvas.
+     * A scale fitted to the current angle would make the surface breathe in and
+     * out as it turns, and a zoom on a data component reads as emphasis. So the
+     * extent is measured once across the whole yaw range and the worst angle
+     * sets the scale for every angle.
      *
-     * 48 samples over the revolution: the extremes are broad, not spiky, so
-     * this lands within a fraction of a percent of the true maximum at a cost
-     * of one pass at setup. */
+     * That costs less than it did when this revolved: measured across a
+     * 45°±30° rock the horizontal extent varies by about 9% (1.01 to 1.21 model
+     * units) while the vertical varies by 50%. Width is effectively stable, and
+     * it is the vertical that the box has to make room for.
+     *
+     * The surface never clips. Both axes are fitted, uniformly, so at worst
+     * there is empty ground beside it — see the note on the band fill in
+     * YieldSurface.tsx. */
     let scale = 1;
-    const fit = () => {
+    let originX = 0;
+    const measure = () => {
       let maxX = 0;
       let maxY = 0;
-      for (let a = 0; a < 48; a++) {
-        const theta = (a / 48) * Math.PI * 2;
+      for (let a = 0; a <= 48; a++) {
+        const theta = yawAt((a / 48) * HALF_CYCLE_MS);
         for (let i = 0; i < rows.length; i++) {
           const z = zOf(i);
           for (let k = 0; k < rows[i].xs.length; k++) {
@@ -134,12 +152,21 @@ export default function YieldSurfaceCanvas({
         (width / 2 - padX) / (maxX || 1),
         (height / 2 - padY) / (maxY || 1)
       );
+      /* Band mode anchors the surface into the right two-thirds, because the
+         hero's headline sits left and a centred surface would run under it. The
+         centre moves right by as much as the remaining room allows, never far
+         enough to push the surface off the edge. */
+      const half = maxX * scale + padX;
+      originX =
+        fit === "band"
+          ? Math.min(width - half, Math.max(half, width * 0.62))
+          : width / 2;
     };
 
     const project = (x: number, y: number, z: number, theta: number) => {
       const p = camera(x, y, z, theta);
       return {
-        sx: width / 2 + p.ux * scale,
+        sx: originX + p.ux * scale,
         sy: height / 2 - p.uy * scale,
         depth: p.depth,
       };
@@ -213,8 +240,7 @@ export default function YieldSurfaceCanvas({
 
     const frame = (t: number) => {
       if (!start) start = t;
-      angle = (((t - start) % REVOLUTION_MS) / REVOLUTION_MS) * Math.PI * 2;
-      draw(angle);
+      draw(yawAt(t - start));
       raf = requestAnimationFrame(frame);
     };
 
@@ -226,11 +252,12 @@ export default function YieldSurfaceCanvas({
     const run = () => {
       stop();
       resize();
-      fit();
+      measure();
       if (!animate) {
-        /* The static frame is not angle zero. Zero is the surface edge-on, which
-           is the one angle at which a landscape looks like a chart. */
-        draw(Math.PI * 0.22);
+        /* The static frame is the middle of the rock: the angle the surface
+           spends most of its time near, and the one the composition was tuned
+           at. */
+        draw(yawAt(0));
         return;
       }
       start = 0;
@@ -278,7 +305,7 @@ export default function YieldSurfaceCanvas({
       window.removeEventListener("resize", onResize);
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [rows, height, tilt, opacity, isStatic]);
+  }, [rows, height, tilt, depth, yawCenter, yawRange, fit, opacity, isStatic]);
 
   return (
     <canvas

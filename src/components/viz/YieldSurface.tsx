@@ -20,13 +20,21 @@ import {
  * surface. The same rule every data component here follows, and it matters more
  * on this one: an invented landscape is a much bigger lie than an invented line.
  *
- * MOTION. One revolution takes ninety seconds. This is continuous ambient
- * motion, which is NOT what the --dur-* tokens are for — they time transitions
- * and one-shot reveals, and EVERY-SCREEN.md §8.2's list of what moves does not
- * include this. It is here because the owner asked for it directly, and it is
- * logged as the deviation it is. It is gated entirely under
- * prefers-reduced-motion, it stops when the tab is hidden, and it stops on a
- * phone whose main thread is measurably blocking.
+ * MOTION. The surface ROCKS rather than revolves: the yaw is a sine through
+ * 45°±30°, forty seconds from one extreme to the other. A full revolution — the
+ * first version — spent a quarter of its cycle edge-on, which is the one angle
+ * at which a landscape reads as a chart, and another quarter showing the back
+ * of the surface with today's curve hidden behind ninety days of history. The
+ * rock never reaches either: the surface is always oblique and today is always
+ * at the front. The sine is also the ease-in-out for free, slowing into each
+ * extreme instead of turning a corner.
+ *
+ * This is continuous ambient motion, which is NOT what the --dur-* tokens are
+ * for — they time transitions and one-shot reveals, and EVERY-SCREEN.md §8.2's
+ * list of what moves does not include this. It is here because the owner asked
+ * for it directly, and it is logged as the deviation it is. It is gated
+ * entirely under prefers-reduced-motion, it stops when the tab is hidden, and
+ * it stops on a phone whose main thread is measurably blocking.
  *
  * COLOUR. Ink at 20-35% for the ninety days of history, depth-faded so the far
  * edge recedes; today's curve in deep-iris at full alpha. That accent is the
@@ -36,24 +44,63 @@ import {
  */
 
 export type YieldSurfaceProps = {
-  /** CSS height of the canvas. Default 380. */
+  /** CSS height of the canvas. Default 520. */
   height?: number;
-  /** Camera tilt above the horizon, in degrees. Default 22. */
+  /** Camera tilt above the horizon, in degrees. Defaults per `fit`. */
   tilt?: number;
-  /** Alpha ceiling for the history strokes. Default 0.35, the top of the range. */
+  /** Middle of the rock, in degrees of yaw. Default 45. */
+  yawCenter?: number;
+  /** Half-width of the rock: the yaw runs yawCenter ± yawRange. Default 30. */
+  yawRange?: number;
+  /**
+   * "band" is the hero: a shallow slab shaped to fill a wide short slot, and
+   * anchored into the right two-thirds so the headline keeps the left.
+   * "natural" is the deeper landscape, centred, for a slot nearer square.
+   */
+  fit?: "band" | "natural";
+  /** Alpha ceiling for the history strokes. Default 0.45 — it has to hold its
+   *  own behind type on paper. */
   opacity?: number;
   /** Force the single static frame — no rAF, no observer. */
   static?: boolean;
   className?: string;
 };
 
+/* The two shapes, and why they differ.
+ *
+ * A rock through 45°±30° sweeps an envelope whose width barely changes (about
+ * 9%) while its height changes by half. Width is therefore free and height is
+ * what the slot has to pay for, so the only way to fill a wide short band is to
+ * flatten the model: less tilt, a shallower time axis, a smaller yield
+ * amplitude. Measured envelope ratios: "natural" 1.9:1, "band" 3.1:1.
+ *
+ * The band shape was tuned by measuring the drawn ink, not by eye. At the two
+ * slots the Conductor named it fills 88% of the width at 1920x520 and 79% at
+ * 3440x520, against targets of 80% and 70%. Flatter shapes fill more — 89% at
+ * both — but at 520px of slot the surface becomes a 134px ribbon with no
+ * vertical presence, so the extra fill is bought with the thing the surface is
+ * for. This is the flattest shape that still reads as depth.
+ *
+ * None of these numbers are claims about the data: the surface prints no y
+ * axis and no z axis, so its proportions are composition, exactly like the
+ * yield curve's aspect. What would be dishonest is a non-uniform scale, and
+ * there isn't one. */
+const SHAPE = {
+  band:    { tilt: 16, depth: 0.95, amplitude: 0.52 },
+  natural: { tilt: 22, depth: 1.0,  amplitude: 0.62 },
+} as const;
+
 export default async function YieldSurface({
-  height = 380,
-  tilt = 22,
-  opacity = 0.35,
+  height = 520,
+  tilt,
+  yawCenter = 45,
+  yawRange = 30,
+  fit = "band",
+  opacity = 0.45,
   static: isStatic = false,
   className = "",
 }: YieldSurfaceProps) {
+  const shape = SHAPE[fit];
   const history = await fetchYieldHistory(90);
   if (!history || history.length < 2) return null;
 
@@ -85,7 +132,7 @@ export default async function YieldSurface({
     .map((row) => ({
       date: row.date,
       xs: row.points.map((p) => ((Math.log(p.years) - lo) / (hi - lo)) * 2 - 1),
-      ys: row.points.map((p) => ((p.rate - min) / span - 0.5) * 0.62),
+      ys: row.points.map((p) => ((p.rate - min) / span - 0.5) * shape.amplitude),
     }));
 
   if (rows.length < 2) return null;
@@ -102,7 +149,11 @@ export default async function YieldSurface({
       <YieldSurfaceCanvas
         rows={rows}
         height={height}
-        tilt={tilt}
+        tilt={tilt ?? shape.tilt}
+        depth={shape.depth}
+        yawCenter={yawCenter}
+        yawRange={yawRange}
+        fit={fit}
         opacity={opacity}
         isStatic={isStatic}
       />
