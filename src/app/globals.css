@@ -40,6 +40,8 @@
     font-family: var(--font-ui);
     font-size: 16px; line-height: 1.5; font-weight: 400;
     -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+    /* §7 rule 9: hyphenation needs lang (html already carries lang="en"). */
+    hyphens: auto;
   }
   ::selection { background: var(--color-pure); color: var(--color-void); }
   :focus-visible { outline: 2px solid var(--color-pure); outline-offset: 3px; border-radius: 8px; }
@@ -68,8 +70,8 @@
   .t-heading-sm { font-family: var(--font-display); font-weight: 400;
                   font-size: 26px; line-height: 1.1; }
   .t-sub   { font-size: 18px; line-height: 1.5; font-weight: 300; }
-  .t-body  { font-size: 16px; line-height: 1.5; color: var(--color-ash); }
-  .t-small { font-size: 14px; line-height: 1.67; color: var(--color-ash); }
+  .t-body  { font-size: 16px; line-height: 1.5; color: var(--color-ash); overflow-wrap: anywhere; }
+  .t-small { font-size: 14px; line-height: 1.67; color: var(--color-ash); overflow-wrap: anywhere; }
   .t-mono  { font-family: var(--font-mono); font-size: 12px; line-height: 2;
              text-transform: uppercase; letter-spacing: .182em; font-weight: 500;
              color: var(--color-ash); }
@@ -111,10 +113,10 @@
   .t-h3   { font-family: var(--font-display); font-weight:400; font-size:24px;
             line-height:1.2; color: var(--color-cloud); }
   @media (min-width:769px){ .t-h1{font-size:80px;} .t-h2{font-size:38px;} .t-h3{font-size:28px;} }
-  .t-lead    { font-size:18px; line-height:1.5; font-weight:300; color: var(--color-ash); }
+  .t-lead    { font-size:18px; line-height:1.5; font-weight:300; color: var(--color-ash); overflow-wrap: anywhere; }
   .t-caption { font-size:12px; line-height:2; font-family: var(--font-mono);
                text-transform:uppercase; letter-spacing:.182em; color: var(--color-ash); }
-  .t-prose   { font-size:18px; line-height:1.7; color: var(--color-ash); }
+  .t-prose   { font-size:18px; line-height:1.7; color: var(--color-ash); overflow-wrap: anywhere; }
   .rule-t { border-top:1px solid rgba(255,255,255,.12); }
   .rule-b { border-bottom:1px solid rgba(255,255,255,.12); }
   .rule-t-black { border-top:1px solid rgba(255,255,255,.12); }
