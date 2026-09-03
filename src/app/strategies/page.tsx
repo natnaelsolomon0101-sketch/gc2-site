@@ -368,16 +368,27 @@ export default function Strategies() {
 
 /* Below 1280: the rail becomes the one horizontal-scroll strip the site
    permits (APPENDIX-A, §7 rule: "no horizontal scroll except the one
-   /strategies strip"). scroll-snap-type + no trailing inline padding so the
-   last link is cut by the viewport edge at rest rather than sitting flush —
-   that cut is the "there is more" affordance instead of a scrollbar. */
+   /strategies strip"). Both edges get the page gutter (padding-inline:24px,
+   matching Container's own), and scroll-padding-inline:24px is the fix that
+   actually makes that gutter hold: scroll-snap-align:start on the first item
+   snaps its content edge to the scrollport's snap-start line, and without
+   scroll-padding telling the browser where that line sits, the snap-start
+   line defaults to the padding EDGE (x=0) rather than the padding box
+   (x=24) — so the browser auto-corrected scrollLeft to 24px on load to force
+   that alignment, which visually cancelled the left gutter and clipped
+   "Systematic Macro"'s leading S at the true screen edge. With scroll-padding
+   matching the visual padding, snapping to the first item lands at
+   scrollLeft:0 and the gutter holds. At rest the third item is the one cut
+   by the right edge (the strip is six names wide, not one screen wide) —
+   ~45% of it stays visible, a crop, not a sliver, which is the "there is
+   more" affordance the scrollbar-less strip relies on. */
 @media (max-width: 1279px) {
   .stx-rail-wrap { padding-block: 16px; border-top: 1px solid var(--color-hairline); border-bottom: 1px solid var(--color-hairline); }
   .stx-rail { margin-inline: -24px; }
   .stx-rail ul {
     display: flex; gap: 28px; overflow-x: auto; scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch; scrollbar-width: none;
-    padding-inline-start: 24px; padding-inline-end: 4px;
+    padding-inline: 24px; scroll-padding-inline: 24px;
   }
   .stx-rail ul::-webkit-scrollbar { display: none; }
   .stx-rail li { flex: none; scroll-snap-align: start; }
