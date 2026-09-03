@@ -14,10 +14,10 @@ import ECBGrid from "@/components/viz/ECBGrid";
    three, 24px of padding from hairline to hairline, and the whole row is the
    link — a real ≥44px tap target, not a decorative surface with a button
    floating on it. Colour survives as a rationed accent (a small swatch keyed
-   to the tile hue below) rather than as a full chromatic ground, per DESIGN.md
+   to the tile hue below) rather than as a full chromatic fill, per DESIGN.md
    principle 2 ("colour is confined to the strategy tiles" — here, a chip of
    it). No box-shadow: DESIGN.md's "Known drift" names this file as the source
-   of the shipped shadow the obsidian/graphite step was meant to replace, and
+   of the shipped shadow a real ground/surface step was meant to replace, and
    there's no shadow left to remove that step for.
 
    No client JS. The first-reveal stagger is a CSS animation keyed off
@@ -60,11 +60,11 @@ const css = `
   .stx-list { margin-top: 24px; }
 }
 .stx-row {
-  border-top: 1px solid rgba(255,255,255,.12);
+  border-top: 1px solid var(--color-hairline);
   animation: stxIn var(--dur-base) var(--ease) both;
   animation-delay: calc(var(--stx-i, 0) * var(--stagger));
 }
-.stx-list .stx-row:last-child { border-bottom: 1px solid rgba(255,255,255,.12); }
+.stx-list .stx-row:last-child { border-bottom: 1px solid var(--color-hairline); }
 
 .stx-link {
   display: flex; flex-direction: column; gap: 12px;
@@ -73,19 +73,22 @@ const css = `
   transition: background var(--dur-fast) var(--ease);
 }
 .stx-top { display: flex; align-items: center; gap: 12px; }
+/* The rationed accent: the tile hue as a small fill, not a card ground. No
+   foreground pairing is needed the way ui/Tile.tsx guarantees one — nothing
+   is set in type on the swatch itself. */
 .stx-swatch { width: 9px; height: 9px; border-radius: 50%; flex: none; background: var(--stx-accent); }
-.stx-name { color: var(--color-cloud); }
-.stx-one { color: var(--color-ash); max-width: 46em; }
-.stx-markets { color: var(--color-fog); }
+.stx-name { color: var(--color-ink); }
+.stx-one { color: var(--color-ink-2); max-width: 46em; }
+.stx-markets { color: var(--color-ink-3); }
 
 @media (hover: hover) and (pointer: fine) {
-  .stx-link:hover { background: rgba(255,255,255,.03); }
-  .stx-link:hover .stx-swatch { background: var(--color-cloud); }
+  .stx-link:hover { background: rgba(20,19,17,.04); }
+  .stx-link:hover .stx-swatch { background: var(--color-ink); }
 }
-.stx-link:active { background: rgba(255,255,255,.05); }
+.stx-link:active { background: rgba(20,19,17,.07); }
 .stx-link:focus-visible {
-  outline: 2px solid var(--color-pure); outline-offset: -2px;
-  border-radius: 4px; background: rgba(255,255,255,.03);
+  outline: 2px solid var(--color-ink); outline-offset: -2px;
+  border-radius: 4px; background: rgba(20,19,17,.04);
 }
 
 @media (min-width: 1280px) {
@@ -97,7 +100,7 @@ const css = `
    split above does not touch it — full section width at every size. */
 .stx-ecb {
   margin-top: 40px; padding-top: 24px;
-  border-top: 1px solid rgba(255,255,255,.12);
+  border-top: 1px solid var(--color-hairline);
 }
 @media (max-width: 767px) {
   .stx-ecb { margin-top: 32px; padding-top: 20px; }

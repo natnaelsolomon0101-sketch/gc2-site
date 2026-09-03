@@ -190,14 +190,14 @@ export default function Strategies() {
           <dl className="mt-8">
             {constraints.map((c) => (
               <div key={c.slug} className="rule-t py-6">
-                <dt className="t-mono text-cloud">
+                <dt className="t-mono text-ink">
                   <TextLink href={`/strategies#${c.slug}`}>{c.name}</TextLink>
                 </dt>
                 <dd className="t-body measure-body mt-3">{c.text}</dd>
               </div>
             ))}
           </dl>
-          <p className="t-small measure-body mt-6 text-fog">
+          <p className="t-small measure-body mt-6 text-ink-3">
             The constraints do not add. Six books that each look sized correctly can still want the
             same liquidity on the same afternoon, which is why capacity is governed at the firm
             rather than at the book.
@@ -212,8 +212,8 @@ export default function Strategies() {
         <dl>
           {capacityQuestions.map((c) => (
             <div key={c.q} className="rule-t py-6">
-              <dt className="t-body text-cloud">{c.q}</dt>
-              <dd className="t-small measure-body mt-2 text-fog">{c.why}</dd>
+              <dt className="t-body text-ink">{c.q}</dt>
+              <dd className="t-small measure-body mt-2 text-ink-3">{c.why}</dd>
             </div>
           ))}
         </dl>
@@ -233,8 +233,8 @@ export default function Strategies() {
     });
   }
 
-  /* Two structural bands after six obsidian strategy bands: abyss, then
-     obsidian, so the ground alternates from the point of insertion and the page
+  /* Two structural bands after six ground strategy bands: ground-2, then
+     ground, so the surface alternates from the point of insertion and the page
      closes on the body ground rather than on a deeper one. */
   const bands: { id: string; title: string; kicker: string; node: React.ReactNode }[] = [
     {
@@ -252,7 +252,7 @@ export default function Strategies() {
           <div className="mt-10">
             {capacityBlocks.map((b, i) => (
               <div key={b.key} className={i ? "mt-12" : ""}>
-                <p className="t-mono-xs text-fog">{ord(i)}</p>
+                <p className="t-mono-xs text-ink-3">{ord(i)}</p>
                 <h3 className="t-h3 mt-2">{b.h}</h3>
                 <div className="mt-5">{b.node}</div>
               </div>
@@ -285,7 +285,7 @@ export default function Strategies() {
             {stopConditions.map((c, i) => (
               <div key={c.h} className="rule-t py-8">
                 <dt>
-                  <span className="t-mono-xs block text-fog">{ord(i)}</span>
+                  <span className="t-mono-xs block text-ink-3">{ord(i)}</span>
                   <span className="t-h3 mt-2 block">{c.h}</span>
                 </dt>
                 <dd className="t-body measure-body mt-4">{c.p}</dd>
@@ -340,20 +340,25 @@ export default function Strategies() {
   .stx-rail { position: sticky; top: calc(var(--nav-h) + 32px); }
   .stx-rail ul { display: flex; flex-direction: column; gap: 8px; }
 }
+/* A block target with the tap-target padding INSIDE the anchor, not left to
+   min-height + flex-centering: the anchor's own box, content plus padding, is
+   what has to measure >=44px, so the target is exactly as tall as what is
+   tappable — no invisible margin around it doing the work. */
 .stx-rail a {
-  display: flex; align-items: center; min-height: 44px;
-  color: var(--color-ash); text-decoration: none;
+  display: block;
+  padding-block: 13px;
+  color: var(--color-ink-2); text-decoration: none;
   border-bottom: 2px solid transparent;
   transition: color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
   animation: stxRailIn var(--dur-base) var(--ease) both;
   animation-delay: calc(var(--stx-i, 0) * var(--stagger));
 }
 @media (hover: hover) and (pointer: fine) {
-  .stx-rail a:hover { color: var(--color-cloud); }
+  .stx-rail a:hover { color: var(--color-ink); }
 }
-.stx-rail a:active { color: var(--color-cloud); }
+.stx-rail a:active { color: var(--color-ink); }
 .stx-rail a:focus-visible {
-  outline: 2px solid var(--color-pure); outline-offset: 2px; border-radius: 4px;
+  outline: 2px solid var(--color-ink); outline-offset: 2px; border-radius: 4px;
 }
 @keyframes stxRailIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .stx-rail a { animation: none; } }
@@ -364,7 +369,7 @@ export default function Strategies() {
    last link is cut by the viewport edge at rest rather than sitting flush —
    that cut is the "there is more" affordance instead of a scrollbar. */
 @media (max-width: 1279px) {
-  .stx-rail-wrap { padding-block: 16px; border-top: 1px solid rgba(255,255,255,.12); border-bottom: 1px solid rgba(255,255,255,.12); }
+  .stx-rail-wrap { padding-block: 16px; border-top: 1px solid var(--color-hairline); border-bottom: 1px solid var(--color-hairline); }
   .stx-rail { margin-inline: -24px; }
   .stx-rail ul {
     display: flex; gap: 28px; overflow-x: auto; scroll-snap-type: x mandatory;
@@ -375,6 +380,25 @@ export default function Strategies() {
   .stx-rail li { flex: none; scroll-snap-align: start; }
   .stx-rail a { white-space: nowrap; }
 }
+
+/* Print: paper does not scroll, so the horizontal-scroll strip — the one
+   exception APPENDIX-A grants on screen — is not one on a printed page.
+   Chromium's print viewport (816px) falls inside the same <1280px range that
+   turns the rail into that strip, and scripts/qa/print.ts's P3 check counts
+   overflow-x:auto as clipping outright: "Tail Overlay" (the last link) was
+   cut by 32px, unreachable on paper since nothing there can scroll to it.
+   The rail becomes a plain wrapped list instead — still six names, still
+   links (P5), nothing lost, nothing hidden behind a scrollbar. */
+@media print {
+  .stx-rail-wrap { padding-block: 12px; }
+  .stx-rail { margin-inline: 0; }
+  .stx-rail ul {
+    overflow: visible; flex-wrap: wrap; scroll-snap-type: none;
+    padding-inline: 0; gap: 4px 20px;
+  }
+  .stx-rail li { scroll-snap-align: none; }
+  .stx-rail a { white-space: normal; }
+}
 `,
         }}
       />
@@ -383,7 +407,7 @@ export default function Strategies() {
         standfirst="Six books run independently and are underwritten against the same limits. One framework governs them because correlated risk does not respect a mandate boundary."
       />
 
-      <section className="scroll-mt-24 bg-obsidian">
+      <section className="scroll-mt-24 bg-ground">
         <Container>
           {/* One nav, two CSS layouts: `.stx-layout` is a plain flow at
               ≤1279 (the rail, first in source, reads as the horizontal
@@ -406,21 +430,21 @@ export default function Strategies() {
               {strategies.map((s) => (
                 <div key={s.slug} id={s.slug} className="grid-gc2 rule-t py-16 md:py-24 scroll-mt-24">
                   <div className="col-span-4 md:col-span-5">
-                    <h2 className="t-h2 text-pure">{s.name}</h2>
+                    <h2 className="t-h2 text-ink">{s.name}</h2>
                     <dl className="mt-8">
                       <div className="rule-t flex justify-between gap-6 py-3">
-                        <dt className="t-small text-fog">Markets</dt>
-                        <dd className="t-body text-right text-ash">{s.markets}</dd>
+                        <dt className="t-small text-ink-3">Markets</dt>
+                        <dd className="t-body text-right text-ink-2">{s.markets}</dd>
                       </div>
                       <div className="rule-t rule-b flex justify-between gap-6 py-3">
-                        <dt className="t-small text-fog">Instruments</dt>
-                        <dd className="t-body text-right text-ash">{s.instruments}</dd>
+                        <dt className="t-small text-ink-3">Instruments</dt>
+                        <dd className="t-body text-right text-ink-2">{s.instruments}</dd>
                       </div>
                     </dl>
                   </div>
                   <div className="col-span-4 md:col-span-6 md:col-start-7">
                     {s.body.map((t, i) => (
-                      <p key={i} className={`t-body measure-body text-ash ${i ? "mt-6" : ""}`}>{t}</p>
+                      <p key={i} className={`t-body measure-body text-ink-2 ${i ? "mt-6" : ""}`}>{t}</p>
                     ))}
                   </div>
                 </div>
@@ -434,13 +458,13 @@ export default function Strategies() {
         <section
           key={b.id}
           id={b.id}
-          className={`scroll-mt-24 ${i % 2 === 0 ? "bg-abyss" : "bg-obsidian"}`}
+          className={`scroll-mt-24 ${i % 2 === 0 ? "bg-ground-2" : "bg-ground"}`}
         >
           <Container>
             <div className="grid-gc2 rule-t py-16 md:py-24">
               <div className="col-span-4 md:col-span-4">
-                <h2 className="t-h2 text-pure">{b.title}</h2>
-                <p className="t-small measure-body mt-6 text-fog">{b.kicker}</p>
+                <h2 className="t-h2 text-ink">{b.title}</h2>
+                <p className="t-small measure-body mt-6 text-ink-3">{b.kicker}</p>
               </div>
               <div className="col-span-4 md:col-span-7 md:col-start-6">{b.node}</div>
             </div>
