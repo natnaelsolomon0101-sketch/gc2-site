@@ -48,7 +48,7 @@ const CSS = `
   .t-mono, .t-mono-xs { font-size: 8pt !important; }
   a, .link { border-bottom: 0 !important; text-decoration: underline !important; }
   .rule-t { border-color: #cccccc !important; }
-  .measure-body, .measure-lead, .measure-head, .measure-prose { max-width: none !important; }
+  .measure-legal, .measure-lead, .measure-head, .measure-prose { max-width: none !important; }
   .grid-gc2 { display: block !important; }
   .section-y { padding-block: 0 12pt !important; }
   .lg-row { break-inside: avoid; page-break-inside: avoid; padding: 10pt 0 !important; }
@@ -110,7 +110,7 @@ export default function Legal() {
                       <h2 className="lg-row-title t-h3 mt-3 text-pure">{d.title}</h2>
                     </div>
                     <div className="col-span-4 md:col-span-7 md:col-start-6">
-                      <p className="t-body measure-body">{d.blurb}</p>
+                      <p className="t-body measure-legal">{d.blurb}</p>
                       <p className="t-small mt-4 text-fog">{d.note}</p>
                     </div>
                   </Link>
@@ -130,25 +130,25 @@ export default function Legal() {
               <h2 className="t-h2">What these pages are not</h2>
             </div>
             <div className="col-span-4 md:col-span-7 md:col-start-6">
-              <p className="t-body measure-body">
+              <p className="t-body measure-legal">
                 These three documents describe a website. None of them describes an
                 investment, states a term, or creates an obligation on either side.
                 Nothing on this website is an offer to sell or a solicitation of an
                 offer to buy any security.
               </p>
-              <p className="t-body measure-body mt-6">
+              <p className="t-body measure-legal mt-6">
                 What governs the partnership is its offering documents. Those
                 documents are definitive, they govern in all respects, and where
                 anything on this website reads differently from them, they win.
               </p>
-              <p className="t-body measure-body mt-6">
+              <p className="t-body measure-legal mt-6">
                 This section was written to describe {site.name}&rsquo;s website as it
                 actually is rather than assembled from a template, and it leaves out
                 the clauses a template would supply that are not true of it. It has
                 not yet been reviewed by counsel, and it carries no effective date for
                 that reason.
               </p>
-              <p className="t-body measure-body mt-6">
+              <p className="t-body measure-legal mt-6">
                 Questions about any of it may be sent to{" "}
                 <TextLink href={`mailto:${site.emails.investors}`}>
                   {site.emails.investors}
