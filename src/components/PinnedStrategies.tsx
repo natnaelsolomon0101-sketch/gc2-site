@@ -1,9 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
-import type { KeyboardEvent } from "react";
+import type { KeyboardEvent, ReactNode } from "react";
 import type { Strategy } from "@/content/strategies";
 import { tileAccents } from "./tileAccents";
+import RevealLines from "@/components/ui/RevealLines";
 
 /* ===========================================================================
    PinnedStrategies — the sliding/fanning tile deck, back by owner's request.
@@ -66,6 +68,26 @@ import { tileAccents } from "./tileAccents";
 const tiles = tileAccents;
 
 type Mode = "static" | "pinned";
+
+/* Aethera frame, round 9 (owner instruction, per docs/v4/TRANSFORM.md): each
+   tile reads as its own frame — an editorial line, a lead, a pill action, a
+   foot caption — the same language HeroV2 established. The name is content
+   (src/content/strategies.ts), so the italic operative word is derived, not
+   hand-typed per strategy: the last word of every name here already reads as
+   the operative one ("Systematic *Macro*", "Tail *Overlay*"), so splitting on
+   the final space is the one rule that needs no per-strategy case. Colour is
+   NOT the framework h2's deep-iris rule — DESIGN.md's tile pairing table is
+   the authority on a tile's own foreground, so the italic word stays
+   currentColor, same as the rest of the name. */
+function editorialTitle(name: string): ReactNode {
+  const i = name.lastIndexOf(" ");
+  if (i === -1) return <em>{name}</em>;
+  return (
+    <>
+      {name.slice(0, i)} <em>{name.slice(i + 1)}</em>
+    </>
+  );
+}
 
 const css = `
 /* --body-h holds the currently-open tile's measured content height (see the
@@ -212,7 +234,25 @@ button.stx-head:focus-visible {
 .stx-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; margin: 0; }
 .stx-meta dd { margin: 0; }
 .stx-tile .t-mono-xs, .stx-tile .t-small, .stx-tile .t-sub, .stx-tile .t-heading-sm,
-.stx-tile dt, .stx-tile dd { color: inherit; }
+.stx-tile .t-caption, .stx-tile dt, .stx-tile dd { color: inherit; }
+.stx-name em { font-style: italic; }
+
+/* ---- the pill: "Read more", into /strategies' matching chapter ---------- */
+.stx-pill {
+  display: inline-flex; align-items: center; gap: 8px; flex: none;
+  align-self: flex-start; min-height: 44px; margin-top: 14px;
+  padding: 10px 22px; border-radius: 999px; border: 1px solid currentColor;
+  color: inherit; text-decoration: none; font-size: 14px;
+  transition: background var(--dur-fast) var(--ease);
+}
+@media (hover: hover) and (pointer: fine) {
+  .stx-pill:hover { background: color-mix(in srgb, currentColor 12%, transparent); }
+}
+.stx-pill:active { background: color-mix(in srgb, currentColor 18%, transparent); }
+.stx-pill:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+
+/* ---- the foot: the tile's index, the way the hero's foot carries facts -- */
+.stx-foot { flex: none; margin-top: 16px; }
 /* No opacity here. It used to be .82, diluting the tile's own paired -fg
    token toward the fill colour to read as "muted" -- axe caught what that
    actually does: on iris-gleam (the lowest-contrast pairing of the six at
@@ -450,7 +490,12 @@ export default function PinnedStrategies({ strategies }: { strategies: Strategy[
               const pid = `${uid}-p${k}`;
               const head = (
                 <>
-                  <span className="t-heading-sm stx-name">{s.name}</span>
+                  <RevealLines
+                    as="div"
+                    className="t-heading-sm stx-name"
+                    from={1}
+                    lines={[editorialTitle(s.name)]}
+                  />
                   <span className="stx-mark" aria-hidden="true" />
                 </>
               );
@@ -490,6 +535,9 @@ export default function PinnedStrategies({ strategies }: { strategies: Strategy[
                     ref={stacked && active ? bodyRef : undefined}
                   >
                     <p className="t-sub stx-one">{s.oneLiner}</p>
+                    <Link href={`/strategies#${s.slug}`} className="stx-pill">
+                      Read more <span aria-hidden="true">&rarr;</span>
+                    </Link>
                     <div className="stx-rule" aria-hidden="true" />
                     <dl className="stx-meta">
                       <div>
@@ -501,6 +549,9 @@ export default function PinnedStrategies({ strategies }: { strategies: Strategy[
                         <dd className="t-small">{s.instruments}</dd>
                       </div>
                     </dl>
+                    <p className="t-caption stx-foot">
+                      {String(k + 1).padStart(2, "0")} / {String(N).padStart(2, "0")}
+                    </p>
                   </div>
                 </article>
               );
