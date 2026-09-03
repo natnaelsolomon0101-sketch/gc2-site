@@ -213,14 +213,18 @@ const showVerify = registrationRows.some((r) => r.href);
    we will answer for, with the document or with the reason there is not one.
    Release is set by the regime and by policy, both of which are true today.
    `asOf` is a fact nobody has supplied, so the whole column stays absent. */
-type Doc = { name: string; asOf: string | null; release: string; requires?: "crd" };
+type Doc = { name: string; asOf: string | null; release: string; requires?: "crd" | "auditor" };
 
 const documents: Doc[] = [
   { name: "Due diligence questionnaire", asOf: null, release: "On request" },
   { name: "Private placement memorandum", asOf: null, release: "Behind the gate" },
   { name: "Limited partnership agreement", asOf: null, release: "Behind the gate" },
   { name: "Subscription agreement", asOf: null, release: "Behind the gate" },
-  { name: "Audited financial statements", asOf: null, release: "On request" },
+  // Gated on the auditor's name existing, the same fact the independence
+  // sentence below is gated on: there is no audited period to release
+  // without an auditor, and "On request" next to nothing to request is the
+  // kind of row a diligence team reads as evasive rather than empty.
+  { name: "Audited financial statements", asOf: null, release: "On request", requires: "auditor" },
   { name: "Form ADV Parts 1, 2A and 2B", asOf: null, release: "Public", requires: "crd" },
   { name: "Valuation policy", asOf: null, release: "On request" },
   { name: "Business continuity summary", asOf: null, release: "On request" },
@@ -228,7 +232,11 @@ const documents: Doc[] = [
   { name: "Insurance summary", asOf: null, release: "On request" },
 ];
 
-const visibleDocs = documents.filter((d) => (d.requires === "crd" ? Boolean(regulatory.crd) : true));
+const visibleDocs = documents.filter((d) => {
+  if (d.requires === "crd") return Boolean(regulatory.crd);
+  if (d.requires === "auditor") return providers.auditor !== null;
+  return true;
+});
 const showAsOf = visibleDocs.some((d) => d.asOf);
 
 /* -------------------------------------------------------- 04 · operations ---
