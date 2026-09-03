@@ -250,8 +250,8 @@ export default function Partnership() {
               <div className="col-span-4 md:col-span-8 md:col-start-5">
                 <p className="t-lead measure-lead">
                   Direct and co-investment are increasingly where a family office
-                  begins rather than where it ends up. All three doors stay open,
-                  and none of them is a lesser version of another.
+                  begins rather than where it ends up. All three are structures the
+                  firm runs, and none of them is a lesser version of another.
                 </p>
               </div>
             </div>
@@ -277,7 +277,7 @@ export default function Partnership() {
 
             <p className="t-small measure-body mt-10 text-ink-3">
               Which structure suits a family is a function of size, horizon and
-              what the family already holds — not of what we would rather sell.
+              what the family already holds — not of which one we would rather run.
             </p>
           </div>
         </Container>
@@ -398,7 +398,7 @@ export default function Partnership() {
               </div>
 
               <a href="/access" className="btn mt-10 min-h-11">
-                How to ask for an introduction
+                Why there is nothing to download
               </a>
               <p className="t-small measure-body mt-6 text-ink-3">
                 There is no download on that page and no form on it either. The

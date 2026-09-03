@@ -3,6 +3,7 @@ import Container from "@/components/Container";
 import PageHeader from "@/components/PageHeader";
 import TextLink from "@/components/TextLink";
 import { fund, hasAny } from "@/config/fund";
+import { site } from "@/config/site";
 
 /**
  * /diligence — the operational spine.
@@ -217,9 +218,9 @@ type Doc = { name: string; asOf: string | null; release: string; requires?: "crd
 
 const documents: Doc[] = [
   { name: "Due diligence questionnaire", asOf: null, release: "On request" },
-  { name: "Private placement memorandum", asOf: null, release: "Behind the gate" },
-  { name: "Limited partnership agreement", asOf: null, release: "Behind the gate" },
-  { name: "Subscription agreement", asOf: null, release: "Behind the gate" },
+  { name: "Private placement memorandum", asOf: null, release: "Direct to eligible investors" },
+  { name: "Limited partnership agreement", asOf: null, release: "Direct to eligible investors" },
+  { name: "Subscription agreement", asOf: null, release: "Direct to eligible investors" },
   // Gated on the auditor's name existing, the same fact the independence
   // sentence below is gated on: there is no audited period to release
   // without an auditor, and "On request" next to nothing to request is the
@@ -340,7 +341,7 @@ export default function Diligence() {
           This is an index, not a download wall. Under Regulation D 506(b) nothing that
           constitutes offering material may sit on a public page, so the offering documents are
           released directly to investors who qualify and never from here. That is what{" "}
-          <TextLink href="/access">behind the gate</TextLink> means below.
+          <TextLink href="/access">direct to eligible investors</TextLink> means below.
         </p>
         <p className="t-body measure-body mt-6">
           Everything else goes to diligence teams on request. A row in this index is something we
@@ -410,6 +411,11 @@ export default function Diligence() {
         eyebrow="Diligence"
         title="Diligence."
         standfirst="What an allocator needs before a first call, in one place: who keeps the books, what we are registered as, which documents are released and on what terms, and how the operating controls are built."
+        quickLink={
+          <p className="t-caption">
+            {`The firm was formed in ${site.foundedLabel}. What is described here is the policy the firm operates under, not a record of periods it has run.`}
+          </p>
+        }
       />
 
       {/* Bands alternate ground / ground-2, matching /firm, so an inner page

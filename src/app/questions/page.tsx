@@ -108,7 +108,7 @@ const groups: Group[] = [
         ],
       },
       {
-        q: "What environment do you underperform in?",
+        q: "What environment would you expect to do badly in?",
         a: [
           "A long, calm, one-directional market. The tail overlay costs money every day and nothing pays for it. Mean reversion inside a cohort gets punished for being early. The regime classifier sits in a single state long enough that the process contributes nothing beyond a direction anybody could have taken without us.",
           "We would rather be flat through that than change the process to catch it, because the change is what costs you in the state that follows.",
@@ -283,7 +283,7 @@ const groups: Group[] = [
       {
         q: "How many families do you intend to have?",
         a: [
-          "Fewer than the market would let us. The binding constraint is capacity, and capacity in this book is a research number computed against exit under stress rather than a sales number computed against demand.",
+          "The binding constraint is capacity, which is a research number computed against exit under stress. It sets the number, not demand.",
           "That is why the number of relationships is small, and it is why the smallness is not a scarcity tactic. The constraint would exist whether or not anybody found it appealing.",
         ],
       },
