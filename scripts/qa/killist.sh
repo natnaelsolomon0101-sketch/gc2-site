@@ -78,5 +78,131 @@ add "short-convexity\|short convexity" "tail overlay mischaracterized"
 n=$(cd "$SRC" && grep -rln "Girlscantrade2\|Girls Can Trade" src/ 2>/dev/null | grep -v "src/config/site.ts")
 [ -n "$n" ] && out+="[name hardcoded outside site.ts]\n$n\n"
 
+# --- motion: one timing source ----------------------------------------------
+# EVERY-SCREEN.md §8.1 and APPENDIX-A "Motion": src/lib/motion.ts is the single
+# source of durations, stagger and easing, mirrored into globals.css as
+# --dur-fast / --dur-base / --dur-draw / --dur-menu / --stagger / --ease. A
+# timing literal anywhere else in src/ is drift: it is how two sections end up
+# moving differently, which is the bug this gate exists to make impossible.
+#
+# What counts, on the comment-stripped source above (so a comment that explains
+# a duration is not a violation):
+#   * transition / animation, and -duration / -delay, with a non-zero time
+#   * the same as a React style-object property
+#   * a cubic-bezier() literal, or a --custom-property holding a time, outside
+#     globals.css — a local --ease or --dur is a second source, not a token
+#   * Tailwind duration-*, delay-*, ease-in|out|linear|in-out
+#   * a literal duration / delay / ease key in a file that imports framer-motion
+#     or motion/react — §5.10: "framer-motion usages read from motion.ts too"
+# Allowed: any line reading var(--dur-*) / var(--ease) / var(--stagger); any
+# line reading duration.* / easing / stagger from motion.ts; `none`; 0; and the
+# 1ms / .001ms values that kill motion under prefers-reduced-motion.
+#
+# NOT-YET-RETIMED, per file, with the section that owns it (docs/v4/OWNERSHIP.md).
+# These files predate the rule and belong to other agents, who are the only ones
+# allowed to touch them. The count is pinned, so an owning section can leave its
+# file alone but cannot add MORE untokenized timing to it, and any file not on
+# the list fails on its first offence. A section that retimes its file deletes
+# its line here; the list reaching empty is what "motion.ts is the only timing
+# source in src/" means, and the Conductor holds that at integration.
+m=$(cd "$SRC" && python3 - <<'MOTIONPY'
+import os, re
+
+DEFS = "src/app/globals.css"
+
+# Pinned pre-existing drift: path -> (count, owning section).
+BASELINE = {
+    "src/app/globals.css":                       (3, "foundation"),
+    "src/app/insights/page.tsx":                 (2, "sec-insights"),
+    "src/app/legal/page.tsx":                    (1, "sec-legal"),
+    "src/app/questions/page.tsx":                (1, "sec-allocators"),
+    "src/components/HairlineList.tsx":           (1, "sec-allocators"),
+    "src/components/PinnedStrategies.tsx":       (2, "sec-strategies"),
+    "src/components/sections/Atmosphere.tsx":    (4, "sec-hero"),
+    "src/components/sections/ContactBand.tsx":   (2, "sec-firm"),
+    "src/components/sections/Feature.tsx":       (5, "sec-framework"),
+    "src/components/sections/ForAllocators.tsx": (2, "sec-allocators"),
+    "src/components/sections/HeroV2.tsx":       (14, "sec-hero"),
+    "src/components/sections/Insights.tsx":      (7, "sec-insights"),
+    "src/components/sections/MarketsBand.tsx":   (5, "sec-hero"),
+    "src/components/sections/SiteNav.tsx":       (8, "sec-chrome"),
+    "src/components/sections/Strategies.tsx":    (2, "sec-strategies"),
+    "src/components/ui/Button.tsx":              (1, "Conductor"),
+    "src/components/ui/Card.tsx":                (1, "Conductor"),
+    # Dead code: neither is imported by any route, and §8.2 forbids a marquee
+    # outright. Pinned rather than fixed because it is not sec-motion's to
+    # delete; reported to the Conductor.
+    "src/components/ui/infinite-slider.tsx":      (3, "Conductor"),
+}
+
+TOKEN   = re.compile(r"var\(\s*--(dur-[a-z]+|ease|stagger)\b")
+FROM_TS = re.compile(r"\b(duration\.(fast|base|draw|menu)|easing|stagger)\b")
+DECL    = re.compile(r"(?:^|[\s;{\"'`])(?:transition|animation)(?:-(?:duration|delay))?\s*:\s*([^;}\"'`\n]+)")
+JSPROP  = re.compile(r"\b(?:transition|animation)(?:Duration|Delay)?\s*:")
+CUSTOM  = re.compile(r"--[a-z0-9-]+\s*:\s*[^;}\n]*(?<![\w.-])\d*\.?\d+\s*m?s(?![\w-])")
+TW      = re.compile(r"(?:^|[\s\"'`])(?:duration|delay)-(?:\[[^\]]+\]|\d+)")
+TWEASE  = re.compile(r"(?:^|[\s\"'`])ease-(?:linear|in|out|in-out)\b")
+BEZIER  = re.compile(r"cubic-bezier\(")
+TIME    = re.compile(r"(?<![\w.-])(\d*\.?\d+)\s*(ms|s)(?![\w-])")
+KEEP    = re.compile(r"^(0|0?\.0*1|1)(ms|s)?$")
+MOTIONLIB = re.compile(r"from\s+[\"\'](framer-motion|motion/react|motion)[\"\']")
+MOTIONKEY = re.compile(r"\b(duration|delay|ease|repeatDelay)\s*:\s*[\"\'\d]")
+
+
+def offending(path, line, uses_motion_lib=False):
+    if TOKEN.search(line) or FROM_TS.search(line):
+        return False
+    if uses_motion_lib and MOTIONKEY.search(line):
+        return True
+    for m in DECL.finditer(line):
+        v = m.group(1).strip()
+        if v.split()[0] in ("none", "inherit", "initial", "unset", "revert"):
+            continue
+        for num, unit in TIME.findall(v):
+            if not KEEP.match(num + unit):
+                return True
+        if BEZIER.search(v):
+            return True
+    if JSPROP.search(line):
+        for num, unit in TIME.findall(line):
+            if not KEEP.match(num + unit):
+                return True
+    if path != DEFS and CUSTOM.search(line):
+        return True
+    if TW.search(line) or TWEASE.search(line):
+        return True
+    if BEZIER.search(line) and not DECL.search(line) and path != DEFS:
+        return True
+    return False
+
+
+per = {}
+for base, dirs, files in os.walk("src"):
+    dirs[:] = [d for d in dirs if d not in {"node_modules", ".next"}]
+    for f in sorted(files):
+        if not f.endswith((".tsx", ".ts", ".css")):
+            continue
+        p = os.path.join(base, f).replace(os.sep, "/")
+        if p == "src/lib/motion.ts":
+            continue
+        src = open(p, encoding="utf-8").read()
+        lib = bool(MOTIONLIB.search(src))
+        for n, line in enumerate(src.splitlines(), 1):
+            if offending(p, line, lib):
+                per.setdefault(p, []).append("%s:%d:%s" % (p, n, line.strip()[:140]))
+
+for p in sorted(per):
+    allowed, owner = BASELINE.get(p, (0, None))
+    if len(per[p]) > allowed:
+        if owner:
+            print("%s  (%d now, %d pinned for %s)" % (p, len(per[p]), allowed, owner))
+        else:
+            print(p)
+        for h in per[p][allowed:]:
+            print("  " + h)
+MOTIONPY
+)
+[ -n "$m" ] && out+="[untokenized motion timing — src/lib/motion.ts is the only source]\n$m\n"
+
 printf "%b" "$out"
 [ -z "$out" ]

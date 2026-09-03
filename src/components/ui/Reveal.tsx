@@ -23,7 +23,8 @@ export type RevealMode = "load" | "scroll";
 export type RevealProps = {
   /** `scroll` (default) reveals on entry; `load` reveals once on first paint. */
   mode?: RevealMode;
-  /** Stagger step. 0 / 1 / 2 / 3 -> 0 / 90 / 180 / 270ms in load mode. */
+  /** Stagger step. 0 / 1 / 2 / 3 -> 0 / 1 / 2 / 3 x `--stagger` (70ms) in
+   *  load mode; in scroll mode the timeline range is shifted instead. */
   delay?: 0 | 1 | 2 | 3;
   as?: "div" | "section" | "article" | "li" | "p" | "span" | "figure";
   className?: string;
