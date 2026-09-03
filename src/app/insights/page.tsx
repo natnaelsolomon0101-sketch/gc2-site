@@ -6,11 +6,26 @@ import { notes, formatDate } from "@/content/notes";
 
 export const metadata: Metadata = {
   title: "Notes from the desk",
-  description: "Commentary from the desk on regime, risk, convexity, and capacity.",
+  // Round 5 (Google presence audit, docs/v4/GOOGLE-PRESENCE.md): was 66
+  // chars, under Google's ~110-char sweet spot. Extended with the page's own
+  // lead sentence — the same "argues a position" line the home Insights
+  // section already uses (src/components/sections/Insights.tsx), restated
+  // in the third person rather than re-describing the section from scratch.
+  description:
+    "Commentary from the desk on regime, risk, convexity, and capacity. Each note argues a position the firm actually holds, not a general market view.",
   // Round 3: /feed.xml (src/app/feed.xml/route.ts) is the same title and
   // description, syndicated. `alternates.types` is what actually emits
   // <link rel="alternate" type="application/rss+xml">.
-  alternates: { types: { "application/rss+xml": "/feed.xml" } },
+  //
+  // Round 5: setting `alternates` at all here REPLACES the root layout's
+  // `alternates.canonical: "./"` (src/app/layout.tsx) rather than merging
+  // with it — Next only shallow-merges metadata objects one level deep, and
+  // `alternates` is itself an object, so this page's `alternates.types` was
+  // silently dropping the root's `alternates.canonical`. Verified in the
+  // built HTML: /insights had no <link rel="canonical"> at all while every
+  // route that leaves `alternates` unset does. `canonical: "./"` restores
+  // it here explicitly.
+  alternates: { canonical: "./", types: { "application/rss+xml": "/feed.xml" } },
 };
 
 /* The rows are written out here rather than through HairlineList because that

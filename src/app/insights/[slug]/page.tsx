@@ -22,7 +22,13 @@ export async function generateMetadata(
   return {
     title: note.title,
     description: note.dek,
-    alternates: { types: { "application/rss+xml": "/feed.xml" } },
+    // Round 5 (Google presence audit): setting `alternates` here replaces
+    // rather than merges with the root layout's `alternates.canonical: "./"`
+    // (Next shallow-merges metadata one level deep, and `alternates` is
+    // itself an object) — every note page was emitting no <link
+    // rel="canonical"> at all. "./" is relative-to-pathname (same trick the
+    // root layout uses), so it resolves to this exact article's own URL.
+    alternates: { canonical: "./", types: { "application/rss+xml": "/feed.xml" } },
   };
 }
 
