@@ -14,6 +14,12 @@ import Container from "./Container";
    article prose (sec-insights, MDX notes) where a full section-band's worth
    of air would fight the surrounding measure; default is unchanged, full
    padding, for the section-band use (Feature.tsx).
+
+   Light pass: `ink` on plain `ground` (surface="paper"), not the ground-2
+   step — Statement is a generic pull-quote object other sections (and MDX
+   prose) drop into their own ground, so it does not carry a section-band's
+   stone tint. The hairlines above and below are still var(--color-hairline)
+   via .rule-t/.rule-b regardless of the ground under it.
    ========================================================================= */
 
 export default function Statement({
@@ -26,13 +32,13 @@ export default function Statement({
   compact?: boolean;
 }) {
   return (
-    <Section surface="stone">
+    <Section surface="paper">
       <Container>
         <div className={`rule-t rule-b ${compact ? "py-7 md:py-10" : "py-14 md:py-20"}`}>
           {/* .t-display-sm ships hyphens: manual + text-wrap: balance itself
               (foundation, v4/every-screen) — no local override needed. */}
           <p className="t-display-sm">{children}</p>
-          {attribution ? <p className="t-small mt-6 text-fog">{attribution}</p> : null}
+          {attribution ? <p className="t-small mt-6 text-ink-3">{attribution}</p> : null}
         </div>
       </Container>
     </Section>
