@@ -32,17 +32,6 @@ export default function Home() {
 
       <Strategies />
 
-      {/* inverted stat card — breaks the dark rhythm once */}
-      <section className="wrap band">
-        <div className="card-lite on-light mx-auto max-w-3xl text-center">
-          <p className="t-heading-lg" style={{ color: "#000" }}>
-            Risk is not the price of return. It is what we manage so that we are still
-            here when the return arrives.
-          </p>
-          <p className="t-mono mt-8" style={{ color: "#000", opacity: .7 }}>Investment Committee</p>
-        </div>
-      </section>
-
       <Approach />
 
       <Insights />
