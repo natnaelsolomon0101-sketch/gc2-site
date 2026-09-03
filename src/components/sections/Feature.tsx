@@ -9,7 +9,7 @@ import Statement from "@/components/Statement";
    The section that carries ONE idea: six strategies, one risk framework,
    because correlated risk does not respect a mandate boundary. Round-0
    rebuild (Conductor decision, docs/v4/APPENDIX-A.md, EVERY-SCREEN.md
-   §5.3): the section is a full-bleed abyss band. The sentence sets at
+   §5.3): the section is a full-bleed band. The sentence sets at
    .t-display-sm — the same scale the site uses everywhere it wants a
    sentence to carry a section — left-aligned, capped to roughly nine of
    twelve columns from 1024px so it reads as a headline, not a paragraph.
@@ -22,13 +22,23 @@ import Statement from "@/components/Statement";
    needs a pull quote.
 
    COLOUR is rationed to one chromatic accent — the "Risk framework" eyebrow
-   label — per DESIGN.md principle 2. No gradient card, no box-shadow: the
-   previous version carried both (a three-stop orchid/pale-iris/periwinkle
-   gradient slab and a pulsing box-shadow on the strand-drawing's junction
-   dot) as DESIGN.md's "Known drift" records; both are gone rather than
-   fixed in place, because the two-slab mosaic and six-hue strand drawing
-   they lived on are gone too — a poster does not carry a decorative field
-   AND a chromatic drawing AND a headline and still read as "one idea, slow."
+   label, set in `deep-iris` (the one accent that passes as text on paper,
+   6.8:1 on ground — DESIGN.md's chromatic-tiles table) — per DESIGN.md
+   principle 2. No gradient card, no box-shadow: the pre-round-0 version
+   carried both (a three-stop orchid/pale-iris/periwinkle gradient slab and
+   a pulsing box-shadow on the strand-drawing's junction dot) as DESIGN.md's
+   "Known drift" records; both are gone rather than fixed in place, because
+   the two-slab mosaic and six-hue strand drawing they lived on are gone too
+   — a poster does not carry a decorative field AND a chromatic drawing AND
+   a headline and still read as "one idea, slow."
+
+   LIGHT PASS (3 Sep 2026): the band is `ground-2` — DESIGN.md's "one step
+   darker: stone" — bounded by a hairline top and bottom (`.rule-t`/
+   `.rule-b`) rather than a colour-value inversion; that is the whole depth
+   mechanism now (ground → ground-2 → surface, all measured ≥1.10, DESIGN.md
+   "Measured — the ground steps"). Facts values are `ink`, labels `ink-3`;
+   the Statement quote below sits on plain `ground`, not the band's stone,
+   so the two read as two objects, not one flat field.
 
    TABLET (768-1024) gets its own two-column composition: the headline runs
    full-width (it's already near .t-display-sm's 80px ceiling by 768px), and
@@ -48,7 +58,7 @@ import Statement from "@/components/Statement";
 const COUNT = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven"];
 
 const css = `
-.ft { position: relative; background: var(--color-abyss); }
+.ft { position: relative; background: var(--color-ground-2); }
 
 .ft-inner { padding-block: 84px; }
 @media (min-width: 768px) { .ft-inner { padding-block: 120px; } }
@@ -97,12 +107,12 @@ export default function Feature() {
   const count = COUNT[strategies.length] ?? String(strategies.length);
 
   return (
-    <section id="framework" className="ft rule-t" aria-labelledby="feature-title">
+    <section id="framework" className="ft rule-t rule-b" aria-labelledby="feature-title">
       <style dangerouslySetInnerHTML={{ __html: css }} />
 
       <div className="wrap ft-inner">
         <div className="ft-head-block">
-          <p className="t-mono-xs text-pale-iris">Risk framework</p>
+          <p className="t-mono-xs text-deep-iris">Risk framework</p>
 
           <h2 id="feature-title" className="t-display-sm ft-head">
             Correlated risk does not respect a mandate boundary.
