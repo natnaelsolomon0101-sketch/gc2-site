@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Container from "@/components/Container";
+import PageHeader from "@/components/PageHeader";
 import { site } from "@/config/site";
 import { fund } from "@/config/fund";
 
@@ -75,6 +77,14 @@ const DEMANDS = [
   },
 ] as const;
 
+/* Same inner-route primitives and the same 5/7 split as `/firm`
+   (`container-gc2` / `grid-gc2` / `.t-h2`), not the home page's `wrap`/`band`/
+   `.t-heading-lg` this component shipped with — the two inner routes this
+   agent owns read as one template rather than two. The split is 5/7 only at
+   ≥1024: `grid-gc2` is already 12 columns at ≥768, so the `md:col-span-12`
+   bridge keeps the pair stacked through tablet, and `break-after-avoid` on
+   the left column keeps the h2 from ever being the last line visible on a
+   screen with none of its own content. */
 function Band({
   n,
   label,
@@ -90,18 +100,20 @@ function Band({
 }) {
   return (
     <section className={ground ? "bg-abyss" : ""}>
-      <div className="wrap band">
-        <div className="grid gap-x-6 gap-y-8 md:grid-cols-12">
-          <div className="md:col-span-4">
+      <Container>
+        <div className="grid-gc2 py-16 md:py-24">
+          <div className="col-span-4 md:col-span-12 lg:col-span-5 break-after-avoid">
             <p className="t-mono-xs text-fog">
               {String(n).padStart(2, "0")}
             </p>
-            <h2 className="t-heading-lg mt-4 text-pure">{title}</h2>
+            <h2 className="t-h2 mt-3">{title}</h2>
             <p className="t-mono-xs mt-5">{label}</p>
           </div>
-          <div className="md:col-span-7 md:col-start-6">{children}</div>
+          <div className="col-span-4 md:col-span-12 lg:col-span-7 lg:col-start-6">
+            {children}
+          </div>
         </div>
-      </div>
+      </Container>
     </section>
   );
 }
@@ -127,18 +139,11 @@ export default function TeamPage() {
        breaks landmark navigation and leaves the layout's skip link pointing at
        one of two mains. Every other route file returns a fragment. */
     <>
-      <section>
-        <div className="wrap band">
-          <p className="t-mono-xs text-fog">Team</p>
-          <h1 className="t-display mt-5 text-pure">The people.</h1>
-          <p className="t-sub measure-body mt-7">
-            {site.name} is small on purpose, and a small firm is mostly its
-            judgement. This page is about who holds which decision. Where a name
-            is not published yet, the seat is still described, because the seat
-            is the part an allocator actually has to price.
-          </p>
-        </div>
-      </section>
+      <PageHeader
+        eyebrow="Team"
+        title="The people."
+        standfirst={`${site.name} is small on purpose, and a small firm is mostly its judgement. This page is about who holds which decision. Where a name is not published yet, the seat is still described, because the seat is the part an allocator actually has to price.`}
+      />
 
       <Band
         n={index("seats")}
@@ -150,11 +155,11 @@ export default function TeamPage() {
           {SEATS.map((s) => (
             <div key={s.seat} className="border-b border-white/12 py-6">
               <dt className="t-heading-sm text-pure">{s.seat}</dt>
-              <dd className="t-body mt-3">{s.holds}</dd>
+              <dd className="t-body measure-body mt-3">{s.holds}</dd>
             </div>
           ))}
         </dl>
-        <p className="t-small mt-8">
+        <p className="t-small measure-body mt-8">
           One person can hold more than one of these, and at a firm this size
           somebody does. That is a fact about concentration, not a compliment
           about range, and it is why{" "}
@@ -202,7 +207,7 @@ export default function TeamPage() {
           {DEMANDS.map((d) => (
             <div key={d.q} className="border-b border-white/12 py-6">
               <dt className="t-heading-sm text-pure">{d.q}</dt>
-              <dd className="t-body mt-3">{d.a}</dd>
+              <dd className="t-body measure-body mt-3">{d.a}</dd>
             </div>
           ))}
         </dl>

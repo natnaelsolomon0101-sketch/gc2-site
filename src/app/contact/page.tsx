@@ -109,7 +109,7 @@ const blocks: Block[] = [
         </p>
         <p className="t-body mt-8">
           <TextLink standalone href={`mailto:${site.emails.investors}`}>
-            {site.emails.investors}
+            <span className="break-all">{site.emails.investors}</span>
           </TextLink>
         </p>
       </>
@@ -140,7 +140,7 @@ const blocks: Block[] = [
         </p>
         <p className="t-body mt-8">
           <TextLink standalone href={`mailto:${site.emails.press}`}>
-            {site.emails.press}
+            <span className="break-all">{site.emails.press}</span>
           </TextLink>
         </p>
       </>
@@ -193,18 +193,36 @@ export default function Contact() {
         standfirst="Four kinds of correspondence reach this firm and they do not want the same answer. There are two published addresses, no form, and no queue you can join. This page says which address applies to you, and what it can and cannot do."
       />
 
+      {/* On a phone the investors mailto lives inside the second block, after
+          three paragraphs — past the first screen on a 320 or 393 viewport.
+          This repeats nothing but that block's own title and address (no new
+          copy) as a single tap-to-mail row directly under the header, so the
+          address itself is always visible without scrolling and is reachable
+          before the reader has to sort themselves into an audience. */}
+      <section className="rule-t">
+        <Container>
+          <a
+            href={`mailto:${site.emails.investors}`}
+            className="flex min-h-11 flex-col gap-2 py-5"
+          >
+            <span className="t-mono-xs text-fog">Existing investors</span>
+            <span className="t-h3 break-all text-pure">{site.emails.investors}</span>
+          </a>
+        </Container>
+      </section>
+
       {/* Bands alternate obsidian / abyss to match /firm and /diligence, so an
-          inner page reads as the same site. Ordinals come from the RENDERED
-          index rather than a fixed list, so the numbering cannot desynchronise
-          from what is on screen. Heading pure 19.05:1 / 19.81:1, body ash
-          7.20:1 / 7.49:1, fog labels 4.61:1 / 4.80:1. */}
+          inner page reads as the same site. The "01/02/03/04" ordinal that
+          shipped here read as a sequence; these are four audiences, not four
+          steps, and the preamble's numerals rule ("no numerals on things that
+          are not sequences") applies — removed. Heading pure 19.05:1 /
+          19.81:1, body ash 7.20:1 / 7.49:1. */}
       {blocks.map((b, i) => (
         <section key={b.id} id={b.id} className={`scroll-mt-24 ${i % 2 ? "bg-abyss" : ""}`}>
           <Container>
             <div className={`grid-gc2 py-16 md:py-24 ${i === 0 ? "rule-t" : ""}`}>
               <div className="col-span-4 md:col-span-4">
-                <p className="t-mono-xs text-fog">{String(i + 1).padStart(2, "0")}</p>
-                <h2 className="t-h2 mt-3">{b.title}</h2>
+                <h2 className="t-h2">{b.title}</h2>
               </div>
               <div className="col-span-4 md:col-span-7 md:col-start-6">{b.node}</div>
             </div>
