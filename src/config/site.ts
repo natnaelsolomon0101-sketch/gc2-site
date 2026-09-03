@@ -1,7 +1,7 @@
 export const site = {
   name: "Girls Can Trade 2",
   mark: "GC2",
-  domain: "gc2.fund",
+  domain: "girlscantrade2.com",
   city: "Miami, Florida",
   // The month matters: the firm is weeks old, and "2026" alone would let a
   // reader assume January. Anything that prints a founding fact reads these

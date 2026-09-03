@@ -1,0 +1,16 @@
+{
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "gc2.fund" }],
+      "destination": "https://girlscantrade2.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.gc2.fund" }],
+      "destination": "https://girlscantrade2.com/:path*",
+      "permanent": true
+    }
+  ]
+}

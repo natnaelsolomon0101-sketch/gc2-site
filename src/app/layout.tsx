@@ -38,7 +38,12 @@ export const metadata: Metadata = {
      With them absent Next emits no canonical unless a page sets one, and derives
      the correct per-page og:url from metadataBase. */
   robots: { index: true, follow: true },
-  openGraph: { type: "website", siteName: site.name, locale: "en_US" },
+  /* `url: "./"` is relative-to-pathname, not a literal path: Next resolves it
+     against each route's own URL before applying metadataBase, so every page
+     gets its own correct absolute og:url (home -> metadataBase, /firm ->
+     metadataBase + "/firm") without any page setting one itself. Leaving
+     `openGraph.url` unset — the prior state — emits no og:url at all. */
+  openGraph: { type: "website", siteName: site.name, locale: "en_US", url: "./" },
   twitter: { card: "summary_large_image" },
 };
 
