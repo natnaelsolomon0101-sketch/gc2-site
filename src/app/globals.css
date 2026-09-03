@@ -31,6 +31,16 @@
 }
 
 :root { --page-max: 1200px; --nav-h: 72px; }
+/* §7.6: above 1920 the text container may widen past 1200 since the type
+   ceilings are rising too (see the fluid-type block below); left-aligned
+   grid, so this just gives the same composition more room on the right. */
+@media (min-width: 1920px) { :root { --page-max: 1440px; } }
+/* Nav height token. 56px is the ≤768 (tablet-and-down) value; 48px is the
+   landscape-phone override (§7 rule 8: 852x393 / 932x430) and is declared
+   after the 56px rule so it wins when both match — a landscape phone is
+   often ≤768px wide too. */
+@media (max-width: 768px) { :root { --nav-h: 56px; } }
+@media (max-height: 500px) and (orientation: landscape) { :root { --nav-h: 48px; } }
 
 @layer base {
   html { -webkit-text-size-adjust:100%; scroll-behavior:smooth; color-scheme: dark; }
@@ -177,7 +187,14 @@
                    font-size:clamp(40px, calc(28.57px + 3.57vw), 56px);
                    line-height:clamp(1.05, calc(1.1357 - .011161vw), 1.1);
                    letter-spacing:-0.02em;color:var(--color-pure);}
-  .nav-frame{height:var(--nav-h);} .hero-frame{min-height:min(calc(100vh - var(--nav-h)),900px);padding-block:72px;}
+  .nav-frame{height:var(--nav-h);}
+  /* vh fallback first (older Safari/WebKit, and any browser without dvh
+     support at all); dvh is what actually accounts for the mobile Safari
+     address bar, so it wins wherever @supports confirms it exists. */
+  .hero-frame{min-height:min(calc(100vh - var(--nav-h)),900px);padding-block:72px;}
+  @supports (height: 100dvh) {
+    .hero-frame{min-height:min(calc(100dvh - var(--nav-h)),900px);}
+  }
   .link{color:var(--color-pure);border-bottom:1px solid rgba(255,255,255,.35);transition:border-color .2s ease;}
   .link:hover{border-color:var(--color-pure);}
   .card-dark { background: var(--color-graphite); border-radius: 16px; }
