@@ -59,7 +59,10 @@
 }
 
 @layer components {
-  .wrap { max-width: var(--page-max); margin-inline:auto; padding-inline: 24px; }
+  /* container-type here too, not just on Section/Container's own root:
+     .wrap is used directly in a few places without either wrapper. */
+  .wrap { max-width: var(--page-max); margin-inline:auto; padding-inline: 24px;
+          container-type: inline-size; }
   .band { padding-block: 80px; }
 
   /* three voices: serif display, sans UI, mono data
@@ -149,7 +152,8 @@
   .tile      { border-radius: 30px; padding: 32px; }
 
   /* ---- inner-page primitives, retargeted from the paper build to Origin ---- */
-  .container-gc2 { width:100%; max-width: var(--page-max); margin-inline:auto; padding-inline:24px; }
+  .container-gc2 { width:100%; max-width: var(--page-max); margin-inline:auto; padding-inline:24px;
+                    container-type: inline-size; }
   .section-y     { padding-block: 80px; }
   .grid-gc2      { display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); gap:24px; }
   @media (max-width:767px){ .grid-gc2 { grid-template-columns:repeat(4,minmax(0,1fr)); } }
