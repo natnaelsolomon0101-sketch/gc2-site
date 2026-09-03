@@ -1,0 +1,50 @@
+/* Open Graph card for `/`. The title is the fund name out of
+   `src/config/site.ts` — it is never a literal outside that file — and the
+   description is the root layout's.
+ 
+   The home card is the one card that carries more than type (§5.10): the day's
+   Treasury par yield curve, drawn from `fetchYieldCurve()`, the same fetch and
+   the same `geometry()` the page's <YieldCurve/> uses, so the two can never
+   disagree. It revalidates on the curve's own six-hour cadence, which makes a
+   share of the home page dated and specific rather than evergreen and generic.
+ 
+   If the feed is unreachable the card renders without it. There is no fallback
+   line: a drawn curve with a date printed beside it is a claim. */
+import { ogImage, ogAlt, OG_SIZE, OG_CONTENT_TYPE } from "@/components/viz/og";
+import {
+  fetchYieldCurve, geometry, asOf, TREASURY_ATTRIBUTION,
+} from "@/components/viz/treasury";
+import { site } from "@/config/site";
+
+/* Six hours, the same cadence as YIELD_CURVE_REVALIDATE. Written as a literal
+   because Next only accepts a statically analyzable value for a route segment
+   config export — an imported constant fails the build with "Invalid segment
+   configuration export detected". Keep the two in step by hand. */
+export const revalidate = 21600;
+
+const card = {
+  title: site.name,
+  description:
+    "A private investment partnership running concentrated, systematic strategies across liquid global markets.",
+};
+
+/* Drawn at its final pixel size rather than scaled: satori rasterizes once, so
+   a 1px stroke in a viewBox of these exact dimensions is a 1px stroke in the
+   PNG. Wide and short, to sit beside the wordmark without competing with it. */
+const PLOT = { width: 430, height: 104 };
+
+export const alt = ogAlt(card);
+export const size = OG_SIZE;
+export const contentType = OG_CONTENT_TYPE;
+
+export default async function Image() {
+  const data = await fetchYieldCurve();
+  const curve = data
+    ? {
+        ...PLOT,
+        d: geometry(data.points, PLOT.width, PLOT.height).d,
+        source: `${TREASURY_ATTRIBUTION} · as of ${asOf(data.date)}`,
+      }
+    : null;
+  return ogImage({ ...card, curve });
+}
