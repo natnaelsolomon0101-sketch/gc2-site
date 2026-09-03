@@ -73,6 +73,11 @@ build ✓ · killist (incl. motion-timing gate, 0 pins) ✓ · regime 506(b) ✓
 - Approach: the veto is stage 04, the tail overlay is the single band beneath (not two bands).
 - Section-height criteria not met where copy-bound: approach at 393 = 3.75 viewports; strategies at 320 = 2.9; tearsheet prints 6–7 pages, not one. Each needs a copy decision, not a layout one.
 
+## 10b. Post-report changes (4 Sep 2026, on Nate's instruction)
+- **Counsel mediums applied** and promoted (framework, allocators, firm).
+- **The sliding strategies deck restored** (`src/components/PinnedStrategies.tsx`): the pinned scroll-through from the original build, re-lit for paper, on every width including phones (rows deleted); header sticky beside the deck on ≥1024; landscape phones and reduced motion get the static grid; open-tile height measured from content; titles never clipped. Gates on /, /strategies, /firm, /diligence: 152/152; print clean.
+- ECB grid rows on one line on phones; PageHeader caption/quickLink slots capped at 60ch.
+
 ## 11. Open items for Nate
 1. ~~Copy (counsel, medium)~~ — APPLIED 4 Sep 2026 on Nate's instruction and promoted to production: "if the return arrives"; partnership "structures the firm runs" / "which one we would rather run" / "Why there is nothing to download"; questions "would you expect to do badly in?" / capacity opener; diligence "Direct to eligible investors"; founding caption on /firm and /diligence. Still unchanged (not on counsel's list): "has stayed small" on /firm and /questions.
 2. **gc2.fund DNS** — attach the domain to the Vercel project (or point it) so the 308 in `vercel.json` takes effect; emails stay @gc2.fund (facts).
