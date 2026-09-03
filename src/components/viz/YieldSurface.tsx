@@ -1,8 +1,8 @@
 import { css } from "@/lib/css";
-import YieldSurfaceCanvas, { type SurfaceRow } from "./YieldSurfaceCanvas";
+import YieldSurfaceCanvas, { type SurfaceRow, type ChartSpec } from "./YieldSurfaceCanvas";
 import YieldLandscapeCanvas from "./YieldLandscapeCanvas";
 import {
-  fetchYieldHistory, asOf, TREASURY_SOURCE, TREASURY_ATTRIBUTION,
+  fetchYieldHistory, asOf, TENORS, TREASURY_SOURCE, TREASURY_ATTRIBUTION,
 } from "./treasury";
 
 /**
@@ -16,12 +16,13 @@ import {
  * today, but how the shape has been moving — the front end lifting, the belly
  * rolling, the long end standing still.
  *
- * TWO MATERIALS, ONE SURFACE. `mode="wire"` is the original drawing: ink
- * polylines at low alpha, a mesh you see through, fitted inside a slot.
- * `mode="painted"` (hero r9) is the same rows rendered as filled, lit, depth-
- * fogged strips — a landscape that fills its box and the page stands on. Same
- * fetch, same projection, same rock; the difference is entirely in the canvas
- * component that receives the numbers. See YieldLandscapeCanvas.tsx.
+ * THREE MATERIALS, ONE SURFACE. `mode="wire"` is the drawing: ink polylines at
+ * low alpha, a mesh you see through. `mode="chart"` is the wire drawn as the
+ * instrument it is — floor grid, tenor and date axes, yield ticks, the
+ * ten-year as a bold line with an area ribbon and a marker on its last value.
+ * `mode="painted"` is the same rows as filled, lit, depth-fogged hills. Same
+ * fetch, same projection, same rock; the difference is entirely in what the
+ * canvas does with the numbers.
  *
  * SERVER-FETCHED, ISR 6h, PASSED AS PROPS. The island never talks to Treasury.
  * If the fetch fails this renders nothing — no placeholder mesh, no last-known
@@ -29,36 +30,33 @@ import {
  * on this one: an invented landscape is a much bigger lie than an invented line.
  *
  * MOTION. The surface ROCKS rather than revolves: the yaw is a sine through
- * yawCenter ± yawRange, forty seconds from one extreme to the other. A full
- * revolution spent a quarter of its cycle edge-on, which is the one angle at
- * which a landscape reads as a chart, and another quarter showing the back of
- * the surface with today's curve hidden behind ninety days of history. The
- * rock never reaches either: the surface is always oblique and today is always
- * at the front. This is continuous ambient motion, here because the owner
- * asked for it directly; it is gated under prefers-reduced-motion, it stops
- * when the tab is hidden, and it stops on a phone whose main thread is
- * measurably blocking.
+ * yawCenter ± yawRange, forty seconds from one extreme to the other, and in
+ * chart and wire modes it bobs on a second slow sine so it floats. This is
+ * continuous ambient motion, here because the owner asked for it directly;
+ * it is gated under prefers-reduced-motion, it stops when the tab is hidden,
+ * and it stops on a phone whose main thread is measurably blocking.
  */
 
 export type YieldSurfaceProps = {
-  /** CSS height of the canvas (wire mode only; painted fills its box). Default 520. */
+  /** CSS height of the canvas. 0 fills the parent box. Default 520. */
   height?: number;
   /** Camera tilt above the horizon, in degrees. Defaults per `fit`. */
   tilt?: number;
-  /** Middle of the rock, in degrees of yaw. Default 45 (wire), 14 (painted). */
+  /** Middle of the rock, in degrees of yaw. */
   yawCenter?: number;
-  /** Half-width of the rock: the yaw runs yawCenter ± yawRange. Default 30 (wire), 9 (painted). */
+  /** Half-width of the rock: the yaw runs yawCenter ± yawRange. */
   yawRange?: number;
   /**
-   * "band" is the wire hero: a shallow slab shaped to fill a wide short slot,
-   * anchored into the right two-thirds. "natural" is the deeper landscape,
-   * centred, for a slot nearer square. "landscape" is the painted shape.
+   * "band" is a shallow slab shaped to fill a wide short slot, anchored into
+   * the right two-thirds. "natural" is the deeper landscape, centred, for a
+   * slot nearer square. "landscape" is the painted shape.
    */
   fit?: "band" | "natural" | "landscape";
-  /** Alpha ceiling for the history strokes (wire only). Default 0.45. */
+  /** Alpha ceiling for the history strokes (wire/chart). Default 0.45. */
   opacity?: number;
-  /** "wire" strokes a mesh; "painted" fills a landscape. Default "wire". */
-  mode?: "wire" | "painted";
+  /** "wire" strokes a mesh; "chart" strokes it with its instrument furniture;
+   *  "painted" fills a landscape. Default "wire". */
+  mode?: "wire" | "chart" | "painted";
   /** Painted only: fallback horizon as a fraction of the box height when
    *  --ys-horizon is not set in CSS. Default 0.44. */
   horizon?: number;
@@ -67,25 +65,18 @@ export type YieldSurfaceProps = {
   className?: string;
 };
 
-/* The shapes, and why they differ.
- *
- * A rock through 45°±30° sweeps an envelope whose width barely changes (about
- * 9%) while its height changes by half. Width is therefore free and height is
- * what the slot has to pay for, so the only way to fill a wide short band is to
- * flatten the model: less tilt, a shallower time axis, a smaller yield
- * amplitude. "band" and "natural" are the wire shapes, measured in r6–r8.
- *
- * "landscape" is the painted shape: a little more tilt and a longer time axis
- * so the ninety strips stack into visible hills rather than a ribbon, and an
- * amplitude that puts a real skyline on the range. None of these numbers are
- * claims about the data: the surface prints no y axis and no z axis, so its
- * proportions are composition, exactly like the yield curve's aspect. What
- * would be dishonest is a non-uniform scale, and there isn't one. */
 const SHAPE = {
-  band:      { tilt: 16, depth: 0.95, amplitude: 0.52 },
-  natural:   { tilt: 22, depth: 1.0,  amplitude: 0.62 },
-  landscape: { tilt: 21, depth: 1.15, amplitude: 0.78 },
+  band:      { tilt: 16, depth: 0.95, span: 1,   amplitude: 0.52 },
+  natural:   { tilt: 22, depth: 1.0,  span: 1,   amplitude: 0.62 },
+  /* The painted shape is wide: time runs across the frame at 2.3 half-units
+     against a 0.9 tenor depth, which is what a 3:1 first screen needs. */
+  landscape: { tilt: 19, depth: 0.9,  span: 2.3, amplitude: 0.72 },
 } as const;
+
+const shortDate = (iso: string) =>
+  new Date(`${iso}T12:00:00Z`)
+    .toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" })
+    .toUpperCase();
 
 export default async function YieldSurface({
   height = 520,
@@ -102,8 +93,8 @@ export default async function YieldSurface({
   const painted = mode === "painted";
   const shapeKey = fit ?? (painted ? "landscape" : "band");
   const shape = SHAPE[shapeKey];
-  const yc = yawCenter ?? (painted ? 14 : 45);
-  const yr = yawRange ?? (painted ? 9 : 30);
+  const yc = yawCenter ?? (painted ? 0 : 45);
+  const yr = yawRange ?? (painted ? 8 : 30);
 
   const history = await fetchYieldHistory(90);
   if (!history || history.length < 2) return null;
@@ -125,6 +116,7 @@ export default async function YieldSurface({
     }
   }
   const span = max - min || 1;
+  const yOf = (rate: number) => ((rate - min) / span - 0.5) * shape.amplitude;
 
   const rows: SurfaceRow[] = history
     /* Every row has to carry the same tenors in the same order or the spines
@@ -135,12 +127,35 @@ export default async function YieldSurface({
     .map((row) => ({
       date: row.date,
       xs: row.points.map((p) => ((Math.log(p.years) - lo) / (hi - lo)) * 2 - 1),
-      ys: row.points.map((p) => ((p.rate - min) / span - 0.5) * shape.amplitude),
+      ys: row.points.map((p) => yOf(p.rate)),
     }));
 
   if (rows.length < 2) return null;
 
   const asOfDate = rows[rows.length - 1].date;
+
+  /* The chart furniture, every value from the feed. The highlighted series is
+     the ten-year, or the longest tenor present if the feed ever lacks it. */
+  let chart: ChartSpec | undefined;
+  if (mode === "chart") {
+    const labelFor = (years: number) =>
+      TENORS.find((t) => Math.abs(t.years - years) < 1e-6)?.label ??
+      (years < 1 ? `${Math.round(years * 12)}M` : `${years}Y`);
+    let seriesIndex = tenors.findIndex((y) => y === 10);
+    if (seriesIndex < 0) seriesIndex = tenors.length - 1;
+    const lastRow = history[history.length - 1];
+    const lastRate = lastRow.points[seriesIndex].rate;
+    const mid = (min + max) / 2;
+    chart = {
+      tenorLabels: tenors.map(labelFor),
+      seriesIndex,
+      seriesLabel: labelFor(tenors[seriesIndex]),
+      seriesLast: `${lastRate.toFixed(2)}%`,
+      ticks: [min, mid, max].map((r) => ({ label: `${r.toFixed(1)}%`, y: yOf(r) })),
+      firstDate: shortDate(rows[0].date),
+      lastDate: shortDate(asOfDate),
+    };
+  }
 
   return (
     <figure
@@ -154,6 +169,7 @@ export default async function YieldSurface({
           rows={rows}
           tilt={tilt ?? shape.tilt}
           depth={shape.depth}
+          span={shape.span}
           yawCenter={yc}
           yawRange={yr}
           horizon={horizon}
@@ -170,6 +186,7 @@ export default async function YieldSurface({
           fit={shapeKey === "natural" ? "natural" : "band"}
           opacity={opacity}
           isStatic={isStatic}
+          chart={chart}
         />
       )}
       <figcaption className="t-caption ys-source">

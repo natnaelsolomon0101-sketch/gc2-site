@@ -16,6 +16,15 @@ import type { SurfaceRow } from "./YieldSurfaceCanvas";
  * upper left like every other object on the page. The result reads as a place,
  * which is what a first screen needs and a mesh at 45% alpha never was.
  *
+ * THE CAMERA LOOKS DOWN THE TENOR AXIS. The wireframe puts tenor across the
+ * frame and time into depth, and a yield curve is monotone, so painted that
+ * way the range is one wedge climbing to the right. Here time runs across the
+ * frame and tenor runs into depth: the one-month yield's ninety days are the
+ * low ground at the front, the belly is the mid-ground, and the thirty-year
+ * is the skyline at the back. Same points, same uniform scale — only which
+ * axis is x and which is z. Each strip is now the ground between two
+ * adjacent tenor samples across all ninety days.
+ *
  * IT FILLS ITS BOX. The wireframe was fitted inside a slot; this is the ground
  * the hero stands on. It overscans the width so the range runs off both edges
  * (a landscape with visible corners is a picture frame, not a horizon), sets
@@ -39,7 +48,11 @@ import type { SurfaceRow } from "./YieldSurfaceCanvas";
 export type YieldLandscapeCanvasProps = {
   rows: SurfaceRow[];
   tilt: number;
+  /** Half-depth of the tenor axis in model units: z runs +depth (short end,
+   *  near) to -depth (long end, far). */
   depth: number;
+  /** Half-width of the time axis in model units: x runs -span..+span. */
+  span: number;
   yawCenter: number;
   yawRange: number;
   /** Fallback horizon (0..1 of box height) when --ys-horizon is unset. */
@@ -57,13 +70,13 @@ const OVERSCAN = 1.34;
    accent family, spent on the picture. The apron below the last strip goes one
    step past the near stop. */
 const STOPS: [number, [number, number, number]][] = [
-  [0.0, [229, 225, 241]],
-  [0.22, [206, 199, 238]],
-  [0.5, [160, 152, 222]],
-  [0.78, [108, 104, 196]],
-  [1.0, [75, 73, 170]],
+  [0.0, [226, 222, 240]],
+  [0.18, [196, 190, 234]],
+  [0.42, [150, 142, 220]],
+  [0.7, [104, 100, 196]],
+  [1.0, [70, 68, 166]],
 ];
-const APRON: [number, number, number] = [58, 56, 132];
+const APRON: [number, number, number] = [52, 50, 128];
 const PAPER = "247, 245, 240";
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
@@ -122,7 +135,7 @@ function resample(xs: number[], ys: number[]): { xs: number[]; ys: number[] } {
 }
 
 export default function YieldLandscapeCanvas({
-  rows, tilt, depth, yawCenter, yawRange, horizon, isStatic,
+  rows, tilt, depth, span, yawCenter, yawRange, horizon, isStatic,
 }: YieldLandscapeCanvasProps) {
   const ref = useRef<HTMLCanvasElement | null>(null);
 
@@ -167,7 +180,12 @@ export default function YieldLandscapeCanvas({
       return { ux: rx * f, uy: ry * f };
     };
 
-    const zOf = (i: number) => ((i / (rows.length - 1)) * 2 - 1) * depth;
+    /* x is the trading day, across the frame; z is the tenor sample, into
+       depth, with the short end nearest (+depth) and the long end farthest. */
+    const n = smooth.length;
+    const xOf = (i: number) => ((i / (n - 1)) * 2 - 1) * span;
+    const zOf = (j: number) => (1 - (2 * j) / (SAMPLES - 1)) * depth;
+    const at = (i: number, j: number) => ({ x: xOf(i), y: smooth[i].ys[j], z: zOf(j) });
 
     let scale = 1;
     let topUY = 0;
@@ -195,20 +213,24 @@ export default function YieldLandscapeCanvas({
       let minY = Infinity;
       for (let a = 0; a <= 32; a++) {
         const theta = yawAt((a / 32) * HALF_CYCLE_MS);
-        for (let i = 0; i < smooth.length; i += 3) {
-          const z = zOf(i);
-          const row = smooth[i];
-          for (let k = 0; k < row.xs.length; k += 5) {
-            const p = camera(row.xs[k], row.ys[k], z, theta);
+        for (let i = 0; i < n; i += 3) {
+          for (let j = 0; j < SAMPLES; j += 5) {
+            const q = at(i, j);
+            const p = camera(q.x, q.y, q.z, theta);
             if (Math.abs(p.ux) > maxX) maxX = Math.abs(p.ux);
             if (p.uy > maxY) maxY = p.uy;
             if (p.uy < minY) minY = p.uy;
           }
         }
       }
+      /* Fill the width, but never let the near ground fall out of the
+         frame: the range's foot lands at or above 104% of the box. On a
+         tall narrow phone the height fit is the larger and wins; on a wide
+         short frame the width fit wins and the cap holds the foot in. */
       const byWidth = ((width * OVERSCAN) / 2) / (maxX || 1);
-      const byHeight = (height * 0.92 - horizonY) / ((maxY - minY) || 1);
-      scale = Math.max(byWidth, byHeight);
+      const byHeight = (height * 0.96 - horizonY) / ((maxY - minY) || 1);
+      const cap = (height * 1.04 - horizonY) / ((maxY - minY) || 1);
+      scale = Math.min(Math.max(byWidth, byHeight), cap);
       topUY = maxY;
     };
 
@@ -219,19 +241,19 @@ export default function YieldLandscapeCanvas({
 
     const draw = (theta: number) => {
       ctx.clearRect(0, 0, width, height);
-      const n = smooth.length;
 
-      /* Far haze: from above the horizon down to the first strip, on a
-         vertical gradient from nothing to the far tone, so the range
-         dissolves into the sky instead of starting on a hard edge. */
-      const first = smooth[0];
+      /* Far haze: from above the horizon down to the skyline, on a vertical
+         gradient from nothing to the far tone, so the range dissolves into
+         the sky instead of starting on a hard edge. */
       const haze = ctx.createLinearGradient(0, horizonY - 90, 0, horizonY + 24);
-      haze.addColorStop(0, "rgba(229, 225, 241, 0)");
+      haze.addColorStop(0, "rgba(226, 222, 240, 0)");
       haze.addColorStop(1, colourAt(0, 0));
+      const jFar = SAMPLES - 1;
       ctx.beginPath();
       ctx.moveTo(-4, horizonY - 90);
-      for (let k = 0; k < first.xs.length; k++) {
-        const p = project(first.xs[k], first.ys[k], zOf(0), theta);
+      for (let i = 0; i < n; i++) {
+        const q = at(i, jFar);
+        const p = project(q.x, q.y, q.z, theta);
         ctx.lineTo(p.sx, p.sy);
       }
       ctx.lineTo(width + 4, horizonY - 90);
@@ -239,58 +261,59 @@ export default function YieldLandscapeCanvas({
       ctx.fillStyle = haze;
       ctx.fill();
 
-      /* The strips, back to front. Each is the polygon between day i's curve
-         and day i+1's, coloured by depth and lit by its slope. */
-      for (let i = 0; i < n - 1; i++) {
-        const a = smooth[i];
-        const b = smooth[i + 1];
-        const za = zOf(i);
-        const zb = zOf(i + 1);
-        const t = i / (n - 2);
+      /* The strips, back to front: the ground between tenor sample j and
+         j-1, across all ninety days, coloured by depth and lit by its slope. */
+      for (let j = SAMPLES - 1; j >= 1; j--) {
+        const t = 1 - (j - 1) / (SAMPLES - 2);
         let rise = 0;
         ctx.beginPath();
-        for (let k = 0; k < a.xs.length; k++) {
-          const p = project(a.xs[k], a.ys[k], za, theta);
-          if (k === 0) ctx.moveTo(p.sx, p.sy);
+        for (let i = 0; i < n; i++) {
+          const q = at(i, j);
+          const p = project(q.x, q.y, q.z, theta);
+          if (i === 0) ctx.moveTo(p.sx, p.sy);
           else ctx.lineTo(p.sx, p.sy);
         }
-        for (let k = b.xs.length - 1; k >= 0; k--) {
-          const p = project(b.xs[k], b.ys[k], zb, theta);
+        for (let i = n - 1; i >= 0; i--) {
+          const q = at(i, j - 1);
+          const p = project(q.x, q.y, q.z, theta);
           ctx.lineTo(p.sx, p.sy);
-          rise += b.ys[k] - a.ys[k];
+          rise += smooth[i].ys[j] - smooth[i].ys[j - 1];
         }
         ctx.closePath();
-        /* Light: a strip that rises toward the viewer faces the sky and
-           lightens; one that falls away darkens. ±18 on the channels at
-           the amplitudes this data reaches. */
-        const light = Math.max(-18, Math.min(18, (rise / a.xs.length) * 900));
+        /* Light: a strip whose back edge stands above its front edge faces
+           the viewer and the sky, and lightens; one that falls away darkens. */
+        const light = Math.max(-16, Math.min(16, (rise / n) * 700));
         ctx.fillStyle = colourAt(t, light);
         ctx.fill();
-        /* A paper-light ridge on each strip's near edge, faint far away and
-           firmer near — the contour that makes layered hills read as layers. */
-        ctx.beginPath();
-        for (let k = 0; k < b.xs.length; k++) {
-          const p = project(b.xs[k], b.ys[k], zb, theta);
-          if (k === 0) ctx.moveTo(p.sx, p.sy);
-          else ctx.lineTo(p.sx, p.sy);
+        /* A paper-light ridge on the strip's near edge, faint far away and
+           firmer near — the contour that makes layered ground read as layers. */
+        if (j % 2 === 1 || j === 1) {
+          ctx.beginPath();
+          for (let i = 0; i < n; i++) {
+            const q = at(i, j - 1);
+            const p = project(q.x, q.y, q.z, theta);
+            if (i === 0) ctx.moveTo(p.sx, p.sy);
+            else ctx.lineTo(p.sx, p.sy);
+          }
+          ctx.strokeStyle = `rgba(${PAPER}, ${(0.05 + 0.28 * t).toFixed(3)})`;
+          ctx.lineWidth = j === 1 ? 1.5 : 0.75;
+          ctx.stroke();
         }
-        ctx.strokeStyle = `rgba(${PAPER}, ${(0.06 + 0.3 * t).toFixed(3)})`;
-        ctx.lineWidth = i === n - 2 ? 1.5 : 0.75;
-        ctx.stroke();
       }
 
-      /* The apron: from today's curve to the bottom edge, in the tone one
-         step past the near stop, so the ground reaches the frame. */
-      const last = smooth[n - 1];
-      const zl = zOf(n - 1);
+      /* The apron: from the near edge to the bottom of the frame, one step
+         past the near stop, so the ground reaches the frame. */
       ctx.beginPath();
-      const p0 = project(last.xs[0], last.ys[0], zl, theta);
+      const q0 = at(0, 0);
+      const p0 = project(q0.x, q0.y, q0.z, theta);
       ctx.moveTo(-4, p0.sy);
-      for (let k = 0; k < last.xs.length; k++) {
-        const p = project(last.xs[k], last.ys[k], zl, theta);
+      for (let i = 0; i < n; i++) {
+        const q = at(i, 0);
+        const p = project(q.x, q.y, q.z, theta);
         ctx.lineTo(p.sx, p.sy);
       }
-      const pn = project(last.xs[last.xs.length - 1], last.ys[last.xs.length - 1], zl, theta);
+      const qn = at(n - 1, 0);
+      const pn = project(qn.x, qn.y, qn.z, theta);
       ctx.lineTo(width + 4, pn.sy);
       ctx.lineTo(width + 4, height + 4);
       ctx.lineTo(-4, height + 4);
@@ -345,7 +368,7 @@ export default function YieldLandscapeCanvas({
       window.removeEventListener("resize", onResize);
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [rows, tilt, depth, yawCenter, yawRange, horizon, isStatic]);
+  }, [rows, tilt, depth, span, yawCenter, yawRange, horizon, isStatic]);
 
   return (
     <canvas
