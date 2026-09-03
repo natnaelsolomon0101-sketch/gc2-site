@@ -196,6 +196,16 @@
   .section-y     { padding-block: 80px; }
   .grid-gc2      { display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); gap:24px; }
   @media (max-width:767px){ .grid-gc2 { grid-template-columns:repeat(4,minmax(0,1fr)); } }
+  /* Foundation r1, deliverable 9: §7.6 says the extra room above 1920 sits to
+     the RIGHT — the left-aligned grid just has more ground on its right, not
+     a re-centered composition. `margin-inline: auto` centers the container,
+     which was pulling the whole page rightward-and-leftward evenly instead;
+     above 1920 the left margin is pinned to what it would be if the viewport
+     were exactly 1920 ((1920 - --page-max) / 2, i.e. the pre-1440px-bump
+     centering gap), and only the right side absorbs the extra width. */
+  @media (min-width: 1920px) {
+    .wrap, .container-gc2 { margin-inline: calc((1920px - var(--page-max)) / 2) auto; }
+  }
   /* Same fluid technique as the home-page primitives above, anchored on the
      44/80 (h1), 32/38 (h2) and 24/28 (h3) pairs this file already shipped.
      .t-h1 gets the same min-width:1920px ceiling rise as .t-display,
