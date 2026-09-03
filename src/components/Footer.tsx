@@ -117,7 +117,7 @@ export default function Footer() {
         <div className="gc2-ftr-table rule-t">
           {FOOTER_GROUPS.map((g) => (
             <nav key={g.label} aria-label={g.label} className="gc2-ftr-col">
-              <h2 className="t-mono-xs text-ink-3 gc2-ftr-col-head">{g.label}</h2>
+              <p className="t-mono-xs text-ink-3 gc2-ftr-col-head" role="heading" aria-level={2}>{g.label}</p>
               <ul>
                 {g.items.map((n) => (
                   <li key={n.href} className="gc2-ftr-row">
