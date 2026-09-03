@@ -16,8 +16,13 @@ const FOOTER_GROUPS = [
       row so it reads as one ruled object even though the three groups (4, 8,
       2 items) are different heights — that asymmetry is real data, not a bug
       to hide.
-   2. THE DISCLOSURE IS `.t-caption` AT THE `.measure-legal` (60em) TOKEN, both
-      already shipped in globals.css. Nothing here invents a size.
+   2. THE DISCLOSURE IS `.t-caption`. `.measure-legal` (60em, globals.css) is
+      tuned for the sans-serif legal pages; `.t-caption` is mono, uppercase,
+      and letter-spaced .182em, so 60em of IT renders past 80ch (measured
+      87ch, Conductor) -- three things that all widen a monospace line past
+      what the same em-count gives a proportional one. `.gc2-ftr-disclosure`
+      sets `max-width:80ch` directly instead, which is what the rule (§7.5 /
+      matrix "Text measure") actually asks for.
    3. THE MARK IS THE ONE PLACE ON THE SITE A DELIBERATELY OVERSIZED WORDMARK
       IS WELCOME. It starts at the same left gutter as everything else and is
       allowed to run past the .wrap container and the true viewport edge —
@@ -43,7 +48,7 @@ const CSS = `
 .gc2-ftr-link{ transition:color var(--dur-fast) var(--ease); }
 .gc2-ftr-link:hover{ color:var(--color-cloud); }
 
-.gc2-ftr-disclosure{ margin-top:64px; }
+.gc2-ftr-disclosure{ margin-top:64px; max-width:80ch; }
 .gc2-ftr-meta{ margin-top:24px; padding-top:24px; border-top:1px solid var(--color-steel); }
 
 /* The mark. Sized to genuinely outrun the viewport at laptop/desktop widths
@@ -98,7 +103,7 @@ export default function Footer() {
           ))}
         </div>
 
-        <p className="t-caption measure-legal gc2-ftr-disclosure">
+        <p className="t-caption gc2-ftr-disclosure">
           {site.name} is a private investment partnership. This website is for
           informational purposes only and does not constitute an offer to sell or a
           solicitation of an offer to buy any security. Past performance is not
