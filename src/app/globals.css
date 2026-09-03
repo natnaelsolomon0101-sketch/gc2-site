@@ -480,16 +480,15 @@
                white on white. .card-invert / .on-ink are flipped back to ink
                below; that is the one colour override the light canvas needs.
 
-   BRIDGE, delete when the sections have migrated: the ten sections still carry
-   hard-coded dark utilities (.text-pure, .text-cloud, .text-silver on
-   /tearsheet, .text-fog on /questions and /tearsheet). Those are white and
-   near-white ink values and they print invisibly on paper. They are remapped
-   below, and that rule comes out with the last of them.
-
    OWNERSHIP: docs/v4/OWNERSHIP.md gives this block to sec-legal. This rewrite
    was made by foundation under an explicit round-3 instruction from the
    Conductor, because the block existed only to undo a dark canvas that no
-   longer exists. sec-legal owns it again from here.
+   longer exists. sec-legal owns it again from here. The BRIDGE subsection
+   that used to sit below — remapping .text-pure/.text-cloud/.text-silver/
+   .text-ash/.text-fog, `summary` and `footer a` back to ink — came out once
+   all ten sections' light passes merged and `grep` for every deprecated
+   dark token under src/ came back empty (verified again here before the
+   deletion, not just taken on the Conductor's word).
    ======================================================================== */
 @media print {
   html, body {
@@ -526,26 +525,6 @@
     background: transparent !important;
     border: 1px solid var(--color-hairline-strong) !important;
   }
-
-  /* BRIDGE — white and near-white ink that unmigrated sections still set for
-     themselves. Each line names the files it is holding up; delete the line
-     when its last owner has moved to the semantic tokens, and delete the whole
-     block when they all have. Verified against scripts/qa/print.ts, which
-     fails any of these at 1.00:1 on paper the moment the rule comes out early.
-
-       .text-pure/.text-cloud/.text-silver, .text-ash/.text-fog
-         — the Tailwind utilities, spread across ~40 files; /tearsheet and
-           /questions are the two print routes that carry them.
-       summary
-         — src/app/questions/page.tsx paints `.qa details[open] > summary`
-           pure white at a higher specificity than its own print override.
-       footer a
-         — src/components/Footer.tsx paints `.gc2-ftr-mark` pure white. Footer
-           NAV is hidden on paper; the wordmark is not. */
-  .text-pure, .text-cloud, .text-silver, summary, footer a {
-    color: var(--color-ink) !important;
-  }
-  .text-ash, .text-fog { color: var(--color-ink-2) !important; }
 
   /* A 13% hairline is right on a lit screen and thin on a laser printer.
      Rules print at the strong weight so a table keeps its structure. */
