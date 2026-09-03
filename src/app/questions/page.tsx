@@ -167,8 +167,8 @@ const groups: Group[] = [
         q: "What was your largest drawdown?",
         a: [
           "We are not going to give you a figure here, and it is worth being exact about why.",
-          "This website carries no performance of any kind — no result, no loss, no ratio. The partnership relies on Regulation D Rule 506(b), and a public page discussing results is precisely what that rule does not permit. It is also a restriction we happen to agree with: a drawdown figure stripped of the period, the positioning and the decisions around it tells a family almost nothing, and tends to be quoted back as though it did.",
           `The firm was formed in ${site.foundedLabel}, so the honest answer today is that there is not yet a meaningful one. What we will say in public is how the book is sized: to survive the tail rather than to flatter the mean. When there is a record, you get the worst period in a conversation, month by month, with what we did and what we would do differently.`,
+          "This website carries no performance of any kind — no result, no loss, no ratio. The partnership relies on Regulation D Rule 506(b), and a public page discussing results is precisely what that rule does not permit. It is also a restriction we happen to agree with: a drawdown figure stripped of the period, the positioning and the decisions around it tells a family almost nothing, and tends to be quoted back as though it did.",
         ],
       },
       {
