@@ -112,8 +112,8 @@ DEFS = "src/app/globals.css"
 
 # Pinned pre-existing drift: path -> (count, owning section).
 BASELINE = {
-    "src/app/globals.css":                       (0, "foundation"),
-    "src/app/insights/page.tsx":                 (2, "sec-insights"),
+    "src/app/globals.css":                           (0, "foundation"),
+    "src/app/insights/page.tsx":                     (0, "sec-insights"),
     "src/app/legal/page.tsx":                    (1, "sec-legal"),
     "src/app/questions/page.tsx":                (0, "sec-allocators"),
     "src/components/HairlineList.tsx":           (0, "sec-allocators"),
@@ -123,7 +123,7 @@ BASELINE = {
     "src/components/sections/Feature.tsx":           (0, "sec-framework"),
     "src/components/sections/ForAllocators.tsx":     (0, "sec-allocators"),
     "src/components/sections/HeroV2.tsx":       (14, "sec-hero"),
-    "src/components/sections/Insights.tsx":      (7, "sec-insights"),
+    "src/components/sections/Insights.tsx":      (0, "sec-insights"),
     "src/components/sections/MarketsBand.tsx":   (5, "sec-hero"),
     "src/components/sections/SiteNav.tsx":       (8, "sec-chrome"),
     "src/components/sections/Strategies.tsx":    (2, "sec-strategies"),

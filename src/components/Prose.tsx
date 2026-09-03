@@ -65,7 +65,7 @@ export function Marginalia({ children }: { children: React.ReactNode }) {
         <p className="t-mono-xs leading-relaxed text-fog">{children}</p>
       </aside>
       <details className="rule-t pt-4 xl:hidden">
-        <summary className="t-mono-xs inline-flex min-h-11 cursor-pointer items-center text-fog">
+        <summary className="t-mono-xs inline-flex min-h-11 min-w-11 cursor-pointer items-center text-fog">
           Note
         </summary>
         <p className="t-small mt-3 text-ash">{children}</p>
@@ -80,6 +80,14 @@ export function Marginalia({ children }: { children: React.ReactNode }) {
    back-link is ↩, and there is exactly one footnote in the note that uses
    this today (see capacity-is-a-research-problem.mdx), so it is also
    literally the one ↩ on the page.
+
+   Round 1: both inline links measured under 44×44 (FootnoteRef 33×17, the
+   ↩ back-link 14×17). Padding expands each to a ≥44×44 hit area; an equal
+   negative horizontal margin cancels the padding's effect on the
+   surrounding line so the glyph doesn't move. (Vertical padding on an
+   inline, non-replaced element doesn't affect line-height by spec, so no
+   vertical margin is needed to compensate — it only grows the click/paint
+   area, overlapping the line above/below where nothing else is painted.)
    ------------------------------------------------------------------------ */
 export function FootnoteRef({ n }: { n: number }) {
   return (
@@ -87,7 +95,7 @@ export function FootnoteRef({ n }: { n: number }) {
       <a
         href={`#fn${n}`}
         id={`fnref${n}`}
-        className="t-mono-xs pl-0.5 text-pure no-underline"
+        className="t-mono-xs -mx-2 px-2 py-3.5 text-pure no-underline"
       >
         [{n}]
       </a>
@@ -108,7 +116,11 @@ export function Footnote({ n, children }: { n: number; children: React.ReactNode
   return (
     <li id={`fn${n}`} className="t-small text-ash">
       {children}{" "}
-      <a href={`#fnref${n}`} aria-label="Back to text" className="text-pure no-underline">
+      <a
+        href={`#fnref${n}`}
+        aria-label="Back to text"
+        className="-mx-4 px-4 py-3.5 text-pure no-underline"
+      >
         ↩
       </a>
     </li>
