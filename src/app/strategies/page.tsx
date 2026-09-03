@@ -190,8 +190,11 @@ export default function Strategies() {
           <dl className="mt-8">
             {constraints.map((c) => (
               <div key={c.slug} className="rule-t py-6">
+                {/* This dt holds nothing but the link — no surrounding prose for
+                    an inline underline to sit inside — so it takes the ≥44px
+                    standalone target rather than TextLink's inline default. */}
                 <dt className="t-mono text-ink">
-                  <TextLink href={`/strategies#${c.slug}`}>{c.name}</TextLink>
+                  <TextLink href={`/strategies#${c.slug}`} standalone>{c.name}</TextLink>
                 </dt>
                 <dd className="t-body measure-body mt-3">{c.text}</dd>
               </div>
