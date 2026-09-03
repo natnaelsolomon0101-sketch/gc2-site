@@ -580,10 +580,42 @@ function browserChecks(opts: {
     const rects = targets.map((el) => el.getBoundingClientRect());
     // De-duplicated by element index (a Set), not by pair/occurrence, so one
     // small or crowded link is reported once per shot, not once per neighbor.
+    //
+    // tap-target-size only: WCAG 2.5.8's inline exception. An <a> that sits
+    // inline within a run of prose — not styled as its own block/button —
+    // is exempt from the 44×44 minimum, same as underlined words in a
+    // paragraph on any site. This does NOT apply to tap-target-gap (an
+    // inline link can still crowd a neighbor) and does not touch `targets`/
+    // `rects`, only which indices land in smallIdx below. An anchor
+    // qualifies only when ALL of:
+    //   - its own computed display is exactly "inline" (not inline-block,
+    //     not flex/inline-flex — those are the anchor behaving as a block
+    //     or button, e.g. the /strategies scroll-snap strip links, which
+    //     are display:inline but whose <dt> parent has no other text, so
+    //     they still fail the next condition; the 404 "GC2" wordmark is
+    //     display:block and fails this one)
+    //   - its parent is a genuine prose container (p, li, dd, td,
+    //     figcaption, or a span itself inside a <p>) that has other
+    //     non-whitespace text besides the anchor — so an anchor that IS
+    //     the entirety of its parent's content (a pill/button styled as a
+    //     link) never qualifies
+    //   - it is not inside nav/header/footer/summary, regardless of the above
     const smallIdx = new Set<number>();
     for (let i = 0; i < targets.length; i++) {
+      const el = targets[i];
       const r = rects[i];
-      if (r.width < 44 || r.height < 44) smallIdx.add(i);
+      if (r.width >= 44 && r.height >= 44) continue;
+      if (el.tagName === "A") {
+        const parent = el.parentElement;
+        const isInline = getComputedStyle(el).display === "inline";
+        const parentIsProseContainer =
+          !!parent &&
+          (/^(P|LI|DD|TD|FIGCAPTION)$/.test(parent.tagName) || (parent.tagName === "SPAN" && !!parent.closest("p")));
+        const parentHasOtherText = !!parent && (parent.textContent || "").replace(el.textContent || "", "").trim().length > 0;
+        const inChrome = !!el.closest("nav, header, footer, summary");
+        if (isInline && parentIsProseContainer && parentHasOtherText && !inChrome) continue; // exempt
+      }
+      smallIdx.add(i);
     }
     const gapIdx = new Set<number>();
     for (let i = 0; i < rects.length; i++) {
