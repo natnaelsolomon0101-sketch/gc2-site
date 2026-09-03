@@ -5,15 +5,18 @@ import styles from "./Tile.module.css";
  * Tile — the chromatic island. The strongest visual idea on the site, and the
  * one most easily ruined.
  *
- * The foreground is NOT uniform across the six tones. White is legible on
- * exactly one of them:
+ * Light canvas (DESIGN.md "Chromatic tiles"): the six accents are fills, not
+ * type colour — five of them fail 4.5:1 as text on paper outright, some
+ * catastrophically (pale-iris 1.43:1). The foreground is NOT uniform across
+ * the six tones. `ink` is legible on five of them; only `deep-iris` is dark
+ * enough itself to need `ground` instead:
  *
- *   iris        #847dff  on black   6.36:1     white would be  3.30:1
- *   cyan        #00b3dd  on black   8.49:1     white would be  2.47:1
- *   pale-iris   #d1c9ff  on black  13.51:1     white would be  1.55:1   <-- fails badly
- *   deep-iris   #4b49aa  on WHITE   7.41:1     black would be  2.83:1
- *   orchid      #dd90d8  on black   9.06:1     white would be  2.32:1
- *   periwinkle  #90b8f0  on black  10.30:1     white would be  2.04:1
+ *   iris        #847dff  fill/ink   5.62:1
+ *   cyan        #00b3dd  fill/ink   7.51:1
+ *   pale-iris   #d1c9ff  fill/ink  11.95:1
+ *   deep-iris   #4b49aa  fill/ground 6.80:1
+ *   orchid      #dd90d8  fill/ink   8.01:1
+ *   periwinkle  #90b8f0  fill/ink   9.11:1
  *
  * So the API takes ONE prop. There is no `foreground`, no `color`, no `bg`, no
  * `className` escape onto the surface colour. A caller picks a tone and the
@@ -45,44 +48,44 @@ export const TILE_TONES: Readonly<Record<TileTone, TonePairing>> = Object.freeze
   iris: {
     surface: "iris-gleam",
     surfaceHex: "#847dff",
-    foreground: "void",
-    foregroundHex: "#000000",
-    className: "bg-iris-gleam text-void",
+    foreground: "ink",
+    foregroundHex: "#141311",
+    className: "bg-iris-gleam text-ink",
   },
   cyan: {
     surface: "cyan-signal",
     surfaceHex: "#00b3dd",
-    foreground: "void",
-    foregroundHex: "#000000",
-    className: "bg-cyan-signal text-void",
+    foreground: "ink",
+    foregroundHex: "#141311",
+    className: "bg-cyan-signal text-ink",
   },
   paleIris: {
     surface: "pale-iris",
     surfaceHex: "#d1c9ff",
-    foreground: "void",
-    foregroundHex: "#000000",
-    className: "bg-pale-iris text-void",
+    foreground: "ink",
+    foregroundHex: "#141311",
+    className: "bg-pale-iris text-ink",
   },
   deepIris: {
     surface: "deep-iris",
     surfaceHex: "#4b49aa",
-    foreground: "pure",
-    foregroundHex: "#ffffff",
-    className: "bg-deep-iris text-pure",
+    foreground: "ground",
+    foregroundHex: "#f7f5f0",
+    className: "bg-deep-iris text-ground",
   },
   orchid: {
     surface: "orchid-bloom",
     surfaceHex: "#dd90d8",
-    foreground: "void",
-    foregroundHex: "#000000",
-    className: "bg-orchid-bloom text-void",
+    foreground: "ink",
+    foregroundHex: "#141311",
+    className: "bg-orchid-bloom text-ink",
   },
   periwinkle: {
     surface: "periwinkle",
     surfaceHex: "#90b8f0",
-    foreground: "void",
-    foregroundHex: "#000000",
-    className: "bg-periwinkle text-void",
+    foreground: "ink",
+    foregroundHex: "#141311",
+    className: "bg-periwinkle text-ink",
   },
 } as const);
 
