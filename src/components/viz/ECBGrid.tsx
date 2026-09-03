@@ -102,12 +102,27 @@ const css = `
 .eg-source { display: block; margin-top: 12px; hyphens: none; }
 .eg-note { display: block; color: var(--color-ink-3); }
 
-/* Under ~360px of container width the three columns and .t-caption's .182em
-   tracking stop fitting on one line. The change moves under the rate rather
-   than being dropped: it is the half of the row that is actually news. */
-@container (max-width: 360px) {
-  .eg-rows, .eg-row { grid-template-columns: 1fr auto; }
-  .eg-row { row-gap: 0; padding-block: 6px; }
-  .eg-chg { grid-column: 2; }
+/* Phones keep all three columns on ONE line.
+ *
+ * They used to stack: under 360px of container the change dropped below the
+ * rate, on the theory that the change is the half of the row that is news and
+ * deserved the space. Wrong call. It made every row two lines and 65px tall,
+ * and it put the sign on a different line from the number it belongs to —
+ * "0.86055" over "+0.22%" reads as two facts rather than one, which is the
+ * opposite of what a rates row is for.
+ *
+ * The three columns do fit: at a 272px container (a 320px phone) the text is
+ * about 203px and the gaps 48px. What made that tight rather than comfortable
+ * is .t-caption's .182em tracking, so below 480px the tracking comes down to
+ * .12em and the gap to 16px — about 53px of slack at the narrowest width the
+ * site supports, which survives a longer rate and a three-digit change. The
+ * mono still reads as the site's mono; it is the one deviation from a type
+ * token here and it buys the row back. */
+@container (max-width: 480px) {
+  .eg-row { column-gap: 16px; }
+  .eg-pair, .eg-rate, .eg-chg { letter-spacing: .12em; }
 }
+/* No cell may wrap inside itself at any width: a rate broken across two lines
+   is a different number. */
+.eg-pair, .eg-rate, .eg-chg { white-space: nowrap; }
 `;
