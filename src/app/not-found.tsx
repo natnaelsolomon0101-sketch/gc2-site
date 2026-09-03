@@ -36,7 +36,20 @@ export default function NotFound() {
               <Button href="/">Return home</Button>
             </div>
           </div>
-          <Wordmark />
+          {/* self-start: without an align-items on the flex-col parent above,
+              a direct flex-column child stretches to the container's full
+              cross-axis width by default — that is what made the wordmark's
+              own <a> measure 1132px wide. This wrapper is the flex item
+              instead, so it takes its content's width and the anchor inside
+              goes back to being an ordinary inline element sized to "GC2".
+
+              The anchor's height (24px, under the 44px tap-target floor)
+              is NOT fixed here: Wordmark.tsx sets no className prop through
+              which a parent can pad it, and it is sec-chrome's file, not
+              this row's — routed to the Conductor rather than edited here. */}
+          <div className="self-start">
+            <Wordmark />
+          </div>
         </div>
       </Container>
     </section>
