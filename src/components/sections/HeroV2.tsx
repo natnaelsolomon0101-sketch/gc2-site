@@ -136,6 +136,18 @@ const louvre = (pitch: number) =>
   ` rgba(20,19,17,0) 0px, rgba(20,19,17,0) ${pitch - 1}px,` +
   ` rgba(20,19,17,.16) ${pitch - 1}px, rgba(20,19,17,.16) ${pitch}px)`;
 
+/* The step's share of the tint is baked into each strip's gradient rather than
+   set as an inline opacity on the element. That frees the element's own opacity
+   to be animated by the scroll response below without the animation's from-value
+   (1) wiping out the step and flattening the wedge on the first frame. */
+const light = (o: number) =>
+  `linear-gradient(191deg,` +
+  ` rgba(209,201,255,${(0.5 * o).toFixed(3)}) 0%,` +
+  ` rgba(132,125,255,${(0.4 * o).toFixed(3)}) 26%,` +
+  ` rgba(132,125,255,${(0.34 * o).toFixed(3)}) 52%,` +
+  ` rgba(144,184,240,${(0.34 * o).toFixed(3)}) 78%,` +
+  ` rgba(75,73,170,${(0.26 * o).toFixed(3)}) 100%)`;
+
 /** The stylesheet below is written to be read: it carries the reasoning for
  *  every measured number in it, and that reasoning is the reason the next
  *  person does not undo a fix. But it is also inlined into the document, and
@@ -229,13 +241,7 @@ const CSS = min(`
    composites to about 1.16:1 against ground, a shade past the ground->ground-2
    step, which is a swatch and not a slab. */
 .hv2-strip-light{position:absolute;left:0;right:0;top:-14%;bottom:-14%;
-  background:
-    linear-gradient(191deg,
-      rgba(209,201,255,.50) 0%,
-      rgba(132,125,255,.40) 26%,
-      rgba(132,125,255,.34) 52%,
-      rgba(144,184,240,.34) 78%,
-      rgba(75,73,170,.26) 100%);}
+  will-change:transform,opacity;}
 /* THE LOUVRE — an ordered dither, not a gradient. Each strip is cut by a
    repeating hard-stop rule pattern; the pitch opens up as the strips brighten,
    so value and line density step together. */
@@ -373,6 +379,23 @@ const CSS = min(`
   margin-right:calc(-1 * var(--hv2-bleed-r));padding:20px 24px 0 0;
   align-self:start;border-top:1px solid var(--color-hairline);}
 
+/* ---- the scroll cue ------------------------------------------------------
+   A word and a hairline at the foot of the frame. Positioned, not in flow:
+   pinned to the hero's bottom edge, it costs the composition no height, which
+   at 1920 is the difference between a 915px hero and an 845px one. It also
+   means the cue is where a cue belongs — at the bottom of the frame — rather
+   than wherever the content happens to stop. It grows downward once, at
+   the end of the load sequence, and it is gone by 120px of scroll. Left-aligned
+   on the column-1 line like everything else; ink-3, because it is the quietest
+   thing on the screen and should stay that way. aria-hidden: it tells a
+   sighted reader that there is more below the fold, which is not information a
+   screen reader is missing. */
+.hv2-cue{position:absolute;z-index:1;bottom:20px;left:var(--hv2-side);
+  display:flex;flex-direction:column;align-items:flex-start;gap:8px;}
+.hv2-cue-word{color:var(--color-ink-3);line-height:1;}
+.hv2-cue-line{display:block;width:1px;height:30px;transform-origin:50% 0;
+  background:var(--color-hairline-strong);}
+
 /* ---- narrow ----------------------------------------------------------- */
 @media (max-width:767px){
   .hv2{--hv2-pt:20px;--hv2-pb:24px;
@@ -500,6 +523,10 @@ const CSS = min(`
   .hv2-curve{display:none;}
   .hv2-band{display:flex;}
   .hv2{min-height:0;}
+  /* No frame to be at the foot of: this hero is exactly its content, so a cue
+     saying "there is more below" is pointing at the next section from two
+     inches above it. The poster keeps it. */
+  .hv2-cue{display:none;}
 }
 
 /* Short phones: the 320x568 floor, and every phone measured with the browser
@@ -559,19 +586,21 @@ const CSS = min(`
    slot takes a lower cap so it stops being the tallest thing in the frame —
    at 1280 it was 181px of a 750px hero and pushed the actions past the fold. */
 @media (min-width:1024px) and (max-height:820px){
-  .hv2{--hv2-pt:20px;--hv2-pb:28px;}
-  /* The plot is the block in the frame with a free shape, so it is what gives
-     when a 720p laptop has 647px of hero to spend. --yc-h was the knob for
-     this in round 1 and motion r4 replaced it: the box follows the viewBox
-     ratio now, and a slot that wants a flatter plot says so with --yc-aspect.
-     1000/260 is the component's own default; 1000/150 is the same width and a
-     little over half the height, which is what a short frame can pay for. */
-  .hv2-curve{--yc-aspect:1000 / 150;}
-  .hv2-h1{margin-block:20px 16px;}
-  .hv2-gap{min-height:16px;}
-  .hv2-gap-b{min-height:12px;}
-  .hv2-foot{padding-top:16px;row-gap:18px;}
-  .hv2-curve{padding-top:14px;}
+  .hv2{--hv2-pt:16px;--hv2-pb:20px;}
+  /* A cue is a promise that the frame ends below the fold. On a 720p laptop
+     the hero is already taller than the viewport — the curve's one shape costs
+     that — so the promise is redundant and the 50px is not free. */
+  .hv2-cue{display:none;}
+  /* No --yc-aspect here any more. It changed the BOX and not the DRAWING: the
+     SVG keeps its 1000x260 viewBox, so a flatter box letterboxed the curve —
+     measured by sec-motion at 761px of line inside a 1042px plot at 1920. One
+     shape, at every width (counsel's rule, Conductor's call). A short frame
+     pays for it in height instead, which is what the numbers below are. */
+  .hv2-h1{margin-block:14px 12px;}
+  .hv2-gap{min-height:10px;}
+  .hv2-gap-b{min-height:8px;}
+  .hv2-foot{padding-top:12px;row-gap:14px;}
+  .hv2-curve{padding-top:12px;}
 }
 /* ---- above 1920: anchor left, exactly as .wrap does ---------------------
    Foundation r1 deliverable 9 stopped centring the page container above 1920
@@ -592,7 +621,7 @@ const CSS = min(`
 @media (min-width:1920px){
   .hv2{--hv2-side: calc((1920px - var(--page-max)) / 2 + 24px);}
   .hv2-fg{margin-inline: calc((1920px - var(--page-max)) / 2) auto;}
-  .hv2-h1{margin-block:24px 20px;}
+  .hv2-h1{margin-block:18px 14px;}
   /* The field still bleeds to the right edge; it just stops starting so far
      left. Unclamped it is 1352px at 2560 and 2232px at 3440, and on paper that
      is not "light arriving from off-frame", it is five large pale rectangles
@@ -611,20 +640,13 @@ const CSS = min(`
      component; a --yc-max or a maxWidth prop would say the same thing in
      motion's own vocabulary and I would rather use that. The rule still bleeds
      to the viewport edge — it is on .hv2-curve's border box, not the figure's.
-     A 2562px-wide 1px hairline is not a better hairline than a 1200px one, and
-     the ceiling is not negotiable. */
-  .hv2-curve .yc{max-width:1200px;}
-}
-
-/* The cap alone left the hero at 921 (2560) and 954 (3440): a 1200px plot at
-   the viewBox's own 1000/260 is 312px tall, and the block around it another
-   163. Flattening the ratio to 1000/190 takes 84px off it, which is what fits
-   under the ceiling — and a par curve with no printed y scale states a shape,
-   so a wider slot drawing it flatter claims nothing it did not claim before.
-   Guarded on height as well as width so a 1920x800 laptop keeps the shorter
-   1000/150 the short-desktop block gives it. */
-@media (min-width:1920px) and (min-height:821px){
-  .hv2-curve{--yc-aspect:1000 / 190;}
+     1000px and not 1200: the plot is drawn at the viewBox's own 1000/260 at
+     every width now, so its width sets its height, and 1200 x .26 is 312px of
+     plot plus ~152 of title, axis, source and note — which put the hero at 921
+     (2560) and 954 (3440) against a 900px ceiling. At 1000 the block fits
+     under it, and the line spans the whole plot instead of being letterboxed
+     inside a flattened box. */
+  .hv2-curve .yc{max-width:1000px;}
 }
 
 /* ---- landscape phones: a letterbox, composed as one (§7 rule 8) --------
@@ -657,6 +679,7 @@ const CSS = min(`
      It comes off here for the same reason the record and the curve do, and the
      same strip is one tap away in the menu and the footer (sec-chrome). */
   .hv2-clockslot{display:none;}
+  .hv2-cue{display:none;}
   .hv2-h1{grid-column:1 / span 8;
           font-size:clamp(2rem, calc(15.318vw - 7.83px), 44px);
           line-height:.92;letter-spacing:-.028em;margin-block:14px 0;}
@@ -740,13 +763,39 @@ const CSS = min(`
   .hv2-l > span,.hv2-mast > *,.hv2-foot > *{
     animation:originFadeIn var(--dur-base) var(--ease) both,
               originRise var(--dur-base) var(--ease) both;}
-  .hv2-l2 > span{animation-delay:var(--stagger),var(--stagger);}
+  /* ONE LADDER, one rung per stagger step: the masthead settles, the two
+     display lines rise a step apart, then the sentence, then the actions, and
+     only then the curve — which draws itself over --dur-draw and does not put
+     a tenor label on the axis until the line has reached it. Every value is
+     --stagger and --dur-*; there is not a literal here. */
   .hv2-m2{animation-delay:var(--stagger),var(--stagger);}
   .hv2-m3{animation-delay:var(--stagger),var(--stagger);}
-  .hv2-clockslot{animation-delay:calc(var(--stagger) * 2),calc(var(--stagger) * 2);}
-  .hv2-lead{animation-delay:calc(var(--stagger) * 2),calc(var(--stagger) * 2);}
-  .hv2-cta{animation-delay:calc(var(--stagger) * 3),calc(var(--stagger) * 3);}
-  .hv2-curve{animation-delay:calc(var(--stagger) * 4),calc(var(--stagger) * 4);}
+  .hv2-clockslot{animation-delay:var(--stagger),var(--stagger);}
+  .hv2-l > span{animation-delay:var(--stagger),var(--stagger);}
+  .hv2-l2 > span{animation-delay:calc(var(--stagger) * 2),calc(var(--stagger) * 2);}
+  .hv2-lead{animation-delay:calc(var(--stagger) * 3),calc(var(--stagger) * 3);}
+  .hv2-cta{animation-delay:calc(var(--stagger) * 4),calc(var(--stagger) * 4);}
+  .hv2-curve,.hv2-band{animation-delay:calc(var(--stagger) * 5),calc(var(--stagger) * 5);}
+  /* The line's own wipe is the component's ycDraw; the hero only says when.
+     Its title arrives with it — a picture and its name — and the axis, the
+     source and the note wait out the full draw so no label is on the page
+     before the line has got to it. */
+  .hv2-curve .yc-line{animation-delay:calc(var(--stagger) * 5);}
+  .hv2-curve .yc-title{
+    animation:originFadeIn var(--dur-base) var(--ease) calc(var(--stagger) * 5) both;}
+  .hv2-curve .yc-tick,.hv2-curve .yc-source,.hv2-curve .yc-note{
+    animation:originFadeIn var(--dur-base) var(--ease)
+              calc(var(--stagger) * 5 + var(--dur-draw)) both;}
+  /* The cue is the last thing to arrive, after the curve has finished. The
+     entrance sits on the word and the rule and NOT on .hv2-cue, because the
+     scroll-out below also animates opacity: two animations on one element do
+     not compose, the later one simply wins, and the first strip showed the cue
+     present at t=0 with no fade at all. The wrapper is the scroll's; what is
+     inside it is the sequence's. */
+  .hv2-cue-word{animation:originFadeIn var(--dur-base) var(--ease)
+                calc(var(--stagger) * 6 + var(--dur-draw)) both;}
+  .hv2-cue-line{animation:hv2Grow var(--dur-base) var(--ease)
+                calc(var(--stagger) * 6 + var(--dur-draw)) both;}
   /* the wedge wipes down one step at a time, left to right */
   .hv2-strip{animation:hv2Wipe var(--dur-base) var(--ease) both;}
   .hv2-strip[data-s="1"]{animation-delay:var(--stagger);}
@@ -765,6 +814,39 @@ const CSS = min(`
      while it ran; with it gone all three hash the same. */
 }
 @keyframes hv2Wipe{from{transform:scaleY(0)}to{transform:none}}
+@keyframes hv2Grow{from{transform:scaleY(0)}to{transform:none}}
+/* The scroll response. Not parallax: nothing with words in it moves. The lit
+   field recedes — up a little, and down in strength — across the first 600px,
+   so the frame keeps changing while the reading column stays exactly where it
+   was put. Scroll-linked in CSS, so it is the compositor's job and there is no
+   handler on the main thread and nothing to throttle. */
+@keyframes hv2Recede{
+  from{transform:translate3d(0,0,0);opacity:1;}
+  to{transform:translate3d(0,-9%,0);opacity:.42;}
+}
+@keyframes hv2CueOut{from{opacity:1}to{opacity:0}}
+
+/* Both scroll-linked animations are inside @supports, and that is not
+   politeness: with animation-timeline unsupported the declaration is dropped
+   and the animation would fall back to the document timeline and simply run —
+   the field would recede on load and the cue would vanish on its own. Where
+   the timeline does not exist the field is static and the cue stays, which is
+   the honest degradation. */
+@supports (animation-timeline: scroll()){
+  @media (prefers-reduced-motion: no-preference){
+    .hv2-strip-light{
+      animation:hv2Recede linear both;
+      animation-timeline:scroll(root block);
+      animation-range:0 600px;}
+    /* Gone after the first scroll, and back if the reader returns to the top,
+       which is what a scroll-linked cue means and is better than a one-way
+       flag: the cue is only ever true when it is true. */
+    .hv2-cue{
+      animation:hv2CueOut linear both;
+      animation-timeline:scroll(root block);
+      animation-range:0 120px;}
+  }
+}
 `);
 
 export default function HeroV2() {
@@ -784,7 +866,7 @@ export default function HeroV2() {
           <div className="hv2-measure" aria-hidden="true">
             {WEDGE.map((w, i) => (
               <div key={i} data-s={i} className="hv2-strip">
-                <div className="hv2-strip-light" style={{ opacity: w.o }} />
+                <div className="hv2-strip-light" style={{ background: light(w.o) }} />
                 <div className="hv2-strip-louvre" style={{ background: louvre(w.pitch) }} />
               </div>
             ))}
@@ -852,7 +934,7 @@ export default function HeroV2() {
           <div className="hv2-band" aria-hidden="true">
             {WEDGE.map((w, i) => (
               <div key={i} data-s={i} className="hv2-strip">
-                <div className="hv2-strip-light" style={{ opacity: w.o }} />
+                <div className="hv2-strip-light" style={{ background: light(w.o) }} />
                 <div className="hv2-strip-louvre" style={{ background: louvre(w.pitch) }} />
               </div>
             ))}
@@ -860,6 +942,13 @@ export default function HeroV2() {
         </div>
 
         <div className="hv2-gap-b" />
+
+        {/* Round 5: the frame says there is more below it. One word and one
+            hairline, last in the load sequence, gone by 120px of scroll. */}
+        <div className="hv2-cue" aria-hidden="true">
+          <span className="t-caption hv2-cue-word">Scroll</span>
+          <span className="hv2-cue-line" />
+        </div>
       </div>
     </section>
   );
