@@ -120,7 +120,7 @@ BASELINE = {
     "src/components/PinnedStrategies.tsx":       (2, "sec-strategies"),
     "src/components/sections/Atmosphere.tsx":    (4, "sec-hero"),
     "src/components/sections/ContactBand.tsx":   (2, "sec-firm"),
-    "src/components/sections/Feature.tsx":       (5, "sec-framework"),
+    "src/components/sections/Feature.tsx":       (0, "sec-framework"),
     "src/components/sections/ForAllocators.tsx": (2, "sec-allocators"),
     "src/components/sections/HeroV2.tsx":       (14, "sec-hero"),
     "src/components/sections/Insights.tsx":      (7, "sec-insights"),
