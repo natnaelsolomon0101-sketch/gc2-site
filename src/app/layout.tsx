@@ -27,16 +27,24 @@ export const metadata: Metadata = {
   },
   description:
     "A private investment partnership running concentrated, systematic strategies across liquid global markets.",
-  /* No `alternates.canonical` here, and no `openGraph.url`. Next shallow-merges
-     both from the root layout into every child that does not override them, and
-     no page does — so `canonical: "/"` told Google that /diligence, /governance,
-     /questions, /tearsheet and 15 others were all duplicates of the homepage.
-     Verified in the built HTML: firm.html and tearsheet.html both carried
-     rel="canonical" href="https://gc2.fund". That silently de-indexed every
-     allocator-facing page, which is the entire reason this site exists, while
-     sitemap.ts submitted all 17 for indexing and robots said index: true.
-     With them absent Next emits no canonical unless a page sets one, and derives
-     the correct per-page og:url from metadataBase. */
+  /* Foundation r1: `alternates.canonical: "./"` is relative-to-pathname, the
+     same trick `openGraph.url` already uses below — Next resolves it against
+     each route's own URL before applying metadataBase, so every page gets its
+     own correct absolute canonical (home -> metadataBase, /firm -> metadataBase
+     + "/firm") without any of the 17 routes setting one itself, and no page
+     overrides it to a literal "/". Previously there was no `alternates.canonical`
+     at all: Next shallow-merges root-layout metadata into every child that
+     doesn't override it, and none did, so earlier in this branch's history a
+     literal `canonical: "/"` here told Google that /diligence, /governance,
+     /questions, /tearsheet and 15 others were all duplicates of the homepage
+     (verified in built HTML: firm.html and tearsheet.html both carried
+     rel="canonical" href="https://gc2.fund") while sitemap.ts submitted all 17
+     for indexing and robots said index: true. "./" fixes that without
+     reintroducing it: verified in the built HTML of / and /firm (Next resolves
+     the root path's canonical to the bare origin, https://girlscantrade2.com,
+     rather than adding a trailing slash — that's Next's own
+     resolveAbsoluteUrlWithPathname behavior, not a bug here). */
+  alternates: { canonical: "./" },
   robots: { index: true, follow: true },
   /* `url: "./"` is relative-to-pathname, not a literal path: Next resolves it
      against each route's own URL before applying metadataBase, so every page
