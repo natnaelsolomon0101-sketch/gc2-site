@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import type { Strategy } from "@/content/strategies";
 
 /* ===========================================================================
@@ -77,34 +77,49 @@ const tiles: Tile[] = [
 type Mode = "static" | "pinned";
 
 const css = `
+/* --body-h holds the currently-open tile's measured content height (see the
+   measure effect below) and drives both the active tile's own height and
+   every later tile's stacked offset. Registering it lets height and the
+   translateY() offsets that reference it in a calc() interpolate smoothly
+   when it changes -- an unregistered custom property is an opaque token to
+   the animation engine, so a calc() built from one jumps instead of
+   transitioning even though the transition is declared on the CSS property
+   that consumes it. */
+@property --body-h {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
 .stx-pin {
-  /* Collapsed tile height / step between collapsed tiles / active tile
-     height / tile inner padding. --overlap is how far the next tile rides
-     up onto the open one's bottom edge -- the fan.
+  /* Collapsed tile height / step between collapsed tiles / tile inner
+     padding. --overlap is how far the next tile rides up onto the open
+     one's bottom edge -- the fan. The active tile's own height is
+     tile-h + the measured --body-h (see the JS measure effect below), not
+     a fixed per-breakpoint number: a fixed height sized for the longest
+     one-liner left a block of empty tile above MARKETS/INSTRUMENTS on every
+     shorter one, so the height now matches whichever strategy is actually
+     open.
 
      Phone (base, mobile-first): the tile is much narrower here (max-width
      is a cap, and the actual width is the phone's own content column, ~270-
      380px) than at 768px and up, so the one-liner and the Markets/
-     Instruments pair wrap to more lines and need more room per tile even
-     though the tile itself is shorter. --expanded is measured with
-     Playwright (scrollHeight vs clientHeight on the open body, at every
-     tile as active, at 320/375/393/412/430), not guessed. */
-  --tile-h: 48px;
-  --step: 40px;
+     Instruments pair wrap to more lines. --tile-h is 58px, not 44 or 48: at
+     320-375px the two longest names ("Volatility Arbitrage", "Statistical
+     Relative Value") wrap to two lines at 53px -- measured with Playwright,
+     same as --expanded used to be -- and 58 gives that a few px of air
+     rather than sitting flush. Still comfortably a >=44px tap target. */
+  --tile-h: 58px;
+  --step: 48px;
   --overlap: calc(var(--tile-h) - var(--step));
-  --expanded: 264px;
   --pad-x: 20px;
   max-width: 640px;
 }
-/* 768 and up: the tile is the full 640px cap (or close to it), so the
-   content wraps less and needs less room per tile despite the tile itself
-   being taller -- 224px was measured the same way at this width, before
-   the phone tier existed. */
 @media (min-width: 768px) {
-  .stx-pin { --tile-h: 72px; --step: 60px; --expanded: 224px; --pad-x: 28px; }
+  .stx-pin { --tile-h: 72px; --step: 60px; --pad-x: 28px; }
 }
 @media (min-width: 1280px) {
-  .stx-pin { --tile-h: 80px; --step: 66px; --expanded: 232px; --pad-x: 32px; }
+  .stx-pin { --tile-h: 80px; --step: 66px; --pad-x: 32px; }
 }
 
 .stx-track { position: relative; }
@@ -129,18 +144,25 @@ const css = `
 
 .stx-deck { position: relative; }
 .stx--pinned .stx-deck {
-  height: calc(5 * var(--step) + var(--expanded));
+  height: calc(5 * var(--step) + var(--tile-h) + var(--body-h));
 }
 
+/* overflow:hidden lives on .stx-body, not here. A collapsed tile's own
+   target height is a fixed --tile-h, but its title can run to two lines at
+   the longest strategy names ("Volatility Arbitrage", "Statistical Relative
+   Value") on the narrowest phones -- clipping the whole article would clip
+   that second line, which is exactly the failure the matrix's clipped-text
+   check exists to catch. The head is never the thing that needs to shrink;
+   only the body region does, to produce the collapse. */
 .stx-tile {
-  border-radius: var(--radius-tile, 30px); overflow: hidden;
+  border-radius: var(--radius-tile, 30px);
   display: flex; flex-direction: column;
 }
 .stx--pinned .stx-tile {
   position: absolute; inset-inline: 0; top: 0; height: var(--tile-h);
   transition: transform var(--dur-base) var(--ease), height var(--dur-base) var(--ease);
 }
-.stx--pinned .stx-tile[data-active="true"] { height: var(--expanded); }
+.stx--pinned .stx-tile[data-active="true"] { height: calc(var(--tile-h) + var(--body-h)); }
 
 .stx-head {
   display: flex; align-items: center; gap: 18px; width: 100%; text-align: left;
@@ -168,7 +190,12 @@ button.stx-head:focus-visible {
   padding: 0 var(--pad-x) 24px;
   flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column;
 }
-.stx--pinned .stx-body { padding-bottom: calc(24px + var(--overlap)); }
+/* The collapse itself: as the tile's own height animates down toward
+   --tile-h, this flex item (flex:1 1 auto, min-height:0) shrinks first and
+   its own overflow:hidden clips its content -- the head, a flex:none
+   sibling that is never asked to shrink, is untouched regardless of what
+   the tile's overall height is doing. */
+.stx--pinned .stx-body { padding-bottom: calc(24px + var(--overlap)); overflow: hidden; }
 .stx-one, .stx-rule, .stx-meta { flex: none; }
 .stx-one { max-width: 32em; margin-bottom: 16px; }
 .stx-rule { height: 1px; background: currentColor; opacity: .3; margin: auto 0 14px; }
@@ -216,9 +243,32 @@ button.stx-head:focus-visible {
 export default function PinnedStrategies({ strategies }: { strategies: Strategy[] }) {
   const uid = useId();
   const trackRef = useRef<HTMLDivElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
   const [mode, setMode] = useState<Mode>("static");
   const [i, setI] = useState(0);
+  const [bodyH, setBodyH] = useState(0);
   const N = strategies.length;
+
+  /* The open tile's height used to be a fixed per-breakpoint number sized
+     for the longest one-liner in the set, which left a block of empty tile
+     above MARKETS/INSTRUMENTS on every shorter one. Measuring instead:
+     bodyRef always points at the active tile's body (the only one rendered
+     without `hidden`), and its scrollHeight is the content's real height
+     regardless of whatever height the tile currently has -- unaffected by
+     the tile's own overflow:hidden, which clips paint, not layout. Runs in
+     a layout effect (before paint) so a tile switch never shows a frame at
+     the wrong size, and on resize, since word-wrap -- and so content
+     height -- changes with tile width. */
+  useLayoutEffect(() => {
+    if (mode !== "pinned") return;
+    const measure = () => {
+      const h = bodyRef.current?.scrollHeight;
+      if (h) setBodyH(h);
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [mode, i, strategies]);
 
   /* Mode is resolved after mount so the server render -- and any client with
      JS off -- gets the fully readable static grid rather than a dead pin.
@@ -290,10 +340,13 @@ export default function PinnedStrategies({ strategies }: { strategies: Strategy[
   const offset = (k: number) =>
     k <= i
       ? `calc(${k} * var(--step))`
-      : `calc(${k - 1} * var(--step) + var(--expanded) - var(--overlap))`;
+      : `calc(${k - 1} * var(--step) + var(--tile-h) + var(--body-h) - var(--overlap))`;
 
   return (
-    <div className={`stx-pin stx--${mode}`}>
+    <div
+      className={`stx-pin stx--${mode}`}
+      style={stacked ? { ["--body-h" as string]: `${bodyH}px` } : undefined}
+    >
       <style dangerouslySetInnerHTML={{ __html: css }} />
       <div ref={trackRef} className="stx-track">
         <div className="stx-panel">
@@ -335,7 +388,12 @@ export default function PinnedStrategies({ strategies }: { strategies: Strategy[
                     <div className="stx-head">{head}</div>
                   )}
 
-                  <div id={pid} className="stx-body" hidden={stacked && !active}>
+                  <div
+                    id={pid}
+                    className="stx-body"
+                    hidden={stacked && !active}
+                    ref={stacked && active ? bodyRef : undefined}
+                  >
                     <p className="t-sub stx-one">{s.oneLiner}</p>
                     <div className="stx-rule" aria-hidden="true" />
                     <dl className="stx-meta">
