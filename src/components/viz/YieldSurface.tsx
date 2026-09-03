@@ -61,6 +61,15 @@ export type YieldSurfaceProps = {
   /** Alpha ceiling for the history strokes. Default 0.45 — it has to hold its
    *  own behind type on paper. */
   opacity?: number;
+  /**
+   * Floor, in CSS px, for how tall the drawn surface may get. A narrow canvas
+   * is width-bound, so without this the whole landscape scales down with the
+   * slot and the band collapses to a line: measured 57px of ink at 393 and
+   * nothing usable at 320. Below the floor the canvas deepens the model — more
+   * amplitude, more time-depth — rather than cropping, so nothing is ever cut
+   * off the ends of the curve. Default 140.
+   */
+  minInkHeight?: number;
   /** Force the single static frame — no rAF, no observer. */
   static?: boolean;
   className?: string;
@@ -97,6 +106,7 @@ export default async function YieldSurface({
   yawRange = 30,
   fit = "band",
   opacity = 0.45,
+  minInkHeight = 140,
   static: isStatic = false,
   className = "",
 }: YieldSurfaceProps) {
@@ -132,7 +142,10 @@ export default async function YieldSurface({
     .map((row) => ({
       date: row.date,
       xs: row.points.map((p) => ((Math.log(p.years) - lo) / (hi - lo)) * 2 - 1),
-      ys: row.points.map((p) => ((p.rate - min) / span - 0.5) * shape.amplitude),
+      /* Normalized to [-0.5, 0.5] and NOT amplified here. The amplitude is the
+         canvas's to set, because how tall the surface has to be depends on how
+         wide the canvas turns out to be, and the server does not know that. */
+      ys: row.points.map((p) => (p.rate - min) / span - 0.5),
     }));
 
   if (rows.length < 2) return null;
@@ -151,15 +164,24 @@ export default async function YieldSurface({
         height={height}
         tilt={tilt ?? shape.tilt}
         depth={shape.depth}
+        amplitude={shape.amplitude}
+        minInkHeight={minInkHeight}
         yawCenter={yawCenter}
         yawRange={yawRange}
         fit={fit}
         opacity={opacity}
         isStatic={isStatic}
       />
+      {/* Two lines by construction, not by wrapping. The attribution and the
+          date are one statement; the disclaimer is another, and letting the two
+          run together meant the second half landed wherever the measure
+          happened to break. The sentence itself is counsel's, unchanged. */}
       <figcaption className="t-caption ys-source">
-        {TREASURY_ATTRIBUTION} par yield curves, last {rows.length} days · as of{" "}
-        {asOf(asOfDate)} · Public market data. Not fund performance.
+        <span className="ys-line">
+          {TREASURY_ATTRIBUTION} par yield curves · {rows.length} days · as of{" "}
+          {asOf(asOfDate)}
+        </span>
+        <span className="ys-line">Public market data. Not fund performance.</span>
       </figcaption>
     </figure>
   );
@@ -168,4 +190,5 @@ export default async function YieldSurface({
 const CSS = css`
   .ys { margin: 0; }
   .ys-source { display: block; margin-top: 14px; hyphens: none; }
+  .ys-line { display: block; }
 `;

@@ -29,6 +29,10 @@ export type YieldSurfaceCanvasProps = {
   tilt: number;
   /** Half-depth of the time axis in model units: z runs -depth..+depth. */
   depth: number;
+  /** Vertical scale applied to the normalized yields. */
+  amplitude: number;
+  /** Floor, in CSS px, for the drawn height of the surface. */
+  minInkHeight: number;
   /** Middle of the rock, in degrees of yaw. */
   yawCenter: number;
   /** Half-width of the rock. The yaw runs yawCenter ± yawRange. */
@@ -53,7 +57,8 @@ const HALF_CYCLE_MS = 40_000;
 const CAMERA_DISTANCE = 3.2;        // in model units, from the origin
 
 export default function YieldSurfaceCanvas({
-  rows, height, tilt, depth, yawCenter, yawRange, fit, opacity, isStatic,
+  rows, height, tilt, depth, amplitude, minInkHeight,
+  yawCenter, yawRange, fit, opacity, isStatic,
 }: YieldSurfaceCanvasProps) {
   const ref = useRef<HTMLCanvasElement | null>(null);
 
@@ -96,9 +101,24 @@ export default function YieldSurfaceCanvas({
        `tilt`, then divide by depth. `f` is the perspective term: nearer points
        (smaller z) spread further from the centre, which is the entire reason
        this reads as a landscape rather than as a chart with slanted lines. */
-    const tiltRad = (tilt * Math.PI) / 180;
-    const ct = Math.cos(tiltRad);
-    const st = Math.sin(tiltRad);
+    /* Tilt and amplitude are the two levers the floor below pulls, so they are
+       state rather than constants. Depth is NOT a lever: the time axis runs
+       -depth..+depth in model units and the camera sits 3.2 units away, so
+       deepening z walks the far edge of the surface into the camera plane,
+       where the perspective divide explodes. The first version of the floor did
+       exactly that and collapsed the drawing to ten pixels. */
+    let ct = Math.cos((tilt * Math.PI) / 180);
+    let st = Math.sin((tilt * Math.PI) / 180);
+    let ampFactor = 1;
+    const setBoost = (b: number) => {
+      /* Tilt does the heavy lifting: it converts the ninety days of depth the
+         model already has into screen height, and it cannot diverge. Amplitude
+         is the smaller, second lever. */
+      const deg = tilt + (46 - tilt) * b;
+      ct = Math.cos((deg * Math.PI) / 180);
+      st = Math.sin((deg * Math.PI) / 180);
+      ampFactor = 1 + 2 * b;
+    };
 
     /* Unscaled: the camera in model units, before the fit below decides how
        many pixels a model unit is worth. */
@@ -114,6 +134,7 @@ export default function YieldSurfaceCanvas({
     };
 
     const zOf = (i: number) => ((i / (rows.length - 1)) * 2 - 1) * depth;
+    const yOf = (v: number) => v * amplitude * ampFactor;
 
     /* ONE scale for the whole rock, not one per frame.
      *
@@ -132,6 +153,35 @@ export default function YieldSurfaceCanvas({
      * YieldSurface.tsx. */
     let scale = 1;
     let originX = 0;
+
+    /** Drawn height at one yaw. */
+    const inkHeightAt = (theta: number) => {
+      let lo = Infinity;
+      let hi = -Infinity;
+      for (let i = 0; i < rows.length; i++) {
+        const z = zOf(i);
+        for (let k = 0; k < rows[i].xs.length; k++) {
+          const uy = camera(rows[i].xs[k], yOf(rows[i].ys[k]), z, theta).uy;
+          if (uy < lo) lo = uy;
+          if (uy > hi) hi = uy;
+        }
+      }
+      return (hi - lo) * scale;
+    };
+
+    /** The WORST drawn height across the rock. The floor has to hold at every
+     *  angle, not at the one the bisection happened to test: measuring only the
+     *  centre landed 393 three pixels short of its floor at the moment the
+     *  screenshot was taken. */
+    const minInkAcrossRock = () => {
+      let worst = Infinity;
+      for (let i = 0; i <= 8; i++) {
+        const h = inkHeightAt(yawAt((i / 8) * HALF_CYCLE_MS));
+        if (h < worst) worst = h;
+      }
+      return worst;
+    };
+
     const measure = () => {
       let maxX = 0;
       let maxY = 0;
@@ -140,7 +190,7 @@ export default function YieldSurfaceCanvas({
         for (let i = 0; i < rows.length; i++) {
           const z = zOf(i);
           for (let k = 0; k < rows[i].xs.length; k++) {
-            const p = camera(rows[i].xs[k], rows[i].ys[k], z, theta);
+            const p = camera(rows[i].xs[k], yOf(rows[i].ys[k]), z, theta);
             if (Math.abs(p.ux) > maxX) maxX = Math.abs(p.ux);
             if (Math.abs(p.uy) > maxY) maxY = Math.abs(p.uy);
           }
@@ -161,6 +211,51 @@ export default function YieldSurfaceCanvas({
         fit === "band"
           ? Math.min(width - half, Math.max(half, width * 0.62))
           : width / 2;
+    };
+
+    /* THE FLOOR.
+     *
+     * A narrow canvas is width-bound, so the fit scales the whole landscape
+     * down with the slot and the band flattens into a line — 57px of drawn ink
+     * at 393, nothing usable at 320. The fix is not to crop: cropping a
+     * term-structure surface cuts the 1M or the 30Y end off, and the ends are
+     * where the news is. Instead the model gets DEEPER as the canvas gets
+     * narrower — more yield amplitude, more time-depth — until the drawn height
+     * clears the floor or the canvas runs out of height.
+     *
+     * A phone slot is tall relative to its width, so there is room for it; a
+     * 1920 band is already over the floor and never enters the loop, which is
+     * why the wide-slot fill and the rock are untouched. Bisection rather than
+     * a formula because raising the amplitude also raises the envelope, which
+     * can flip the fit from width-bound to height-bound partway. */
+    const applyFloor = () => {
+      setBoost(0);
+      measure();
+      if (minInkAcrossRock() >= minInkHeight) return;
+
+      /* Bisect the boost rather than solve it: raising the tilt also raises the
+         envelope, which can flip the fit from width-bound to height-bound
+         partway, so the drawn height is not a clean function of the boost. Ten
+         steps over [0, 1] is finer than a pixel of result. */
+      let lo = 0;
+      let hi = 1;
+      setBoost(1);
+      measure();
+      const reachable = minInkAcrossRock() >= minInkHeight;
+      if (reachable) {
+        for (let i = 0; i < 10; i++) {
+          const mid = (lo + hi) / 2;
+          setBoost(mid);
+          measure();
+          if (minInkAcrossRock() >= minInkHeight) hi = mid;
+          else lo = mid;
+        }
+      }
+      /* If even a full boost cannot reach the floor the canvas is simply too
+         small for the floor asked of it; the surface stays at the tallest shape
+         available rather than being cropped to fake it. */
+      setBoost(hi);
+      measure();
     };
 
     const project = (x: number, y: number, z: number, theta: number) => {
@@ -198,7 +293,7 @@ export default function YieldSurfaceCanvas({
         let sum = 0;
         ctx.beginPath();
         for (let k = 0; k < row.xs.length; k++) {
-          const p = project(row.xs[k], row.ys[k], z, theta);
+          const p = project(row.xs[k], yOf(row.ys[k]), z, theta);
           sum += p.depth;
           if (k === 0) ctx.moveTo(p.sx, p.sy);
           else ctx.lineTo(p.sx, p.sy);
@@ -214,7 +309,7 @@ export default function YieldSurfaceCanvas({
         let sum = 0;
         ctx.beginPath();
         for (let i = 0; i < rows.length; i++) {
-          const p = project(rows[i].xs[k], rows[i].ys[k], zOf(i), theta);
+          const p = project(rows[i].xs[k], yOf(rows[i].ys[k]), zOf(i), theta);
           sum += p.depth;
           if (i === 0) ctx.moveTo(p.sx, p.sy);
           else ctx.lineTo(p.sx, p.sy);
@@ -229,7 +324,7 @@ export default function YieldSurfaceCanvas({
       const today = rows[rows.length - 1];
       ctx.beginPath();
       for (let k = 0; k < today.xs.length; k++) {
-        const p = project(today.xs[k], today.ys[k], zOf(rows.length - 1), theta);
+        const p = project(today.xs[k], yOf(today.ys[k]), zOf(rows.length - 1), theta);
         if (k === 0) ctx.moveTo(p.sx, p.sy);
         else ctx.lineTo(p.sx, p.sy);
       }
@@ -252,7 +347,7 @@ export default function YieldSurfaceCanvas({
     const run = () => {
       stop();
       resize();
-      measure();
+      applyFloor();
       if (!animate) {
         /* The static frame is the middle of the rock: the angle the surface
            spends most of its time near, and the one the composition was tuned
@@ -305,7 +400,8 @@ export default function YieldSurfaceCanvas({
       window.removeEventListener("resize", onResize);
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [rows, height, tilt, depth, yawCenter, yawRange, fit, opacity, isStatic]);
+  }, [rows, height, tilt, depth, amplitude, minInkHeight,
+      yawCenter, yawRange, fit, opacity, isStatic]);
 
   return (
     <canvas
