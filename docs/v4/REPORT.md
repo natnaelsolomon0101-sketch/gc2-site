@@ -78,6 +78,11 @@ build ✓ · killist (incl. motion-timing gate, 0 pins) ✓ · regime 506(b) ✓
 - **The sliding strategies deck restored** (`src/components/PinnedStrategies.tsx`): the pinned scroll-through from the original build, re-lit for paper, on every width including phones (rows deleted); header sticky beside the deck on ≥1024; landscape phones and reduced motion get the static grid; open-tile height measured from content; titles never clipped. Gates on /, /strategies, /firm, /diligence: 152/152; print clean.
 - ECB grid rows on one line on phones; PageHeader caption/quickLink slots capped at 60ch.
 
+## 10e. Visible changes shipped on the owner's pick (4 Sep 2026)
+- **Cinematic hero** (hero r5): one load choreography (masthead → headline lines → lead → buttons → curve draw-in, labels last), scroll cue, scroll-responsive tile field, one curve shape at every width, CLS 0, LCP 1.10s throttled.
+- **/strategies as an experience** (strategies r8): six chapters, each opened by the book's own tile band, two-column body with capacity, rail/strip tracking the active chapter, ECB reference rates closing the page. Deck: arrow-key navigation, aria-current, 8–10ms TBT during a scroll-through.
+- **Google presence**: audit + owner checklist (docs/v4/GOOGLE-PRESENCE.md); three flags fixed (descriptions, insights canonical).
+
 ## 10c. Lighthouse (§9 gate, first run 4 Sep 2026)
 Production, mobile preset, all 19 routes: Performance 96–99, Accessibility 96–100, Best Practices 100, SEO 100. **LCP 2.0–2.7s under Lighthouse's simulated Slow 4G — misses the doc's 1.5s bar** (the hero's own Slow-4G+4×CPU measurement is 1.10s; Lighthouse's simulation is harsher). CLS 0 everywhere except / at 0.031 before hero r4 (now 0). Dominant opportunity on every route: "Reduce unused JavaScript" (~150ms) — the Next client runtime, not site code. Not chased further this run on the owner's instruction to spend only on visible change.
 
