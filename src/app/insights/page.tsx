@@ -7,6 +7,10 @@ import { notes, formatDate } from "@/content/notes";
 export const metadata: Metadata = {
   title: "Notes from the desk",
   description: "Commentary from the desk on regime, risk, convexity, and capacity.",
+  // Round 3: /feed.xml (src/app/feed.xml/route.ts) is the same title and
+  // description, syndicated. `alternates.types` is what actually emits
+  // <link rel="alternate" type="application/rss+xml">.
+  alternates: { types: { "application/rss+xml": "/feed.xml" } },
 };
 
 /* The rows are written out here rather than through HairlineList because that
