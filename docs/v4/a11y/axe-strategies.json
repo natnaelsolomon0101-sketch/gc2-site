@@ -1,0 +1,23 @@
+{
+  "393": {
+    "tag": "393-webkit",
+    "url": "http://localhost:3101/strategies",
+    "violations": [],
+    "passCount": 42,
+    "incompleteCount": 1
+  },
+  "1280": {
+    "tag": "1280-chromium",
+    "url": "http://localhost:3101/strategies",
+    "violations": [],
+    "passCount": 40,
+    "incompleteCount": 1
+  },
+  "393-menu": {
+    "tag": "393-webkit-menu-open",
+    "url": "http://localhost:3101/strategies",
+    "violations": [],
+    "passCount": 43,
+    "incompleteCount": 0
+  }
+}
