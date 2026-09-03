@@ -40,3 +40,14 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .gstack/
+
+# Agent worktrees — transient checkouts that each carry their own node_modules
+# (~580MB apiece; twelve of them filled a 228GB disk to 100%).
+.claude/worktrees/
+.design-audit/
+
+# QA artifacts. Reproducible with `npm run qa`; the raw Lighthouse traces are
+# ~9,900 lines each and buried the real diff on a previous PR.
+docs/qa/**/lighthouse-*.json
+docs/qa/**/screens/
+docs/screens/
