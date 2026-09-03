@@ -594,10 +594,23 @@ function browserChecks(opts: {
         const dy = Math.max(a.top - b.bottom, b.top - a.bottom, 0);
         const overlapping = dx === 0 && dy === 0;
         const gap = Math.hypot(dx, dy);
-        if (!overlapping && gap < 8 && gap > 0) {
-          gapIdx.add(i);
-          gapIdx.add(j);
-        }
+        if (overlapping || gap >= 8 || gap === 0) continue;
+        // Exempt hairline-list rows: adjacent full-width block links that
+        // touch by design (the six strategy rows, the three legal-index
+        // rows, …) — both targets span ≥80% of their own container's width
+        // and are stacked vertically (one's bottom meets the other's top
+        // within 2px). Everything else — side-by-side or narrower targets —
+        // still fails.
+        const aParent = targets[i].parentElement;
+        const bParent = targets[j].parentElement;
+        const aContainerW = aParent ? aParent.getBoundingClientRect().width : 0;
+        const bContainerW = bParent ? bParent.getBoundingClientRect().width : 0;
+        const aWide = aContainerW > 0 && a.width >= aContainerW * 0.8;
+        const bWide = bContainerW > 0 && b.width >= bContainerW * 0.8;
+        const stackedTouching = Math.abs(a.bottom - b.top) <= 2 || Math.abs(b.bottom - a.top) <= 2;
+        if (aWide && bWide && stackedTouching) continue;
+        gapIdx.add(i);
+        gapIdx.add(j);
       }
     }
     if (smallIdx.size)
