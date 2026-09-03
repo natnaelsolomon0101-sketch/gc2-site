@@ -65,7 +65,7 @@ await tile(
   browser, load,
   "hero load sequence — 1920x1080",
   "load-sequence--1920.png",
-  "masthead · headline line 1 · line 2 · lead · actions · curve draws (--dur-draw), tenor labels after it completes"
+  "fade-rise: headline at 0, lead at --stagger x3, actions at --stagger x6, cue last; the surface fades up over --dur-draw underneath"
 );
 
 /* ---- the scroll response ----------------------------------------------- */
@@ -78,17 +78,20 @@ for (const y of SCROLL_PX) {
   await page.evaluate((v) => window.scrollTo(0, v), y);
   await page.waitForTimeout(400);
   const m = await page.evaluate(() => {
+    /* The striped field was retired in round 6; the surface replaced it. Where
+       it is gone the strip still records the cue, which is the one thing in
+       this hero that answers the scroll. */
     const l = document.querySelector(".hv2-strip-light");
     const c = document.querySelector(".hv2-cue");
-    const cs = getComputedStyle(l);
+    const s = document.querySelector(".hv2-surface");
     return {
-      op: (+cs.opacity).toFixed(2),
-      tf: cs.transform,
-      cue: c ? (+getComputedStyle(c).opacity).toFixed(2) : "n/a",
+      op: l ? (+getComputedStyle(l).opacity).toFixed(2) : (s ? (+getComputedStyle(s).opacity).toFixed(2) : "n/a"),
+      tf: l ? getComputedStyle(l).transform : "n/a",
+      cue: c && getComputedStyle(c).display !== "none" ? (+getComputedStyle(c).opacity).toFixed(2) : "n/a",
     };
   });
   scroll.push({
-    label: `scrollY = ${y} px   ·   field opacity ${m.op}, ${m.tf}   ·   cue opacity ${m.cue}`,
+    label: `scrollY = ${y} px   ·   surface opacity ${m.op}   ·   cue opacity ${m.cue}`,
     b64: (await page.screenshot()).toString("base64"),
   });
   console.log(`  scrollY ${String(y).padStart(3)}  field opacity ${m.op}  cue opacity ${m.cue}`);
@@ -98,7 +101,7 @@ await tile(
   browser, scroll,
   "hero scroll response — 1920x1080",
   "scroll-response--1920.png",
-  "the lit field recedes and dims across the first 600px; the cue is gone by 120px; no text moves"
+  "the cue is gone by 120px of scroll; no text moves and the surface holds"
 );
 
 await browser.close();
