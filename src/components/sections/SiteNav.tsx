@@ -33,6 +33,16 @@ const CTA = { label: "Investor inquiries", href: "/contact" } as const;
    tokens already declared in globals.css — no new colours, no arbitrary Tailwind
    values, and nothing that requires editing a file this component does not own. */
 const CSS = `
+/* A hash-link or "scroll into view" jump lands the target flush against the
+   viewport top, which is exactly where the sticky nav sits -- the section
+   heading ends up under it (Conductor, 1920, Approach). scroll-padding-top
+   on the scrolling box fixes every such jump at once, source-order or JS
+   scrollIntoView alike, and tracks --nav-h through its own 72/56/48
+   breakpoints automatically since it reads the same custom property. This
+   is the nav's rule, so it ships from the nav's stylesheet rather than
+   editing the frozen html{} block in globals.css. */
+html{ scroll-padding-top: var(--nav-h); }
+
 .sn-header{
   position:sticky; top:0; z-index:50;
   background:color-mix(in srgb, var(--color-obsidian) 82%, transparent);
@@ -40,7 +50,7 @@ const CSS = `
   -webkit-backdrop-filter:blur(20px) saturate(140%);
   /* constant 1px. only the colour moves. */
   border-bottom:1px solid transparent;
-  transition:border-bottom-color 300ms ease;
+  transition:border-bottom-color var(--dur-menu) var(--ease);
 }
 .sn-header[data-scrolled="true"]{ border-bottom-color:var(--color-steel); }
 
@@ -53,14 +63,17 @@ const CSS = `
 
 .sn-mark{ letter-spacing:-0.01em; }
 
-/* ---- desktop links: quiet by default, chromatic hairline when current ---- */
+/* ---- desktop links: quiet by default, chromatic hairline when current ----
+   padding-inline (not a wider hit-slop trick) is what gets a 4-letter label
+   like "Firm" to a real >=44px tap target -- the matrix measured it at 32px
+   wide before this. Pad the box, never the text. */
 .sn-link{
-  display:inline-flex; align-items:center;
-  min-height:44px;
+  display:inline-flex; align-items:center; justify-content:center;
+  min-height:44px; padding-inline:10px;
   font-size:15px; line-height:1.2; letter-spacing:0.01em;
   color:var(--color-ash);
   text-decoration-line:none;
-  transition:color 200ms ease;
+  transition:color var(--dur-fast) var(--ease);
 }
 .sn-link:hover{ color:var(--color-pure); }
 .sn-link[aria-current="page"]{
@@ -83,7 +96,7 @@ const CSS = `
   border-radius:var(--radius-control);
   background:var(--color-pure); color:var(--color-void);
   font-size:15px; line-height:1.2; letter-spacing:0.01em;
-  transition:background-color 200ms ease;
+  transition:background-color var(--dur-fast) var(--ease);
 }
 .sn-cta:hover{ background:var(--color-cloud); }
 
@@ -91,9 +104,23 @@ const CSS = `
   display:inline-flex; align-items:center; justify-content:center;
   height:44px; width:44px;
   color:var(--color-cloud);
-  transition:color 200ms ease;
+  transition:color var(--dur-fast) var(--ease);
 }
 .sn-burger:hover{ color:var(--color-pure); }
+
+/* Desktop bar vs. the drawer trigger: width alone is not the signal.
+   852x393 / 932x430 / 812x375 (landscape phones, EVERY-SCREEN.md §7 rule 8)
+   are all >=768px WIDE, so a min-width:768px breakpoint alone put the full
+   five-item bar + CTA into a 48px-tall row on every one of them instead of
+   the drawer. Foundation already treats "short + landscape" as the phone
+   signal for --nav-h; this reuses the same signal so the trigger and the
+   height token never disagree. */
+.sn-desktop-nav{ display:none; }
+@media (min-width:768px){ .sn-desktop-nav{ display:flex; } }
+@media (max-height:500px) and (orientation:landscape){
+  .sn-desktop-nav{ display:none !important; }
+  .sn-burger{ display:inline-flex !important; }
+}
 @media (min-width:768px){ .sn-burger{ display:none; } }
 
 /* ---- drawer: fades, never slides; opaque; gutter-aligned ---- */
@@ -102,13 +129,14 @@ const CSS = `
   background:var(--color-obsidian);
   overflow-y:auto; overscroll-behavior:contain;
   opacity:0; visibility:hidden;
-  transition:opacity 200ms ease, visibility 0s linear 200ms;
+  transition:opacity var(--dur-menu) var(--ease), visibility 0s linear var(--dur-menu);
 }
 .sn-drawer[data-open="true"]{
   opacity:1; visibility:visible;
-  transition:opacity 200ms ease, visibility 0s linear 0s;
+  transition:opacity var(--dur-menu) var(--ease), visibility 0s linear 0s;
 }
 @media (min-width:768px){ .sn-drawer{ display:none; } }
+@media (max-height:500px) and (orientation:landscape){ .sn-drawer{ display:block; } }
 
 /* Fills the viewport so the investor block sits on the bottom edge instead of
    leaving a pool of dead black under the last link. */
@@ -123,15 +151,17 @@ const CSS = `
 
 .sn-list{ border-bottom:1px solid var(--color-steel); }
 
+/* .t-nav-mobile (globals.css) carries the font-family/weight/size/line-height
+   -- clamp(34px, ..., 40px), foundation's fluid anchor for this tier. Only
+   the chrome-specific bits (row height, rule, colour, decoration) live here. */
 .sn-drawer-link{
   display:flex; align-items:center;
   min-height:64px;
   border-top:1px solid var(--color-steel);
-  font-family:var(--font-display); font-weight:400;
-  font-size:32px; line-height:1; letter-spacing:-0.018em;
+  letter-spacing:-0.018em;
   color:var(--color-cloud);
   text-decoration-line:none;
-  transition:color 200ms ease;
+  transition:color var(--dur-fast) var(--ease);
 }
 .sn-drawer-link:hover{ color:var(--color-pure); }
 .sn-drawer-link[aria-current="page"]{
@@ -142,19 +172,16 @@ const CSS = `
   text-underline-offset:6px;
   text-decoration-skip-ink:none;
 }
-
-.sn-drawer-cta{
-  display:inline-flex; align-items:center; justify-content:center;
-  align-self:flex-start;
-  min-height:52px; padding-inline:24px;
-  border-radius:var(--radius-control);
-  background:var(--color-pure); color:var(--color-void);
-  font-size:16px; line-height:1.2;
-}
+/* The fifth link -- Investor inquiries, folded into the same list rather than
+   a separate pill so the poster reads as one composed list, not a list plus
+   a button bolted on. Colour is the only thing that marks it as the action. */
+.sn-drawer-link[data-cta="true"]{ color:var(--color-iris-gleam); }
+.sn-drawer-link[data-cta="true"]:hover{ color:var(--color-pale-iris); }
 
 .sn-meta-link{
   display:inline-flex; align-items:center; min-height:44px;
-  color:var(--color-ash); transition:color 200ms ease;
+  color:var(--color-ash); transition:color var(--dur-fast) var(--ease);
+  word-break:break-all;
 }
 .sn-meta-link:hover{ color:var(--color-cloud); }
 
@@ -261,12 +288,12 @@ export default function SiteNav() {
           <Link
             href="/"
             aria-label={`${site.mark} — home`}
-            className="sn-mark t-wordmark text-pure inline-flex min-h-11 items-center"
+            className="sn-mark t-wordmark text-pure inline-flex min-h-11 min-w-11 items-center"
           >
             {site.mark}
           </Link>
 
-          <nav aria-label="Primary" className="hidden items-center gap-7 md:flex">
+          <nav aria-label="Primary" className="sn-desktop-nav items-center gap-7">
             {nav.map((n) => (
               <Link
                 key={n.href}
@@ -326,12 +353,17 @@ export default function SiteNav() {
         <div className="wrap sn-drawer-inner">
           <p className="t-mono-xs sn-eyebrow">Menu</p>
 
+          {/* Five links, one list: the four primary routes plus the CTA,
+              same display face throughout (§5.1). The CTA is distinguished by
+              colour only — see .sn-drawer-link[data-cta] — not by a separate
+              button dropped onto the poster. */}
           <nav aria-label="Menu" className="sn-list mt-6">
-            {nav.map((n) => (
+            {[...nav, CTA].map((n) => (
               <Link
-                key={n.href}
+                key={n.label}
                 href={n.href}
-                className="sn-drawer-link"
+                className="sn-drawer-link t-nav-mobile"
+                data-cta={n === CTA ? "true" : undefined}
                 aria-current={isCurrent(n.href) ? "page" : undefined}
                 onClick={() => setOpen(false)}
               >
@@ -340,16 +372,17 @@ export default function SiteNav() {
             ))}
           </nav>
 
-          <Link href={CTA.href} className="sn-drawer-cta mt-10" onClick={() => setOpen(false)}>
-            {CTA.label}
-          </Link>
-
           <div className="sn-drawer-foot">
             <p className="t-mono-xs sn-eyebrow">Investors</p>
             <a href={`mailto:${site.emails.investors}`} className="sn-meta-link t-small">
               {site.emails.investors}
             </a>
             <p className="t-small mt-2 text-fog">{site.city}</p>
+            {/* SessionClock slot (cross-section object, OWNERSHIP.md). sec-motion
+                builds src/components/viz/SessionClock.tsx; it does not exist on
+                this branch yet, so the slot renders nothing rather than a dash
+                placeholder (STATE.md §0.2 item 6 — never render "--:--:--").
+                Wire `<SessionClock />` in here once that file lands. */}
           </div>
         </div>
       </div>
