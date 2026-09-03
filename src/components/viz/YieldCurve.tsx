@@ -178,19 +178,34 @@ const css = `
 .yc-note { display: block; margin: 2px 0 0; color: var(--color-ink-3); hyphens: none; }
 .yc[data-card="true"] .yc-svg { height: auto; }
 
-/* Below ~430px of CONTAINER width — not viewport: the component has to survive
-   a narrow column at 1920 the same way it survives a 320 phone — 10Y (81% of
-   the axis) and 30Y (pinned to the right edge) collide. Three labels still
-   span the axis. §7 rule 4. */
-@container (max-width: 430px) {
-  .yc[data-card="true"] .yc-tick[data-t="10Y"] { display: revert; }
+/* Label collision, and where the 470px comes from.
+ *
+ * The labels are placed by the SAME x() the path is drawn with — log-spaced in
+ * years — so they sit over their own points at every width. What that mapping
+ * cannot help with is that a log axis crowds the long end: 1M to 1Y is 42% of
+ * the width, 1Y to 10Y is another 39%, and 10Y to 30Y is 18.6%. Only the last
+ * pair can ever touch.
+ *
+ * The rule, from the geometry rather than from a guess. A .t-caption label is
+ * about 4.5ch wide at .182em tracking; 30Y is pinned inward at the right edge
+ * and 10Y is centred on its own x, so the space between the two boxes is
+ * 18.6% of the plot minus half of each. Holding the Conductor's 3ch minimum,
+ * with headroom for the tracking that makes a mono gap look tighter than it
+ * measures, wants about 10.5ch between their centres: 10.5 x ~7.8px / 0.186 =
+ * ~440px of plot. 470px is that with a margin.
+ *
+ * Below it, the intermediate label goes and 1M / 1Y / 30Y still span the axis.
+ * CONTAINER width, not viewport (§7 rule 4): the component has to survive a
+ * narrow column at 1920 the same way it survives a 320 phone — and a share card
+ * scaled to fill its frame, which is the case that made this wrong. Round 2
+ * forced 10Y back on in card mode on the theory that a card is never a phone.
+ * It is not a phone, but the square card's block is zoomed 2.54x to fill 1080,
+ * so its layout container is 423px and the crowding is real: zoom scales the
+ * label and the plot together, which is exactly why measuring in layout px is
+ * the right test and the override was the wrong answer. It is gone. */
+@container (max-width: 470px) {
   .yc-tick[data-t="10Y"] { display: none; }
 }
-/* A card is a fixed frame, never a phone. The share kit scales the whole block
-   to fill it, which shrinks the CONTAINER's layout width below 430px and was
-   dropping 10Y from the square card while the portrait card kept it — the same
-   plot labelled two different ways. Card mode keeps all four. */
-.yc[data-card="true"] .yc-tick[data-t="10Y"] { display: revert; }
 
 @keyframes ycDraw {
   from { clip-path: inset(-8% 100% -8% -2%); }
