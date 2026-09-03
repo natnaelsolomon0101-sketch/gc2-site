@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Container from "@/components/Container";
-import PageHeader from "@/components/PageHeader";
 import TextLink from "@/components/TextLink";
 import { fund, hasAny } from "@/config/fund";
 import { site } from "@/config/site";
@@ -275,6 +274,57 @@ const operations: { h: string; p: string }[] = [
 /* ----------------------------------------------------------------- render --- */
 type Block = { id: string; title: string; kicker?: string; node: React.ReactNode };
 
+/* Local Editorial Hero header (21st Editorial Hero 19075: tagline left,
+   headline right, one italic word). `PageHeader` (sec-firm's, `title: string`)
+   takes no children, so this page carries its own header in the same
+   structure rather than forking `PageHeader` itself. Same file shape as
+   /partnership, /questions, /access and /letters — never imported across
+   those directories, so no route depends on another route's internals.
+   `emphasize` finds the FIRST whole-word match of `word` in `title` and
+   wraps it in <em>; a miss degrades to the plain title rather than throwing. */
+function emphasize(text: string, word: string): React.ReactNode {
+  const re = new RegExp(`\\b${word}\\b`);
+  const m = re.exec(text);
+  if (!m) return text;
+  const i = m.index;
+  return (
+    <>
+      {text.slice(0, i)}
+      <em style={{ fontStyle: "italic", color: "var(--color-accent-deep-iris)" }}>
+        {text.slice(i, i + word.length)}
+      </em>
+      {text.slice(i + word.length)}
+    </>
+  );
+}
+
+function EditorialHeader({
+  eyebrow, title, emphasis, standfirst, caption,
+}: {
+  eyebrow: string; title: string; emphasis: string; standfirst?: string; caption?: string;
+}) {
+  return (
+    <section className="relative overflow-hidden">
+      <Container>
+        <div
+          className="grid-gc2 items-start pt-6 pb-8 md:items-end md:pt-12 md:pb-14 lg:pt-20 lg:pb-20
+                     [@media(max-height:480px)_and_(orientation:landscape)]:pt-3
+                     [@media(max-height:480px)_and_(orientation:landscape)]:pb-4"
+        >
+          <p className="col-span-4 t-mono text-ink-3 md:col-span-3 md:pb-1">{eyebrow}</p>
+          <div className="col-span-4 mt-4 md:col-span-8 md:col-start-5 md:mt-0">
+            <h1 className="t-h1 measure-head [@media(max-height:480px)_and_(orientation:landscape)]:max-w-[22em]">
+              {emphasize(title, emphasis)}
+            </h1>
+            {standfirst && <p className="t-lead measure-lead mt-6 md:mt-8">{standfirst}</p>}
+            {caption && <p className="t-caption max-w-[60ch] mt-6 md:mt-8">{caption}</p>}
+          </div>
+        </div>
+      </Container>
+    </section>
+  );
+}
+
 export default function Diligence() {
   const blocks: Block[] = [];
 
@@ -407,9 +457,10 @@ export default function Diligence() {
 
   return (
     <>
-      <PageHeader
+      <EditorialHeader
         eyebrow="Diligence"
         title="Diligence."
+        emphasis="Diligence"
         standfirst="What an allocator needs before a first call, in one place: who keeps the books, what we are registered as, which documents are released and on what terms, and how the operating controls are built."
         caption={`The firm was formed in ${site.foundedLabel}. What is described here is the policy the firm operates under, not a record of periods it has run.`}
       />
