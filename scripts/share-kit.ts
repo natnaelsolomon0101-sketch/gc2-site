@@ -72,6 +72,14 @@ type Card = {
   curve?: "body" | "foot";
   /** Extra frame rules for this card only. Layout, never type or colour. */
   frame?: string;
+  /**
+   * Counsel high, second read: a card describing how the firm works, travelling
+   * without the page around it, reads as a description of how the firm HAS
+   * worked. The four-stages and strategies cards get the founding fact in the
+   * caption tier above the frame line. The month is read from
+   * site.foundedLabel, never typed — one founding fact, one home.
+   */
+  formed?: boolean;
 };
 
 const CARDS: Card[] = [
@@ -98,6 +106,7 @@ const CARDS: Card[] = [
     name: "four-stages",
     width: 1080, height: 1920,           // story — the tall poster
     route: "/",
+    formed: true,
     selectors: [
       { sel: "#approach p.t-mono", first: true },   // the eyebrow, not the five stage labels
       "#approach h2",
@@ -139,6 +148,7 @@ const CARDS: Card[] = [
     name: "strategies",
     width: 1600, height: 900,            // X
     route: "/",
+    formed: true,
     /* .stx-name, not .stx-head: sec-strategies took the 01-06 numerals off the
        rows in round 1 and the wrapper went with them. Six names, no numerals —
        which is what STATE.md §0.2 item 4 asked for, arriving here for free. */
@@ -231,6 +241,8 @@ const FRAME = `
      line sits above the wordmark so the mark still closes the composition. */
   .sk-legal { display: block; margin: 0 0 16px; color: var(--color-ink-3);
               hyphens: none; }
+  .sk-formed { display: block; margin: 0 0 10px; max-width: 62ch;
+               color: var(--color-ink-3); hyphens: none; }
   /* The wordmark is the frame's own element, not lifted content, so the frame
      is entitled to state its colour. Wordmark.tsx still carries the dark
      build's white utility while sec-chrome's light pass is in flight, which
@@ -430,6 +442,11 @@ async function main() {
         (curve ? `<div class="sk-curve">${curve}</div>` : "") +
         /* site.domain, not a literal: the domain has one home and it is
            src/config/site.ts. */
+        (card.formed
+          ? `<p class="t-caption sk-formed">The firm was formed in ` +
+            `${site.foundedLabel}. This describes the policy the firm operates ` +
+            `under, not a record of periods it has run.</p>`
+          : "") +
         `<p class="t-caption sk-legal">Informational only. Not an offer. ${site.domain}</p>` +
         `<div class="sk-mark">${c.wordmark}</div></div></div>` +
         `</body></html>`,

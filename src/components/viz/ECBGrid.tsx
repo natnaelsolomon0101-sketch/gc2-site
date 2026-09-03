@@ -65,6 +65,10 @@ export default async function ECBGrid({ className = "" }: { className?: string }
       </ul>
       <figcaption className="t-caption eg-source">
         {ECB_ATTRIBUTION} · reference rates · as of {date}
+        {/* Counsel's second read: the same sentence the curve carries, on every
+            surface. A grid of rates on a fund's page is read as the fund's
+            rates unless it says otherwise, and it costs one line to say so. */}
+        <span className="eg-note">Public market data. Not fund performance.</span>
       </figcaption>
     </figure>
   );
@@ -96,6 +100,7 @@ const css = `
 .eg-chg { color: var(--color-ink-2); font-variant-numeric: tabular-nums;
           text-align: right; min-width: 7ch; }
 .eg-source { display: block; margin-top: 12px; hyphens: none; }
+.eg-note { display: block; color: var(--color-ink-3); }
 
 /* Under ~360px of container width the three columns and .t-caption's .182em
    tracking stop fitting on one line. The change moves under the rate rather
