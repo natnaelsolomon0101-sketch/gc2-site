@@ -16,7 +16,7 @@ Verdict: **share kit NOT SHIPPABLE** as of cc82237; site copy has one BLOCKING a
 | 8 | questions/page.tsx (largest drawdown) | high | "Ask in a conversation and you get the worst one, month by month…" | opens with the founding fact; see counsel text | sec-allocators |
 | 9 | HeroV2 placeholder curve | high | invented ascending bézier | real <YieldCurve/> (sec-hero r1, in flight) | sec-hero |
 
-## Left for Nate (medium; copy judgment)
+## Approved by Nate 4 Sep 2026 ("apply the counsel copy fixes too") — applied via sec-framework, sec-allocators, sec-firm
 
 - Feature.tsx statement: "…when the return arrives" → "if the return arrives" (counsel: forward-looking). Not changed: it is the firm's sentence.
 - diligence: "Behind the gate" → "Direct to eligible investors" (contradicts /questions "there is no gate").
