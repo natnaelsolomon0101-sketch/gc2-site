@@ -53,10 +53,9 @@ const css = `
 .ft-inner { padding-block: 84px; }
 @media (min-width: 768px) { .ft-inner { padding-block: 120px; } }
 
-/* Display faces don't hyphenate — a mid-word break in a poster headline
-   reads as a bug, and the site-wide "hyphens: auto" (body, §7 rule 9) is
-   built for reading prose, not for a five-word-per-line headline. */
-.ft-head { margin-top: 20px; text-wrap: balance; hyphens: none; }
+/* .t-display-sm now ships hyphens: manual + text-wrap: balance itself
+   (foundation, v4/every-screen) — no local override needed here any more. */
+.ft-head { margin-top: 20px; }
 @media (min-width: 1024px) { .ft-head { max-width: 75%; } }
 /* Phone floor: the fluid .t-display-sm ramp reads as ~40px+ from 320px up,
    which wraps this sentence to four lines with hyphenation forced off. The
