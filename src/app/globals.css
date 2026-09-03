@@ -122,15 +122,25 @@
          padding: 12px 18px; font-size: 16px; font-weight: 400;
          background: var(--color-pure); color: var(--color-void);
          transition: background .2s ease, opacity .2s ease; }
-  .btn:hover { background: var(--color-cloud); }
   .btn-ghost { background: transparent; color: var(--color-pure);
                border: 1px solid var(--color-pure); }
-  .btn-ghost:hover { background: rgba(255,255,255,.08); }
 
   .nav-glass { min-height: 44px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.28);
                border-radius: 8px; padding: 9px 12px; font-size: 15px; color: var(--color-pure);
                transition: background .2s ease; }
-  .nav-glass:hover { background: rgba(255,255,255,.2); }
+
+  /* §7 rule 5: hover is opt-in for devices that actually have it. Touch
+     gets an :active press state instead — nothing here was previously
+     discoverable only by hover, so this only changes which input method
+     gets which feedback, not what is reachable. */
+  @media (hover: hover) and (pointer: fine) {
+    .btn:hover { background: var(--color-cloud); }
+    .btn-ghost:hover { background: rgba(255,255,255,.08); }
+    .nav-glass:hover { background: rgba(255,255,255,.2); }
+  }
+  .btn:active { background: var(--color-silver); }
+  .btn-ghost:active { background: rgba(255,255,255,.14); }
+  .nav-glass:active { background: rgba(255,255,255,.28); }
 
   .chip { display:inline-flex; align-items:center; border-radius: 9999px;
           background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.15);
@@ -196,7 +206,10 @@
     .hero-frame{min-height:min(calc(100dvh - var(--nav-h)),900px);}
   }
   .link{color:var(--color-pure);border-bottom:1px solid rgba(255,255,255,.35);transition:border-color .2s ease;}
-  .link:hover{border-color:var(--color-pure);}
+  @media (hover: hover) and (pointer: fine) {
+    .link:hover{border-color:var(--color-pure);}
+  }
+  .link:active{border-color:var(--color-pure);}
   .card-dark { background: var(--color-graphite); border-radius: 16px; }
   .card-lite { background: var(--color-silver); color: var(--color-void); border-radius: 30px; padding: 32px; }
 }
