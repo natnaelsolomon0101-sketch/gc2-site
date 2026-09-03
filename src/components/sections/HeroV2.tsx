@@ -92,7 +92,6 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { site } from "@/config/site";
-import { duration, easing, stagger } from "@/lib/motion";
 
 /* -- grain ---------------------------------------------------------------
    Turbulence pushed into the alpha channel over a fixed pale fill: sparse
@@ -125,12 +124,6 @@ const louvre = (pitch: number) =>
   `repeating-linear-gradient(180deg,` +
   ` rgba(9,10,11,0) 0px, rgba(9,10,11,0) ${pitch - 1}px,` +
   ` rgba(9,10,11,.84) ${pitch - 1}px, rgba(9,10,11,.84) ${pitch}px)`;
-
-/* Motion, read from the single source. `d(n)` is n stagger steps. */
-const D_BASE = `${duration.base}ms`;
-const D_DRAW = `${duration.draw}ms`;
-const D_FAST = `${duration.fast}ms`;
-const d = (n: number) => `${n * stagger}ms`;
 
 /* The curve slot's aspect. YieldCurve (sec-motion) renders into the same box;
    the placeholder below uses the same viewBox so nothing reflows when the real
@@ -271,7 +264,9 @@ const CSS = `
 .hv2-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;
   min-height:48px;padding:12px 22px;border-radius:8px;font-size:16px;
   background:#fff;color:#000;border:1px solid #fff;
-  transition:background ${D_FAST} ${easing},border-color ${D_FAST} ${easing},color ${D_FAST} ${easing};}
+  transition:background var(--dur-fast) var(--ease),
+              border-color var(--dur-fast) var(--ease),
+              color var(--dur-fast) var(--ease);}
 .hv2-btn-ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.42);}
 @media (hover: hover) and (pointer: fine){
   .hv2-btn:hover{background:#f5f5f7;border-color:#f5f5f7;}
@@ -512,42 +507,54 @@ const CSS = `
   .hv2-measure{display:flex;gap:16px;}
 }
 
-/* ---- motion (every value from src/lib/motion.ts) ----------------------- */
-/* Opacity and transform are split, and the split is the whole point. It is the
+/* ---- motion ------------------------------------------------------------
+   Every duration, delay and curve below is var(--dur-*) / var(--stagger) /
+   var(--ease) — globals.css's mirror of src/lib/motion.ts, and the same way
+   YieldCurve and SessionClock state their timing.
+
+   Round 0 interpolated the values out of motion.ts into this template literal
+   instead. That was a true single source at build time, but it was invisible
+   to scripts/qa/killist.sh's motion gate, which reads the SOURCE line: a
+   template hole carries no time literal, so the gate could neither fail nor verify
+   it, and HeroV2 was passing its 14-line pin by being unreadable rather than by
+   being right. A gate that cannot see a value is not a gate. Custom properties
+   are legible to it, and the pin is now 0.
+
+   Opacity and transform are split, and the split is the whole point. It is the
    site's documented entrance from globals.css: originFadeIn lands the content
-   fast, originRise keeps the travel underneath it. Both run duration.base on
-   the one site easing, and the reading stagger is motion.ts's own step.
-   This block used to gate content, which DESIGN.md forbids in writing ("It
-   never gates content becoming visible"); it came back once in transform form,
-   masking the LCP element entirely for the first 200ms. Everything here is
-   painted in the first frame and only settles after. */
+   fast, originRise keeps the travel underneath it. This block used to gate
+   content, which DESIGN.md forbids in writing ("It never gates content becoming
+   visible"); it came back once in transform form, masking the LCP element
+   entirely for the first 200ms. Everything here is painted in the first frame
+   and only settles after. */
 @media (prefers-reduced-motion: no-preference){
   .hv2-l > span,.hv2-mast > *,.hv2-foot > *{
-    animation:originFadeIn ${D_BASE} ${easing} both,
-              originRise ${D_BASE} ${easing} both;}
-  .hv2-l2 > span{animation-delay:${d(1)},${d(1)};}
-  .hv2-m2{animation-delay:${d(1)},${d(1)};}
-  .hv2-m3{animation-delay:${d(1)},${d(1)};}
-  .hv2-m4{animation-delay:${d(2)},${d(2)};}
-  .hv2-lead{animation-delay:${d(2)},${d(2)};}
-  .hv2-cta{animation-delay:${d(3)},${d(3)};}
-  .hv2-curve{animation-delay:${d(4)},${d(4)};}
-  /* the curve draws in once, over duration.draw, after the words have settled */
-  .hv2-curve-path{animation:hv2Draw ${D_DRAW} ${easing} ${d(4)} both;}
+    animation:originFadeIn var(--dur-base) var(--ease) both,
+              originRise var(--dur-base) var(--ease) both;}
+  .hv2-l2 > span{animation-delay:var(--stagger),var(--stagger);}
+  .hv2-m2{animation-delay:var(--stagger),var(--stagger);}
+  .hv2-m3{animation-delay:var(--stagger),var(--stagger);}
+  .hv2-m4{animation-delay:calc(var(--stagger) * 2),calc(var(--stagger) * 2);}
+  .hv2-lead{animation-delay:calc(var(--stagger) * 2),calc(var(--stagger) * 2);}
+  .hv2-cta{animation-delay:calc(var(--stagger) * 3),calc(var(--stagger) * 3);}
+  .hv2-curve{animation-delay:calc(var(--stagger) * 4),calc(var(--stagger) * 4);}
   /* the wedge wipes down one step at a time, left to right */
-  .hv2-strip{animation:hv2Wipe ${D_BASE} ${easing} both;}
-  .hv2-strip[data-s="1"]{animation-delay:${d(1)};}
-  .hv2-strip[data-s="2"]{animation-delay:${d(2)};}
-  .hv2-strip[data-s="3"]{animation-delay:${d(3)};}
-  .hv2-strip[data-s="4"]{animation-delay:${d(4)};}
-  /* the one continuous movement in the frame: the light sliding behind the
+  .hv2-strip{animation:hv2Wipe var(--dur-base) var(--ease) both;}
+  .hv2-strip[data-s="1"]{animation-delay:var(--stagger);}
+  .hv2-strip[data-s="2"]{animation-delay:calc(var(--stagger) * 2);}
+  .hv2-strip[data-s="3"]{animation-delay:calc(var(--stagger) * 3);}
+  .hv2-strip[data-s="4"]{animation-delay:calc(var(--stagger) * 4);}
+  /* The one continuous movement in the frame: the light sliding behind the
      fixed louvre. One composited transform per strip, all in lockstep, so it
-     reads as a single source moving rather than five things drifting. */
-  .hv2-strip-light{animation:hv2Drift calc(${D_BASE} * 44) cubic-bezier(.45,.05,.55,.95) infinite alternate both;}
+     reads as a single source moving rather than five things drifting. 44 x
+     --dur-base is the 22s cycle; the curve was its own ease-in-out and is now
+     the house curve, which under alternate runs out on the way down and in on
+     the way back — a slower turnaround than before, which is the right
+     direction for something meant to read as atmosphere. */
+  .hv2-strip-light{animation:hv2Drift calc(var(--dur-base) * 44) var(--ease) infinite alternate both;}
 }
 @keyframes hv2Wipe{from{transform:scaleY(0)}to{transform:none}}
 @keyframes hv2Drift{from{transform:translate3d(0,-7%,0)}to{transform:translate3d(0,7%,0)}}
-@keyframes hv2Draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
 `;
 
 /** The real current time in the firm's stated city, not a decorative counter.
