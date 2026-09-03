@@ -267,9 +267,15 @@ async function main() {
     console.log(`  ${label.padEnd(26)} ${buf.length}B`);
   };
 
-  await write(join(APP, "favicon.ico"),
+  /* public/, not src/app/. As a Next file convention it emitted its own hashed
+     <link rel="icon"> ALONGSIDE the one the metadata block declares — the one
+     icon convention `metadata.icons` does not suppress — so the page carried
+     two links for the same bytes. Served from public/ there is no convention,
+     the metadata entry is the single declaration, and /favicon.ico is a
+     stable URL with no cache-busting query, which is what a crawler wants. */
+  await write(join(PUBLIC, "favicon.ico"),
     ico([16, 32, 48].map((size) => ({ size, buf: toRgba(out.get(size)!) }))),
-    "src/app/favicon.ico 16/32/48");
+    "public/favicon.ico 16/32/48");
   await write(join(APP, "icon.png"), out.get(512)!, "src/app/icon.png 512");
   await write(join(APP, "apple-icon.png"), out.get(180)!, "src/app/apple-icon.png 180");
   await write(join(PUBLIC, "logo.png"), out.get(512)!, "public/logo.png 512");
