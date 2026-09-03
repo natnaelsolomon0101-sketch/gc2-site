@@ -67,6 +67,12 @@ export type OgCard = {
   title: string;
   /** The route's metadata description. Passed through `opening()`. */
   description: string;
+  /**
+   * The home card only (§5.10): the day's Treasury curve, drawn from the same
+   * fetch the page uses, so a share of the home page is dated. `null` — an
+   * unreachable feed — falls back to the plain card rather than to a fake line.
+   */
+  curve?: { d: string; width: number; height: number; source: string } | null;
 };
 
 /** Alt text for the card, so the `og:image:alt` a screen reader hears is the
@@ -75,7 +81,7 @@ export function ogAlt({ title, description }: OgCard): string {
   return `${title} — ${opening(description)}`;
 }
 
-export function ogImage({ title, description }: OgCard) {
+export function ogImage({ title, description, curve = null }: OgCard) {
   return Promise.all([displayFont, uiFont]).then(
     ([display, ui]) =>
       new ImageResponse(
@@ -122,13 +128,48 @@ export function ogImage({ title, description }: OgCard) {
             </div>
             <div
               style={{
-                fontFamily: "DM Serif Display",
-                fontSize: 34,
-                letterSpacing: "-0.01em",
-                color: PURE,
+                display: "flex",
+                width: "100%",
+                alignItems: "flex-end",
+                justifyContent: "space-between",
               }}
             >
-              {site.mark}
+              <div
+                style={{
+                  fontFamily: "DM Serif Display",
+                  fontSize: 34,
+                  letterSpacing: "-0.01em",
+                  color: PURE,
+                }}
+              >
+                {site.mark}
+              </div>
+              {curve ? (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                  }}
+                >
+                  <svg
+                    width={curve.width}
+                    height={curve.height}
+                    viewBox={`0 0 ${curve.width} ${curve.height}`}
+                  >
+                    <path
+                      d={curve.d}
+                      fill="none"
+                      stroke={PURE}
+                      strokeWidth={1}
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  <div style={{ marginTop: 14, fontSize: 17, color: ASH, letterSpacing: "0.09em" }}>
+                    {curve.source}
+                  </div>
+                </div>
+              ) : null}
             </div>
           </div>
         ),
