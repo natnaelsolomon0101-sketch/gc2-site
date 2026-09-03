@@ -393,13 +393,16 @@ const CSS = `
      the clock onto a fourth line (measured at 360x740 before this). City and
      clock share line one; the standing facts take a line each below. */
   .hv2-m1{order:1;flex:1 0 100%;}
-  .hv2-m2{order:2;flex:1 0 100%;}
-  .hv2-m3{order:3;flex:1 0 100%;}
+  /* Two lines, on every phone: city, then the session strip. The two standing
+     facts used to take a line each between them, and at 430 that made the band
+     four lines and 22% of the screen before the headline had started. They are
+     on /firm and in the footer; a masthead is not where a phone reads them. */
+  .hv2-m2,.hv2-m3{display:none;}
   /* The session strip is a block, not a word: it takes its own full-width line
      under the three facts. flex-basis 100% and not auto on purpose — the
      component sets container-type: inline-size, and an inline-size container
      with an indefinite basis has no content-derived width to resolve to. */
-  .hv2-clock{order:4;flex:1 0 100%;margin-top:6px;}
+  .hv2-clock{order:2;flex:1 0 100%;margin-top:6px;}
 
   /* Two lines, at every phone width, in both engines. Sized off the measure
      rather than off a guess: DM Serif Display sets "Evidence first." at
@@ -425,6 +428,13 @@ const CSS = `
      plot and its labels stay inside the 24px measure. */
   .hv2-curve{grid-row:2;grid-column:1 / -1;align-self:stretch;
     margin-inline:-24px;padding:14px 24px 0;}
+  /* The band is the picture on the phones the curve cannot fit. It is the same
+     five steps and the same louvre, laid on its side and run from viewport edge
+     to viewport edge, so every strip is whole — the round-0 version stopped at
+     the page gutter and read as amputated, which is what got it deleted. It
+     shows only where .hv2-curve does not; the two never both paint. */
+  .hv2-band{display:none;grid-row:2;grid-column:1 / -1;align-self:stretch;
+    margin:16px -24px 0;height:72px;gap:12px;}
   .hv2-cta{grid-row:3;grid-column:1 / -1;justify-content:flex-start;gap:10px;}
   /* Content-width buttons on one row, exactly as on desktop, rather than two
      identical full-width pills with centred labels. 15px of side padding and a
@@ -432,16 +442,38 @@ const CSS = `
   .hv2-btn{flex:0 1 auto;padding:12px 15px;}
 }
 
-/* The curve is 242px on a phone — its 132px plot floor, the tenor axis, and a
-   source line that wraps to two lines under 430px. That is a third of the
-   poster, and on anything shorter than a full-height 393x852 it costs the
-   actions their place above the fold. Measured at 360x740: the stack runs 788px
-   against 683px of usable height with the curve, 546 without. So it is gated on
-   the viewport being at least as tall as the poster — the same devices with
-   browser chrome showing (412x839, 430x739, 393x659) get the composition
-   without it, which is the r0 poster plus a session strip. */
-@media (max-width:767px) and (max-height:839px){
+/* THE CURVE'S HEIGHT GATE, and the hero's, because they are the same decision.
+
+   The curve block is 221px at 393-412 and 247px at 320-360, where the source
+   line wraps; motion round 4 adds "Public market data. Not fund performance."
+   under it, another ~40px. It is a third of a poster, and on a phone short
+   enough it costs the actions their place above the fold. Re-measured after
+   the masthead lost its two caption lines, with the actions' bottom against
+   the fold, and again with r4's line added:
+
+     412x839   738 -> 778 against 839    fits, 61px clear   CURVE ON (new)
+     393x852   733 -> 773 against 852    fits, 79px clear   CURVE ON
+     430x739   721 -> 761 against 739    over by 22         off
+     393x659   651 -> 691 against 659    over by 32         off
+     360x658   738 -> 778 against 658    over by 120        off
+     320x568   738 -> 778 against 568    over by 210        off
+
+   So the threshold moves from 840 to 820 and 412x839 gains the curve. 430x739
+   and 393x659 clear it today and would not once r4 lands, and a gate that has
+   to be re-cut in a week is not a gate.
+
+   AND: below the threshold the hero stops holding a height it has nothing to
+   fill. It kept min(100dvh - nav, 820px) whether or not the curve was in it,
+   so a 360x740 phone got 683px of hero for 445px of content — 238px of empty
+   ground under the buttons, and more of it on the full-page view where the
+   next section's own padding follows. With the curve the hero may fill the
+   frame; without it, it is its content and the section padding, full stop.
+   (Landscape is not this case: §7 rule 8 makes the letterbox exactly 100dvh
+   by design, and its block at the foot of this file still says so.) */
+@media (max-width:767px) and (max-height:819px){
   .hv2-curve{display:none;}
+  .hv2-band{display:flex;}
+  .hv2{min-height:0;}
 }
 
 /* Short phones: the 320x568 floor, and every phone measured with the browser
@@ -454,7 +486,7 @@ const CSS = `
    recoverable anywhere. Everything that is air gives some back with them.
    Measured: 320x568 570 -> 556 against a 568 fold; 360x658 678 -> 582. */
 @media (max-width:767px) and (max-height:700px){
-  .hv2-m2,.hv2-m3{display:none;}
+  .hv2-band{height:64px;margin-top:12px;}
   .hv2-h1{margin-block:10px 0;}
   .hv2-gap{min-height:8px;}
   .hv2-gap-b{min-height:6px;}
@@ -502,11 +534,13 @@ const CSS = `
    at 1280 it was 181px of a 750px hero and pushed the actions past the fold. */
 @media (min-width:1024px) and (max-height:820px){
   .hv2{--hv2-pt:20px;--hv2-pb:28px;}
-  /* The plot is the one block in the frame with a free height, so it is what
-     gives when a 720p laptop has 647px of hero to spend. --yc-h is the
-     component's own knob for exactly this; the round-1 version reached inside
-     for .yc-svg. */
-  .hv2-curve{--yc-h:132px;}
+  /* The plot is the block in the frame with a free shape, so it is what gives
+     when a 720p laptop has 647px of hero to spend. --yc-h was the knob for
+     this in round 1 and motion r4 replaced it: the box follows the viewBox
+     ratio now, and a slot that wants a flatter plot says so with --yc-aspect.
+     1000/260 is the component's own default; 1000/150 is the same width and a
+     little over half the height, which is what a short frame can pay for. */
+  .hv2-curve{--yc-aspect:1000 / 150;}
   .hv2-h1{margin-block:20px 16px;}
   .hv2-gap{min-height:16px;}
   .hv2-gap-b{min-height:12px;}
@@ -541,6 +575,30 @@ const CSS = `
      min() leaves 1920 exactly as it was. */
   .hv2-measure{left:auto;
     width:min(calc(100vw - var(--hv2-side) - var(--hv2-c9)), 980px);}
+  /* The plot stops widening past 1200px, for the same reason the field stops
+     at 980. Motion r4 made the box follow the viewBox ratio, so the slot's
+     width now sets the plot's height: at 2560 the slot is 1682px and the plot
+     437px, at 3440 it is 2562 and 666, and the hero measured 1308px against a
+     900px ceiling. --yc-aspect cannot fix this — a ratio scales with the box,
+     and the box is what is growing — so the constraint is a max-width on the
+     figure. That is a slot saying how much room it has, not a restyle of the
+     component; a --yc-max or a maxWidth prop would say the same thing in
+     motion's own vocabulary and I would rather use that. The rule still bleeds
+     to the viewport edge — it is on .hv2-curve's border box, not the figure's.
+     A 2562px-wide 1px hairline is not a better hairline than a 1200px one, and
+     the ceiling is not negotiable. */
+  .hv2-curve .yc{max-width:1200px;}
+}
+
+/* The cap alone left the hero at 921 (2560) and 954 (3440): a 1200px plot at
+   the viewBox's own 1000/260 is 312px tall, and the block around it another
+   163. Flattening the ratio to 1000/190 takes 84px off it, which is what fits
+   under the ceiling — and a par curve with no printed y scale states a shape,
+   so a wider slot drawing it flatter claims nothing it did not claim before.
+   Guarded on height as well as width so a 1920x800 laptop keeps the shorter
+   1000/150 the short-desktop block gives it. */
+@media (min-width:1920px) and (min-height:821px){
+  .hv2-curve{--yc-aspect:1000 / 190;}
 }
 
 /* ---- landscape phones: a letterbox, composed as one (§7 rule 8) --------
@@ -567,7 +625,6 @@ const CSS = `
   }
   .hv2-fg{padding-block:var(--hv2-pt) var(--hv2-pb);}
   .hv2-mast{padding-bottom:10px;}
-  .hv2-m2,.hv2-m3{display:none;}
   .hv2-m1{grid-column:1 / span 12;}
   /* 345px of letterbox cannot carry a 106px session strip on top of a
      headline, a lead and two actions -- measured, the stack would run 401px.
@@ -596,6 +653,30 @@ const CSS = `
      light two thirds of the way down for no reason — there is no curve here
      for it to stop on. Negative bottom, clipped by .hv2's overflow. */
   .hv2-measure{display:flex;gap:16px;bottom:-100vh;}
+  .hv2-band{display:none;}
+}
+/* Landscape phones under ~400px tall — 568x320 and 740x360, the small Androids
+   and the old iPhones turned sideways. §7 rule 8's "100dvh with no minimum" is
+   right for a 393-tall letterbox and wrong here: the stack does not fit in
+   272px of usable height, so forcing the frame to exactly one viewport put the
+   actions across the bottom edge and sliced them. The hero flows to its
+   content instead. The buttons then sit below the fold and whole, and a phone
+   held sideways scrolls, which is a thing phones do; a cut button is not. */
+@media (max-height:400px) and (orientation:landscape){
+  .hv2{min-height:0;}
+  .hv2-gap{flex:0 0 auto;}
+  .hv2-gap-b{flex:0 0 auto;}
+}
+/* And under ~340px the lead comes off, which §7 rule 8 allows in as many
+   words ("the lead optional"). Letting the hero flow stops the actions being
+   sliced by the frame, but at 568x320 they still land 36px below a 320px fold
+   and a button you have to scroll a sideways phone to reach is barely better
+   than a cut one. Without the lead the whole composition is 235px against 272
+   of usable height: masthead, headline, actions, all whole, all on the screen.
+   The sentence is the first thing on the page the moment the phone is turned
+   back. 740x360 keeps it — it fits there. */
+@media (max-height:340px) and (orientation:landscape){
+  .hv2-lead{display:none;}
 }
 
 /* ---- print --------------------------------------------------------------
@@ -736,6 +817,17 @@ export default function HeroV2() {
               where a curve would go. */}
           <div className="hv2-curve">
             <YieldCurve />
+          </div>
+          {/* Phone-only, and only where the curve does not fit: the same wedge
+              turned on its side and run edge to edge, so the first screen is
+              never all ground. */}
+          <div className="hv2-band" aria-hidden="true">
+            {WEDGE.map((w, i) => (
+              <div key={i} data-s={i} className="hv2-strip">
+                <div className="hv2-strip-light" style={{ opacity: w.o }} />
+                <div className="hv2-strip-louvre" style={{ background: louvre(w.pitch) }} />
+              </div>
+            ))}
           </div>
         </div>
 

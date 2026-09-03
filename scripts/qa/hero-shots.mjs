@@ -13,6 +13,8 @@ const url = `http://localhost:${port}/`;
 
 const SHOTS = [
   // name, engine, context options
+  ["568x320-landscape", "webkit", { viewport: { width: 568, height: 320 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true }],
+  ["740x360-landscape", "chromium", { viewport: { width: 740, height: 360 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true }],
   ["320", "webkit", { viewport: { width: 320, height: 568 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true }],
   ["360-chromium", "chromium", { ...devices["Galaxy S9+"], viewport: { width: 360, height: 740 } }],
   ["360-chromium-chrome", "chromium", { ...devices["Galaxy S9+"] }],
@@ -20,7 +22,7 @@ const SHOTS = [
   ["393-chrome", "webkit", { ...devices["iPhone 15 Pro"] }],
   ["412-chromium", "chromium", { ...devices["Pixel 7"], viewport: { width: 412, height: 915 } }],
   ["412-chromium-chrome", "chromium", { ...devices["Pixel 7"] }],
-  ["430", "webkit", { ...devices["iPhone 15 Pro Max"], viewport: { width: 430, height: 932 } }],
+  ["430x932", "webkit", { ...devices["iPhone 15 Pro Max"], viewport: { width: 430, height: 932 } }],
   ["430-chrome", "webkit", { ...devices["iPhone 15 Pro Max"] }],
   ["734x393-landscape", "webkit", { ...devices["iPhone 15 Pro landscape"] }],
   ["852x393-landscape", "webkit", { ...devices["iPhone 15 Pro landscape"], viewport: { width: 852, height: 393 } }],
