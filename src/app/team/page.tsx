@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Container from "@/components/Container";
 import PageHeader from "@/components/PageHeader";
-import { site } from "@/config/site";
+import { site, siteUrl } from "@/config/site";
 import { fund } from "@/config/fund";
 
 /**
@@ -30,6 +30,25 @@ export const metadata: Metadata = {
   title: "Team",
   description:
     "The seats that exist at the firm, what each one holds, and what a reader should demand of a biography.",
+};
+
+/* AboutPage / Organization JSON-LD, round 4 (search): same shape as /firm's
+   — foundingDate from `site.foundedISO`, foundingLocation "Miami" — and for
+   the same reason nothing here names a person: `fund.people` is null, and
+   this whole page's argument is that a seat is described before anyone
+   holds it, so structured data naming someone the visible page does not
+   would contradict the page it sits on. */
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "AboutPage",
+  mainEntity: {
+    "@type": "Organization",
+    name: site.name,
+    alternateName: site.mark,
+    url: siteUrl,
+    foundingDate: site.foundedISO,
+    foundingLocation: { "@type": "Place", name: "Miami" },
+  },
 };
 
 /** Seats, not people. Each line is already true elsewhere on the site:
@@ -144,6 +163,10 @@ export default function TeamPage() {
        breaks landmark navigation and leaves the layout's skip link pointing at
        one of two mains. Every other route file returns a fragment. */
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <PageHeader
         eyebrow="Team"
         title="The people."
