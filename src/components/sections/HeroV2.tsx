@@ -34,6 +34,7 @@ import Link from "next/link";
 import { site } from "@/config/site";
 import { css } from "@/lib/css";
 import SessionClock from "@/components/viz/SessionClock";
+import YieldSurface from "@/components/viz/YieldSurface";
 
 /* -- grain ---------------------------------------------------------------
    Turbulence pushed into the alpha channel over a fixed ink fill: sparse, weak
@@ -81,20 +82,52 @@ const CSS = css`
       rgba(209,201,255,.30) 0%, rgba(209,201,255,.10) 44%, rgba(247,245,240,0) 72%),
     radial-gradient(150% 100% at 86% 0%,
       rgba(20,19,17,.055) 0%, rgba(20,19,17,.018) 48%, rgba(20,19,17,0) 74%);}
-/* The surface fills the hero corner to corner and the paper shows through it.
-   Opacity is a variable so the phone can turn it down without the component
-   knowing: over a 393px column the headline sits ON the surface rather than
-   beside it, and the ink has to keep 7:1. */
-.hv2-surface{position:absolute;inset:0;opacity:var(--hv2-surface-o, .9);}
-.hv2-surface > *{width:100%;height:100%;display:block;}
-/* The stand-in. One quiet diagonal of the page's own tones — enough to prove
-   the box and the fade, deliberately not enough to look like a design, because
-   a placeholder that looks finished is a placeholder nobody replaces. */
-.hv2-surface-ph{width:100%;height:100%;
-  background:linear-gradient(118deg,
-    color-mix(in srgb, var(--color-ground-2) 92%, transparent) 0%,
-    color-mix(in srgb, var(--color-surface) 78%, transparent) 46%,
-    color-mix(in srgb, var(--color-ground-2) 30%, transparent) 100%);}
+/* THE SURFACE. A direct child of .hv2 and NOT of .hv2-bg, because .hv2-bg is
+   aria-hidden and this figure carries the page's only data-source and the
+   attribution that goes with it — burying it in decorative furniture would
+   hide a citation. It is absolutely positioned so it costs the composition no
+   height, and it clips: the canvas is drawn at a fixed 900px and centred, so a
+   shorter hero crops it top and bottom the way a full-bleed background image
+   crops, and it is edge to edge horizontally at every width.
+
+   The canvas's own opacity prop does the paper-through-it work (0.45 desktop,
+   0.28 on phones, where the headline sits ON the surface rather than beside
+   it). Measured composited contrast under the headline is in the commit. */
+/* --hv2-surface-o is the layer's own opacity and it multiplies the component's
+   opacity prop: 0.45 x 0.85 desktop, 0.45 x 0.62 on phones, which is the 0.28
+   the brief asks for there. It has to be a variable and the entrance keyframe
+   has to end AT it — a plain to-opacity-1 overrides the declared value
+   for the whole life of the animation, which is how the phone step silently
+   did nothing and the headline measured against a surface at full strength. */
+.hv2-surface{position:absolute;inset:0;z-index:0;overflow:hidden;
+  pointer-events:none;opacity:var(--hv2-surface-o, .85);}
+.hv2-surface .ys{position:absolute;top:50%;left:0;right:0;
+  transform:translateY(-50%);}
+/* THE MASK, and it is the composition and not a patch. Measured with the
+   canvas pixels composited over paper, ink-2 in the lead ran 1.56-3.27:1
+   against a 4.5 floor and the attribution ran 1.16:1 at 1280 — a surface dense
+   enough to be worth drawing is dense enough to destroy every text role except
+   the headline. fit="band" right-anchors the slab, which does most of the work
+   the mask was doing; what is left is the last of the falloff across the
+   reading column, and the numbers in the commit are measured with both in
+   place. On the CANVAS and not on .hv2-surface, because the figure's
+   attribution is a child of the same box and a mask there would erase the
+   citation along with the drawing. */
+.hv2-surface canvas{
+  -webkit-mask-image:linear-gradient(90deg,
+    transparent 0%, rgba(0,0,0,.10) 26%, rgba(0,0,0,.55) 48%, #000 70%);
+  mask-image:linear-gradient(90deg,
+    transparent 0%, rgba(0,0,0,.10) 26%, rgba(0,0,0,.55) 48%, #000 70%);}
+/* The attribution is the one part of the figure that is content, so it leaves
+   the clipped canvas box and pins to the foot of the frame on the column-1
+   line, in ink-3 like every other caption on the page. */
+.hv2-surface .ys-source{position:absolute;margin:0;bottom:20px;
+  left:var(--hv2-side);right:var(--hv2-side);max-width:52em;
+  color:var(--color-ink-3);
+  /* Its own paper, because it is the one piece of text that has to sit at the
+     dense end of the frame: near-invisible where the surface is already light,
+     and the difference between 1.16:1 and legible where it is not. */
+  background:color-mix(in srgb, var(--color-ground) 88%, transparent);}
 .hv2-grain{position:absolute;inset:0;background-image:${GRAIN_URL};
   background-size:140px 140px;opacity:.30;}
 
@@ -150,48 +183,23 @@ const CSS = css`
 .hv2-lead{grid-column:1 / span 5;font-size:18px;line-height:1.55;font-weight:300;
   color:var(--color-ink-2);max-width:30em;hyphens:manual;}
 
-/* ---- the actions ---------------------------------------------------------
-   One glass, one ghost. The glass is the MotionSites pill translated to paper:
-   a white veil rather than a dark one, because on a warm off-white ground the
-   thing glass does is lift toward the page's own light; a blur behind it so
-   the surface it sits on is present but not legible through it; and the
-   gradient hairline drawn with the mask-composite trick in INK alpha, so the
-   edge catches on two corners the way a real bevel would.
+/* ---- the actions --------------------------------------------------------
+   THE GLASS WAS BUILT AND THEN JUDGED FROM THE FRAME, which is what the brief
+   asked for. It is gone. The pill worked as a translation — a white veil
+   rather than a dark one, a 6px blur, the gradient hairline drawn with the
+   mask-composite trick in ink alpha — and it still read as the quieter of the
+   two actions, for a reason no amount of tuning fixes: fit="band" anchors the
+   surface to the RIGHT, the actions sit on the column-1 line at the left, and
+   a glass control with nothing behind it is an outline on paper. Side by side
+   with an outlined secondary, neither read as the thing to press.
 
-   The white is a literal, and it is the one colour in this file that is not a
-   token: the semantic set has ground, ground-2 and surface, all of which are
-   the page's own tones, and a glass fill made of them is invisible on them.
-   Written as color-mix, not as a white-with-alpha literal, so it reads as a
-   deliberate white and not as a leftover from the dark build. If this pattern
-   spreads past the hero it wants a --color-glass token from foundation. */
+   So "Our approach" is the ink .btn again — the one black button, 17.04:1, the
+   single heaviest object on the page, which is what makes it the one thing to
+   press — and "Investor inquiries" is .btn-ghost at the site's own default. If
+   the surface ever moves under the actions, the glass is worth rebuilding; the
+   trick is documented in this commit rather than left in the file as dead
+   style. */
 .hv2-btn{justify-content:center;min-height:48px;padding:12px 22px;}
-.hv2-btn-glass{position:relative;border:0;border-radius:8px;
-  background:color-mix(in srgb, #ffffff 55%, transparent);
-  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
-  color:var(--color-ink);
-  transition:transform var(--dur-fast) var(--ease),
-             background var(--dur-fast) var(--ease);}
-.hv2-btn-glass::before{content:"";position:absolute;inset:0;border-radius:inherit;
-  padding:1px;pointer-events:none;
-  background:linear-gradient(135deg,
-    rgba(20,19,17,.46) 0%, rgba(20,19,17,.10) 46%, rgba(20,19,17,.40) 100%);
-  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite:xor;mask-composite:exclude;}
-@media (hover: hover) and (pointer: fine){
-  .hv2-btn-glass:hover{transform:scale(1.03);
-    background:color-mix(in srgb, #ffffff 72%, transparent);}
-}
-.hv2-btn-glass:active{transform:scale(.99);}
-/* A transform on a control is a motion effect like any other. */
-@media (prefers-reduced-motion: reduce){
-  .hv2-btn-glass:hover,.hv2-btn-glass:active{transform:none;}
-}
-/* The ghost's border steps down from ink to hairline-strong HERE and not in
-   globals: side by side, a full-ink outline is heavier than any glass can be
-   on paper, and the secondary action was reading as the primary one. This is
-   the hero saying which of its two actions is which, not a restyle of .btn. */
-.hv2-cta .btn-ghost{border-color:var(--color-hairline-strong);}
 .hv2-cta{grid-column:1 / span 6;display:flex;flex-wrap:wrap;gap:12px;
   justify-content:flex-start;}
 
@@ -201,8 +209,11 @@ const CSS = css`
    content stops. It grows downward once at the end of the sequence and is gone
    by 120px of scroll. aria-hidden — it tells a sighted reader there is more
    below the fold, which is not information a screen reader is missing. */
-.hv2-cue{position:absolute;z-index:1;bottom:20px;left:var(--hv2-side);
-  display:flex;flex-direction:column;align-items:flex-start;gap:8px;}
+/* Bottom RIGHT since round 7: the surface's attribution owns the foot-left,
+   and two quiet captions on the same corner is one too many. */
+.hv2-cue{position:absolute;z-index:1;bottom:20px;right:var(--hv2-side);
+  display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
+.hv2-cue-line{margin-right:1px;}
 .hv2-cue-word{color:var(--color-ink-3);line-height:1;}
 .hv2-cue-line{display:block;width:1px;height:30px;transform-origin:50% 0;
   background:var(--color-hairline-strong);}
@@ -210,10 +221,26 @@ const CSS = css`
 /* ---- narrow -------------------------------------------------------------- */
 @media (max-width:767px){
   .hv2{--hv2-pb:28px;
-       min-height:min(calc(100vh - var(--nav-h, 56px)), 820px);
-       /* The headline sits ON the surface here, not beside it, so the surface
-          comes down to where ink still measures past 7:1 against it. */
-       --hv2-surface-o:.55;}
+       min-height:min(calc(100vh - var(--nav-h, 56px)), 820px);}
+  /* The headline sits ON the surface here rather than beside it, so the canvas
+     comes down to where ink still measures past 7:1 against it. The prop is a
+     server value and cannot be a media query, so the step is an opacity on the
+     layer; the component's own 0.45 is the desktop figure. */
+  /* The horizontal mask cannot help here: it separates a reading column on the
+     left from the surface's mass on the right, and on a phone the text IS the
+     whole column — the lead runs edge to edge straight through the dense end.
+     Washing the surface out instead got ink-2 to 4.45:1 against a 4.5 floor
+     and left almost nothing to look at. So the mask turns 90 degrees: the
+     surface lives in the lower third, under the actions and clear of the
+     sentence, and it can stay strong enough to be worth having. It also puts
+     something behind the glass CTA, which on a phone is the only place there
+     was anything for it to refract. */
+  .hv2{--hv2-surface-o:.62;}
+  .hv2-surface canvas{
+    -webkit-mask-image:linear-gradient(180deg,
+      transparent 0%, transparent 50%, rgba(0,0,0,.45) 66%, #000 82%);
+    mask-image:linear-gradient(180deg,
+      transparent 0%, transparent 50%, rgba(0,0,0,.45) 66%, #000 82%);}
   @supports (height: 100dvh){
     .hv2{min-height:min(calc(100dvh - var(--nav-h, 56px)), 820px);}
   }
@@ -245,6 +272,10 @@ const CSS = css`
   .hv2-btn{flex:0 1 auto;padding:12px 15px;}
   .hv2-gap{min-height:20px;}
   .hv2-gap-b{min-height:16px;}
+  /* No cue on a phone. The attribution wraps to four lines at 393 and runs the
+     width of the frame; a second caption pinned to the same foot collided with
+     it. The source line is the one that has to be there. */
+  .hv2-cue{display:none;}
 }
 
 /* Short phones: the 320x568 floor, and every phone measured with the browser
@@ -276,6 +307,16 @@ const CSS = css`
   .hv2-h1{grid-column:1 / -1;}
   .hv2-lead{grid-column:1 / span 8;}
   .hv2-cta{grid-column:1 / -1;margin-top:28px;}
+  /* Same reason as the phone, and the same answer: the composition here is
+     stacked, so a lead across eight of twelve columns reaches the band's
+     right-anchored mass and ink-2 measured 3.76:1 there. The mask turns 90
+     degrees and the surface takes the lower third, clear of the sentence. */
+  .hv2{--hv2-surface-o:.6;}
+  .hv2-surface canvas{
+    -webkit-mask-image:linear-gradient(180deg,
+      transparent 0%, transparent 50%, rgba(0,0,0,.45) 66%, #000 82%);
+    mask-image:linear-gradient(180deg,
+      transparent 0%, transparent 50%, rgba(0,0,0,.45) 66%, #000 82%);}
 }
 
 /* ---- short desktop frames (1280x720, 1366x768) --------------------------- */
@@ -304,8 +345,10 @@ const CSS = css`
    "span 6" runs into implicit tracks and takes the whole width. */
 @media (max-height:500px) and (orientation:landscape){
   .hv2-row{grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px;}
-  .hv2{--hv2-pb:20px;--hv2-surface-o:.7;
+  .hv2{--hv2-pb:20px;
        min-height:calc(100vh - var(--nav-h, 48px));}
+  .hv2{--hv2-surface-o:.8;}
+  .hv2-surface .ys-source{display:none;}
   @supports (height: 100dvh){
     .hv2{min-height:calc(100dvh - var(--nav-h, 48px));}
   }
@@ -354,6 +397,7 @@ const CSS = css`
 @keyframes hv2Rise{from{transform:translate3d(0,24px,0)}to{transform:none}}
 @keyframes hv2Grow{from{transform:scaleY(0)}to{transform:none}}
 @keyframes hv2CueOut{from{opacity:1}to{opacity:0}}
+@keyframes hv2SurfaceIn{from{opacity:0}to{opacity:var(--hv2-surface-o, .85)}}
 
 @media (prefers-reduced-motion: no-preference){
   .hv2-facts > *,.hv2-l > span,.hv2-lead,.hv2-cta{
@@ -362,7 +406,7 @@ const CSS = css`
   .hv2-l2 > span{animation-delay:var(--stagger),var(--stagger);}
   .hv2-lead{animation-delay:calc(var(--stagger) * 3),calc(var(--stagger) * 3);}
   .hv2-cta{animation-delay:calc(var(--stagger) * 6),calc(var(--stagger) * 6);}
-  .hv2-surface{animation:originFadeIn var(--dur-draw) var(--ease) both;}
+  .hv2-surface{animation:hv2SurfaceIn var(--dur-draw) var(--ease) both;}
   /* The entrance is on the word and the rule and NOT on .hv2-cue, because the
      scroll-out below also animates opacity: two animations on one element do
      not compose, the later one simply wins, and the cue would be on screen at
@@ -397,15 +441,6 @@ const CSS = css`
 }
 `;
 
-/** The surface's stand-in until src/components/viz/YieldSurface.tsx lands.
- *  It occupies the box and states nothing: no data, no source line, no
- *  data-source attribute, because there is nothing yet to source. It is a
- *  single very quiet token wash, deliberately not a picture — a placeholder
- *  that looks like a design is a placeholder nobody replaces. */
-function SurfacePlaceholder() {
-  return <div className="hv2-surface-ph" data-hv2-surface="placeholder" />;
-}
-
 export default function HeroV2() {
   return (
     <section className="hv2">
@@ -413,13 +448,12 @@ export default function HeroV2() {
 
       <div className="hv2-bg" aria-hidden="true">
         <div className="hv2-wash" />
-        {/* Swap SurfacePlaceholder for <YieldSurface/> when it lands; the box,
-            the fade and the phone's opacity step are already here. */}
-        <div className="hv2-surface">
-          <SurfacePlaceholder />
-        </div>
         <div className="hv2-grain" />
       </div>
+
+      {/* Not inside .hv2-bg: this figure carries the page's data-source and its
+          attribution, and aria-hidden furniture is no place for a citation. */}
+      <YieldSurface height={900} fit="band" opacity={0.45} className="hv2-surface" />
 
       <div className="hv2-fg">
         <div className="hv2-row hv2-facts">
@@ -458,7 +492,7 @@ export default function HeroV2() {
 
         <div className="hv2-row">
           <div className="hv2-cta">
-            <Link href="/firm" className="hv2-btn hv2-btn-glass">
+            <Link href="/firm" className="btn hv2-btn">
               Our approach
             </Link>
             <Link href="/contact" className="btn btn-ghost hv2-btn">
