@@ -149,7 +149,7 @@ export default function Feature() {
 
       <Statement attribution="Investment Committee">
         Risk is not the price of return. It is what we manage so that we are still
-        here when the return arrives.
+        here if the return arrives.
       </Statement>
     </section>
   );
