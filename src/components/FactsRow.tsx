@@ -57,14 +57,20 @@ const css = `
 
 export default function FactsRow({ items = defaultFacts }: { items?: Fact[] }) {
   return (
-    <dl className="facts-row">
+    <>
+      {/* <dl>'s content model permits dt/dd groups (optionally wrapped in a
+          div) intermixed only with script-supporting elements (script,
+          template) — not style. It rendered fine nested (browsers are
+          lenient), but it wasn't a valid <dl>; moved out as a sibling. */}
       <style dangerouslySetInnerHTML={{ __html: css }} />
-      {items.map((f) => (
-        <div key={f.label} className="facts-cell">
-          <dt className="t-mono-xs facts-label text-ink-3">{f.label}</dt>
-          <dd className="facts-value">{f.value}</dd>
-        </div>
-      ))}
-    </dl>
+      <dl className="facts-row">
+        {items.map((f) => (
+          <div key={f.label} className="facts-cell">
+            <dt className="t-mono-xs facts-label text-ink-3">{f.label}</dt>
+            <dd className="facts-value">{f.value}</dd>
+          </div>
+        ))}
+      </dl>
+    </>
   );
 }
