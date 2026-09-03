@@ -326,7 +326,7 @@ const CSS = `
      way a tearsheet sets a fact. */
   .hv2-ledger{display:block;margin:20px 0 0;}
   .hv2-lrow{display:flex;align-items:baseline;justify-content:space-between;
-    gap:16px;padding:11px 0;border-top:1px solid #3f4041;}
+    gap:16px;padding:9px 0;border-top:1px solid #3f4041;}
   .hv2-lrow:last-child{border-bottom:1px solid #3f4041;}
   .hv2-ledger dt,.hv2-ledger dd{margin:0;font-family:var(--font-mono);
     font-size:11px;line-height:1.6;letter-spacing:.182em;text-transform:uppercase;
@@ -386,10 +386,15 @@ const CSS = `
   .hv2-l > span{white-space:normal;}
   .hv2-h1{font-size:clamp(2.4rem, calc(25.925vw - 12.44px), 6rem);
           line-height:.84;letter-spacing:-.038em;margin-block:8px 0;}
-  /* the cover type is worth ~40px of surrounding air on a 844 screen */
-  .hv2-band{margin-top:14px;}
-  .hv2-ledger{margin-top:14px;}
-  .hv2-lrow{padding:8px 0;}
+  /* The cover type is worth ~40px of surrounding air on an 844 screen, and the
+     third record row costs another ~35. Both are paid for here rather than by
+     letting the actions slide under the fold: the band loses 6px of height, the
+     two margins lose 4px each, every record row loses 6px of padding (18 across
+     three), and the lead drops a point. Measured at 390x844: 872 -> 833. */
+  .hv2-band{height:38px;margin-top:10px;}
+  .hv2-ledger{margin-top:10px;}
+  .hv2-lrow{padding:5px 0;}
+  .hv2-lead{font-size:14px;}
   /* Actions as full-bleed stamps, not pills floating on a field. They continue
      the ledger's rhythm: same hairlines, label left, mono arrow hard right, so
      the foot of the screen reads as one ruled stack rather than as a form. */
@@ -606,6 +611,15 @@ export default function HeroV2() {
           <div className="hv2-lrow">
             <dt><span className="hv2-lx">02</span>Mandate</dt>
             <dd>{site.mandate}</dd>
+          </div>
+          {/* The month, not the year. site.foundedLabel exists precisely because
+              "2026" alone would let a reader assume January, and the firm is
+              weeks old. Putting that on the first screen rather than burying it
+              is the same instinct as the rest of the site: state the thing an
+              allocator would otherwise have to dig for. */}
+          <div className="hv2-lrow">
+            <dt><span className="hv2-lx">03</span>Formed</dt>
+            <dd>{site.foundedLabel}</dd>
           </div>
         </dl>
 
