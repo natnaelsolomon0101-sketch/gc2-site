@@ -331,6 +331,19 @@
     .t-h1 { font-size: clamp(80px, calc(59.79px + 1.05vw), 96px); }
     .t-h2 { font-size: clamp(38px, calc(30.42px + .39vw), 44px); }
   }
+  /* Foundation r6: landscape-phone cap for the inner-route h1 tier. HeroV2
+     already caps its own headline at 44px under this same short-viewport
+     landscape condition (see its letterbox rule at the foot of this file);
+     PageHeader's h1 shares the plain .t-h1 clamp and had no such cap, so at
+     a landscape width like 734px the fluid clamp was still resolving in the
+     high 70s, wrapping a short title ("Questions we expect.") onto a second
+     line with half the line box empty. Capping .t-h1/.t-display to the
+     hero's 44px here, and .t-display-sm/.t-h2 to the next tier down (32px),
+     makes the inner routes match the hero. */
+  @media (max-height: 480px) and (orientation: landscape) {
+    .t-h1, .t-display { font-size: 44px; }
+    .t-display-sm, .t-h2 { font-size: 32px; }
+  }
   .t-lead    { font-size: clamp(15px, calc(11.57px + 1.07vw), 18px);
                line-height: 1.5;
                font-weight:300; color: var(--color-ink-2); overflow-wrap: anywhere;
