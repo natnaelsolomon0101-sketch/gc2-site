@@ -3,7 +3,7 @@
 | Section | Round | Status | Last failing viewports | Next action |
 |---|---|---|---|---|
 | foundation | 0 | LAUNCHING | — | §0.2 items 1, 8; §7.1 fluid tokens; §7.2/7.3/7.5; motion.ts skeleton |
-| viewport-runner | 0 | LAUNCHING | — | build scripts/qa/matrix.ts + contact-sheet.ts; baseline full run |
+| viewport-runner | 1 | DONE (tool merged 2639fec→recommitted) | — | rerun baseline-full against a healthy :3000 |
 | sec-chrome | 0 | WAITING (foundation) | — | — |
 | sec-hero | 0 | WAITING (foundation) | — | — |
 | sec-framework | 0 | WAITING (foundation) | — | — |
