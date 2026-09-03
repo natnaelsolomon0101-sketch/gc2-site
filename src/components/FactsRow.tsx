@@ -1,19 +1,63 @@
 import { site } from "@/config/site";
 
-const facts = [
-  { label: "Founded", value: site.foundedLabel },
-  { label: "Headquarters", value: site.city },
+/* ===========================================================================
+   FACTS ROW — the firm's own registration data, four cells, sourced from
+   src/config/site.ts only. A 2x2 grid with a hairline cross below 1024px
+   (verified at the 320 floor and 375), one row of four above it. Labels are
+   short by design so they never wrap; values set in the display face.
+   ========================================================================= */
+
+export type Fact = { label: string; value: string };
+
+const defaultFacts: Fact[] = [
+  { label: "Formed", value: site.foundedLabel },
+  { label: "Domicile", value: site.city },
   { label: "Structure", value: site.structure },
   { label: "Mandate", value: site.mandate },
 ];
 
-export default function FactsRow() {
+const css = `
+.facts-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  border-top: 1px solid rgba(255,255,255,.12);
+}
+.facts-cell {
+  padding: 20px 20px 20px 0;
+  border-bottom: 1px solid rgba(255,255,255,.12);
+}
+.facts-cell:nth-child(2n) {
+  border-left: 1px solid rgba(255,255,255,.12);
+  padding-left: 20px;
+  padding-right: 0;
+}
+.facts-cell:nth-last-child(-n+2) { border-bottom: none; }
+.facts-label { white-space: nowrap; }
+.facts-value {
+  font-family: var(--font-display); font-weight: 400;
+  font-size: clamp(22px, 6vw, 28px); line-height: 1.15; letter-spacing: -.01em;
+  margin-top: 6px; color: var(--color-pure);
+  /* Values wrap between words, never mid-word: a display face doesn't
+     hyphenate (see Feature.tsx .ft-head for the same rule on the headline). */
+  hyphens: none;
+}
+@media (min-width: 1024px) {
+  .facts-row { grid-template-columns: repeat(4, minmax(0,1fr)); }
+  .facts-cell { border-bottom: none; padding: 20px; }
+  .facts-cell:nth-child(2n) { border-left: none; padding-left: 20px; padding-right: 20px; }
+  .facts-cell:first-child { padding-left: 0; }
+  .facts-cell:not(:first-child) { border-left: 1px solid rgba(255,255,255,.12); }
+}
+`;
+
+export default function FactsRow({ items = defaultFacts }: { items?: Fact[] }) {
   return (
-    <dl className="rule-t rule-b grid grid-cols-2 md:grid-cols-4">
-      {facts.map((f) => (
-        <div key={f.label} className="py-8 pr-6">
-          <dt className="t-caption text-fog">{f.label}</dt>
-          <dd className="t-h3 mt-2 text-pure">{f.value}</dd>
+    <dl className="facts-row">
+      <style dangerouslySetInnerHTML={{ __html: css }} />
+      {items.map((f) => (
+        <div key={f.label} className="facts-cell">
+          <dt className="t-mono-xs facts-label text-fog">{f.label}</dt>
+          <dd className="facts-value">{f.value}</dd>
         </div>
       ))}
     </dl>
