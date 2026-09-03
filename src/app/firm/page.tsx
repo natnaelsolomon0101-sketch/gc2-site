@@ -92,6 +92,7 @@ export default function Firm() {
         eyebrow="The firm"
         title="A research house that trades."
         standfirst="We are a small partnership. The work is research; trading is how the research is expressed."
+        caption={`The firm was formed in ${site.foundedLabel}. What is described here is the policy the firm operates under, not a record of periods it has run.`}
       />
       {/* Bands alternate ground / ground-2 rather than every section sitting on
           one flat ground, so the page has rhythm the way the home page does.
