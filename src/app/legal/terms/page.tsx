@@ -224,7 +224,7 @@ export default function Terms() {
             would be inventing it.
           </p>
           {fund.updatedAt && (
-            <p className="t-mono-xs mt-6 text-fog">Last updated {fund.updatedAt}</p>
+            <p className="t-mono-xs mt-6 text-ink-3">Last updated {fund.updatedAt}</p>
           )}
         </>
       ),
@@ -242,11 +242,11 @@ export default function Terms() {
       />
 
       {blocks.map((b, i) => (
-        <section key={b.id} id={b.id} className={`tm-band scroll-mt-24 ${i % 2 ? "bg-abyss" : ""}`}>
+        <section key={b.id} id={b.id} className={`tm-band scroll-mt-24 ${i % 2 ? "bg-ground-2" : ""}`}>
           <Container>
             <div className={`grid-gc2 py-16 md:py-24 ${i === 0 ? "rule-t" : ""}`}>
               <div className="col-span-4 md:col-span-4">
-                <p className="t-mono-xs text-fog">{String(i + 1).padStart(2, "0")}</p>
+                <p className="t-mono-xs text-ink-3">{String(i + 1).padStart(2, "0")}</p>
                 <h2 className="t-h2 mt-3">{b.title}</h2>
                 {b.kicker && <p className="t-small measure-body mt-6">{b.kicker}</p>}
               </div>

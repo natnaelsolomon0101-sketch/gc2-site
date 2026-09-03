@@ -59,10 +59,10 @@ function Ledger({
       <caption className="sr-only">{caption}</caption>
       <thead className="sr-only md:not-sr-only">
         <tr className="block md:table-row">
-          <th scope="col" className="t-mono-xs block pb-3 text-left text-fog md:table-cell md:w-1/3 md:pr-6">
+          <th scope="col" className="t-mono-xs block pb-3 text-left text-ink-3 md:table-cell md:w-1/3 md:pr-6">
             {termHead}
           </th>
-          <th scope="col" className="t-mono-xs block pb-3 text-left text-fog md:table-cell md:pr-6">
+          <th scope="col" className="t-mono-xs block pb-3 text-left text-ink-3 md:table-cell md:pr-6">
             {valueHead}
           </th>
         </tr>
@@ -72,15 +72,15 @@ function Ledger({
           <tr key={r.term} className="rule-t block py-5 md:table-row md:py-0">
             <th
               scope="row"
-              className="t-body block text-left font-normal text-fog md:table-cell md:w-1/3 md:py-6 md:pr-6 md:align-top"
+              className="t-body block text-left font-normal text-ink-3 md:table-cell md:w-1/3 md:py-6 md:pr-6 md:align-top"
             >
               {r.term}
             </th>
             <td className="block pt-2 md:table-cell md:py-6 md:align-top">
-              <span aria-hidden="true" className="t-mono-xs block text-fog md:hidden">
+              <span aria-hidden="true" className="t-mono-xs block text-ink-3 md:hidden">
                 {valueHead}
               </span>
-              <span className="t-body measure-body block text-cloud">{r.value}</span>
+              <span className="t-body measure-body block text-ink">{r.value}</span>
             </td>
           </tr>
         ))}
@@ -327,36 +327,43 @@ export default function Tearsheet() {
           lines) rather than a duplicate caption. Letter's own 8.5:11 ratio,
           the shape `scripts/qa/print.ts` emulates. Centered in its own
           viewport-height band rather than left with the rest of the grid,
-          because it is an object, not a column of text. */}
+          because it is an object, not a column of text.
+
+          Light pass: the object sits on the page `ground` and reads as
+          paper by being the next step down, `surface`, with a hairline
+          edge — the same depth mechanism as every card on the site (ground
+          → ground-2 → surface plus a rule, never a shadow). The decorative
+          lines are `ink` at low alpha, standing in for printed text the way
+          they always did. */}
       <header className="print:hidden">
         <Container>
           <div className="flex min-h-[70dvh] flex-col items-center justify-center gap-8 py-16">
             <div
               aria-hidden="true"
-              className="flex aspect-[8.5/11] w-full max-w-xs flex-col gap-3 rounded-card border border-void/10 bg-pure p-8 md:max-w-sm"
+              className="flex aspect-[8.5/11] w-full max-w-xs flex-col gap-3 rounded-card border border-hairline bg-surface p-8 md:max-w-sm"
             >
-              <div className="h-3 w-2/3 rounded-control bg-void/15" />
-              <div className="mt-4 h-2 w-full rounded-control bg-void/10" />
-              <div className="h-2 w-full rounded-control bg-void/10" />
-              <div className="h-2 w-5/6 rounded-control bg-void/10" />
-              <div className="mt-auto h-2 w-1/3 rounded-control bg-void/10" />
+              <div className="h-3 w-2/3 rounded-control bg-ink/15" />
+              <div className="mt-4 h-2 w-full rounded-control bg-ink/10" />
+              <div className="h-2 w-full rounded-control bg-ink/10" />
+              <div className="h-2 w-5/6 rounded-control bg-ink/10" />
+              <div className="mt-auto h-2 w-1/3 rounded-control bg-ink/10" />
             </div>
             <PrintButton />
           </div>
         </Container>
       </header>
 
-      {/* Bands alternate obsidian / abyss, matching /firm, /diligence and
+      {/* Bands alternate ground / ground-2, matching /firm, /diligence and
           /governance. Ordinals come from the RENDERED index rather than a fixed
           list, so the collapsed provenance block leaves no gap in the numbering.
-          Heading pure 19.05:1 / 19.81:1, body ash 7.20:1 / 7.49:1, fog labels
-          4.61:1 / 4.80:1. */}
+          Heading ink 17.04:1 / 15.47:1, body ink-2 7.55:1 / 6.85:1, ink-3
+          labels 5.61:1 / 5.09:1 (DESIGN.md's measured table). */}
       {blocks.map((b, i) => (
-        <section key={b.id} id={b.id} className={`scroll-mt-24 ${i % 2 ? "bg-abyss" : ""}`}>
+        <section key={b.id} id={b.id} className={`scroll-mt-24 ${i % 2 ? "bg-ground-2" : ""}`}>
           <Container>
             <div className={`grid-gc2 py-16 md:py-24 ${i === 0 ? "rule-t" : ""}`}>
               <div className="col-span-4 md:col-span-4">
-                <p className="t-mono-xs text-fog">{String(i + 1).padStart(2, "0")}</p>
+                <p className="t-mono-xs text-ink-3">{String(i + 1).padStart(2, "0")}</p>
                 <h2 className="t-h2 mt-3">{b.title}</h2>
                 {b.kicker && <p className="t-small measure-body mt-6">{b.kicker}</p>}
               </div>
@@ -368,9 +375,9 @@ export default function Tearsheet() {
 
       {/* Stamped only when there is a date to stamp. */}
       {fund.updatedAt && (
-        <section className={blocks.length % 2 ? "bg-abyss" : ""}>
+        <section className={blocks.length % 2 ? "bg-ground-2" : ""}>
           <Container>
-            <p className="t-mono-xs rule-t py-8 text-fog">Last updated {fund.updatedAt}</p>
+            <p className="t-mono-xs rule-t py-8 text-ink-3">Last updated {fund.updatedAt}</p>
           </Container>
         </section>
       )}

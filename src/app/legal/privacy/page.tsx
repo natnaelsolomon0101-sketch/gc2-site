@@ -126,10 +126,10 @@ function Ledger() {
       </caption>
       <thead className="sr-only md:not-sr-only">
         <tr className="block md:table-row">
-          <th scope="col" className="t-mono-xs block pb-3 text-left text-fog md:table-cell md:w-1/3 md:pr-6">
+          <th scope="col" className="t-mono-xs block pb-3 text-left text-ink-3 md:table-cell md:w-1/3 md:pr-6">
             Category
           </th>
-          <th scope="col" className="t-mono-xs block pb-3 text-left text-fog md:table-cell">
+          <th scope="col" className="t-mono-xs block pb-3 text-left text-ink-3 md:table-cell">
             What this site does
           </th>
         </tr>
@@ -139,15 +139,15 @@ function Ledger() {
           <tr key={r.term} className="rule-t block py-5 md:table-row md:py-0">
             <th
               scope="row"
-              className="t-body block text-left font-normal text-fog md:table-cell md:w-1/3 md:py-6 md:pr-6 md:align-top"
+              className="t-body block text-left font-normal text-ink-3 md:table-cell md:w-1/3 md:py-6 md:pr-6 md:align-top"
             >
               {r.term}
             </th>
             <td className="block pt-2 md:table-cell md:py-6 md:align-top">
-              <span aria-hidden="true" className="t-mono-xs block text-fog md:hidden">
+              <span aria-hidden="true" className="t-mono-xs block text-ink-3 md:hidden">
                 What this site does
               </span>
-              <span className="t-body block text-cloud">{r.value}</span>
+              <span className="t-body block text-ink">{r.value}</span>
             </td>
           </tr>
         ))}
@@ -298,7 +298,7 @@ export default function Privacy() {
             leave a sentence standing that has stopped being true.
           </p>
           {fund.updatedAt && (
-            <p className="t-mono-xs mt-6 text-fog">Last updated {fund.updatedAt}</p>
+            <p className="t-mono-xs mt-6 text-ink-3">Last updated {fund.updatedAt}</p>
           )}
         </>
       ),
@@ -341,11 +341,11 @@ export default function Privacy() {
       />
 
       {blocks.map((b, i) => (
-        <section key={b.id} id={b.id} className={`pv-band scroll-mt-24 ${i % 2 ? "bg-abyss" : ""}`}>
+        <section key={b.id} id={b.id} className={`pv-band scroll-mt-24 ${i % 2 ? "bg-ground-2" : ""}`}>
           <Container>
             <div className={`grid-gc2 py-16 md:py-24 ${i === 0 ? "rule-t" : ""}`}>
               <div className="col-span-4 md:col-span-4">
-                <p className="t-mono-xs text-fog">{String(i + 1).padStart(2, "0")}</p>
+                <p className="t-mono-xs text-ink-3">{String(i + 1).padStart(2, "0")}</p>
                 <h2 className="t-h2 mt-3">{b.title}</h2>
                 {b.kicker && <p className="t-small measure-body mt-6">{b.kicker}</p>}
               </div>

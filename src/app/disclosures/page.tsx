@@ -38,10 +38,10 @@ export default function Disclosures() {
       <PageHeader eyebrow="Legal" title="Disclosures." />
       <section>
         <Container>
-          {/* Legal copy still has to be readable: `.t-h3` is cloud (17.49:1) and
-              `.t-body` is ash (7.20:1) on obsidian — the `text-black` /
-              `text-ink` the paper build set here were both invisible on the
-              Origin ground. */}
+          {/* No manual colour here on purpose: `.t-h3` and `.t-body` already
+              resolve to `var(--color-ink)` / `var(--color-ink-2)` from
+              globals.css (17.04:1 / 7.55:1 on `ground`, DESIGN.md's measured
+              table), so this section needs no token of its own. */}
           <div className="measure-body pb-16 md:pb-24">
             {sections.map((s) => (
               <div key={s.h} className="rule-t py-8">

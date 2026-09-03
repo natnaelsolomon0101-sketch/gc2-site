@@ -100,13 +100,13 @@ export default function Legal() {
       <section>
         <Container>
           <div className="pb-16 md:pb-24">
-            <p className="t-mono-xs rule-t pt-8 text-fog">The documents</p>
+            <p className="t-mono-xs rule-t pt-8 text-ink-3">The documents</p>
             <ul className="mt-2">
               {documents.map((d) => (
                 <li key={d.href} className="lg-row rule-t">
                   <Link href={d.href} className="grid-gc2 block py-8 md:grid md:py-10">
                     <div className="col-span-4 md:col-span-4">
-                      <h2 className="lg-row-title t-h3 text-pure">{d.title}</h2>
+                      <h2 className="lg-row-title t-h3 text-ink">{d.title}</h2>
                     </div>
                     {/* measure-body (34em): round 1 capped this at
                         `max-w-[80ch]`, which still rendered ~84-102 real
@@ -121,7 +121,7 @@ export default function Legal() {
                         few characters of margin. */}
                     <div className="col-span-4 measure-body md:col-span-7 md:col-start-6">
                       <p className="t-body">{d.blurb}</p>
-                      <p className="t-small mt-4 text-fog">{d.note}</p>
+                      <p className="t-small mt-4 text-ink-3">{d.note}</p>
                     </div>
                   </Link>
                 </li>
@@ -133,7 +133,7 @@ export default function Legal() {
 
       {/* Boundary + status. One band, two things a reader needs and would
           otherwise have to infer. */}
-      <section className="lg-band bg-abyss">
+      <section className="lg-band bg-ground-2">
         <Container>
           <div className="grid-gc2 py-16 md:py-24">
             <div className="col-span-4 md:col-span-4">
