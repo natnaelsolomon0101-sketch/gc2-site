@@ -184,8 +184,16 @@ const CSS = css`
 /* ---- motion ---------------------------------------------------------------- */
 @keyframes hv2Rise{from{transform:translate3d(0,24px,0)}to{transform:none}}
 @keyframes hv2ChartIn{from{opacity:0;transform:translate3d(0,40px,0)}to{opacity:1;transform:none}}
-@keyframes hv2Par{to{transform:translate3d(0,18%,0)}}
-@keyframes hv2CopyOut{to{opacity:0;transform:translate3d(0,-48px,0)}}
+/* THE SCROLL-AWAY, turned up (owner: "I like the effect that disappears when
+   you scroll, make that very obvious"). The copy lifts 160px, shrinks to 90%
+   and is gone by half a viewport; the chart sinks a quarter of its box and
+   fades to a third by the time the frame has scrolled off. Both are scroll-
+   driven, so scrolling back plays them back. */
+@keyframes hv2Par{to{transform:translate3d(0,26%,0) scale(.96);opacity:.32}}
+@keyframes hv2CopyOut{
+  40%{opacity:.55}
+  to{opacity:0;transform:translate3d(0,-160px,0) scale(.9);filter:blur(6px)}}
+@keyframes hv2FootOut{to{opacity:0;transform:translate3d(0,-40px,0)}}
 
 @media (prefers-reduced-motion: no-preference){
   .hv2-h1,.hv2-lead,.hv2-cta,.hv2-foot > *{
@@ -199,9 +207,11 @@ const CSS = css`
 @supports (animation-timeline: scroll()){
   @media (prefers-reduced-motion: no-preference){
     .hv2-chart{animation:hv2Par linear both;
-      animation-timeline:scroll(root block);animation-range:0 100vh;}
-    .hv2-copy{animation:hv2CopyOut linear both;
-      animation-timeline:scroll(root block);animation-range:0 70vh;}
+      animation-timeline:scroll(root block);animation-range:0 90vh;}
+    .hv2-copy{animation:hv2CopyOut linear both;transform-origin:0 50%;
+      animation-timeline:scroll(root block);animation-range:0 55vh;}
+    .hv2-foot{animation:hv2FootOut linear both;
+      animation-timeline:scroll(root block);animation-range:0 60vh;}
   }
 }
 

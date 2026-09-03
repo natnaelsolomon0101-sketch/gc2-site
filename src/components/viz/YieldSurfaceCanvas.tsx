@@ -437,7 +437,7 @@ export default function YieldSurfaceCanvas({
       if (!start) start = t;
       const ms = t - start;
       const u = Math.min(1, ms / REVEAL_MS);
-      reveal = 1 - (1 - u) * (1 - u) * (1 - u);   // ease-out cubic
+      reveal = 1 - (1 - u) * (1 - u) * (1 - u);   // cubic falloff of the draw-in
       cx += (tx - cx) * PARALLAX_EASE;
       cy += (ty - cy) * PARALLAX_EASE;
       bob = bobAt(ms) + cy * PARALLAX_PX;
