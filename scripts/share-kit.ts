@@ -132,17 +132,14 @@ const CARDS: Card[] = [
     /* The whole Statement object, not just its sentence: counsel finding 3 —
        the card was dropping the attribution the live page carries. Lifting the
        wrapper takes the sentence and the byline together and cannot fall out of
-       step with the page again. */
-    selectors: [{ sel: "section.ft div.rule-t.rule-b", first: true }],
-    /* The em rule is the card's typographic treatment of a byline, not new
-       copy: the word is the page's "Investment Committee". The section band's
-       own vertical padding is zeroed because the card supplies the air. */
-    frame:
-      ".sk-body div.rule-t { padding-top: 0 !important; padding-bottom: 0 !important; }" +
-      /* Structural, not by class: the attribution is the second <p> in the
-         Statement wrapper, and its colour utility changes with the light pass
-         while its position does not. */
-      '.sk-body div.rule-t > p + p::before { content: "\\2014\\00a0"; }',
+       step with the page again. Statement.tsx (r9) renders a <figure> with a
+       <blockquote> and, when there is one, a <figcaption> — <figure>, not the
+       <div> an earlier round used, and the two parts are already semantically
+       distinct, so the card needs no CSS content hack to tell them apart. */
+    selectors: [{ sel: "section.ft figure.rule-t.rule-b", first: true }],
+    /* The section band's own vertical padding is zeroed because the card
+       supplies the air. */
+    frame: ".sk-body figure.rule-t { padding-top: 0 !important; padding-bottom: 0 !important; }",
   },
   {
     name: "strategies",
