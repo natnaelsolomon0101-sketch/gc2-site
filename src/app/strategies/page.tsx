@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import Container from "@/components/Container";
 import PageHeader from "@/components/PageHeader";
 import TextLink from "@/components/TextLink";
@@ -7,6 +8,25 @@ import { strategies } from "@/content/strategies";
 import StrategiesRail from "./StrategiesRail";
 import { tileAccents } from "@/components/tileAccents";
 import ECBGrid from "@/components/viz/ECBGrid";
+import RevealLines from "@/components/ui/RevealLines";
+import Glass from "@/components/ui/Glass";
+import Tilt from "@/components/ui/Tilt";
+
+/* The chapter title's italic word, same rule PinnedStrategies.tsx uses for
+   the home deck (round 9, docs/v4/TRANSFORM.md): the last word of every
+   strategy name is already the operative one, so it is derived from the name
+   rather than hand-typed per strategy. Colour stays currentColor — a tile's
+   own paired -fg token, not the framework h2's deep-iris rule (DESIGN.md
+   "Chromatic tiles" is the authority on a tile's foreground). */
+function editorialTitle(name: string): ReactNode {
+  const i = name.lastIndexOf(" ");
+  if (i === -1) return <em>{name}</em>;
+  return (
+    <>
+      {name.slice(0, i)} <em>{name.slice(i + 1)}</em>
+    </>
+  );
+}
 
 /**
  * /strategies — the six books, then the two questions the six raise.
@@ -420,6 +440,7 @@ export default function Strategies() {
   animation-delay: calc(var(--stx-i, 0) * var(--stagger));
 }
 .stx-chapter-tile .t-h1 { color: inherit; }
+.stx-chapter-tile .t-h1 em { font-style: italic; }
 @keyframes stxChapterIn {
   from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: none; }
@@ -433,6 +454,31 @@ export default function Strategies() {
 .stx-chapter-body { display: grid; gap: 32px; }
 @media (min-width: 1024px) {
   .stx-chapter-body { grid-template-columns: 5fr 6fr; gap: 56px; }
+}
+
+/* ---- the soft ground behind a chapter's copy (TRANSFORM.md rule 3) ------
+   The chapter's own tile band is already a full chromatic fill, so the wash
+   sits under .stx-chapter-body only, at the same low alpha the hero's
+   .hv2-wash uses for its pale-iris radial. isolation:isolate on
+   .stx-chapter gives the wash's z-index:-1 a stacking context to sit
+   within instead of falling behind the page ground itself. */
+.stx-chapter { position: relative; isolation: isolate; }
+.stx-chapter-ground {
+  position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(60% 65% at 18% 8%,
+      color-mix(in srgb, var(--color-accent-pale-iris) 24%, transparent) 0%,
+      transparent 72%);
+}
+
+/* ---- sub-cards: the fact pane and the capacity note, both tilting glass -- */
+.stx-fact-card, .stx-capacity-card { padding: 24px 28px; }
+.stx-fact-card dt, .stx-fact-card dd { margin: 0; }
+.stx-fact-tilt, .stx-capacity-tilt { display: block; }
+
+/* ---- the chapter's foot caption ------------------------------------------ */
+.stx-chapter-foot { margin: 0; padding-top: 4px; }
+@media (min-width: 1024px) {
+  .stx-chapter-foot { grid-column: 1 / -1; padding-top: 8px; }
 }
 
 /* Print: paper does not scroll, so the horizontal-scroll strip — the one
@@ -490,38 +536,48 @@ export default function Strategies() {
                     className={`stx-chapter ${k ? "rule-t" : ""} scroll-mt-24`}
                     style={{ ["--stx-i" as string]: k }}
                   >
+                    <div className="stx-chapter-ground" aria-hidden="true" />
                     <div
                       className="stx-chapter-tile"
                       data-tone={t.dark ? "dark" : "light"}
                       style={{ background: t.bg, color: t.fg }}
                     >
-                      <h2 className="t-h1">{s.name}</h2>
+                      <RevealLines as="h2" className="t-h1" lines={[editorialTitle(s.name)]} />
                     </div>
                     <div className="stx-chapter-body py-12 md:py-16">
                       <div>
                         <p className="t-lead measure-lead">{s.oneLiner}</p>
-                        <dl className="mt-8">
-                          <div className="rule-t flex justify-between gap-6 py-3">
-                            <dt className="t-small text-ink-3">Markets</dt>
-                            <dd className="t-body text-right text-ink-2">{s.markets}</dd>
-                          </div>
-                          <div className="rule-t rule-b flex justify-between gap-6 py-3">
-                            <dt className="t-small text-ink-3">Instruments</dt>
-                            <dd className="t-body text-right text-ink-2">{s.instruments}</dd>
-                          </div>
-                        </dl>
+                        <Tilt as="div" max={5} className="stx-fact-tilt mt-8">
+                          <Glass as="div" radius={20} className="stx-fact-card">
+                            <dl>
+                              <div className="rule-t flex justify-between gap-6 py-3">
+                                <dt className="t-small text-ink-3">Markets</dt>
+                                <dd className="t-body text-right text-ink-2">{s.markets}</dd>
+                              </div>
+                              <div className="rule-t rule-b flex justify-between gap-6 py-3">
+                                <dt className="t-small text-ink-3">Instruments</dt>
+                                <dd className="t-body text-right text-ink-2">{s.instruments}</dd>
+                              </div>
+                            </dl>
+                          </Glass>
+                        </Tilt>
                       </div>
                       <div>
                         {s.body.map((p, i) => (
                           <p key={i} className={`t-body measure-body text-ink-2 ${i ? "mt-6" : ""}`}>{p}</p>
                         ))}
                         {constraint && (
-                          <div className="rule-t mt-8 pt-6">
-                            <p className="t-mono-xs text-ink-3">Capacity</p>
-                            <p className="t-body measure-body mt-2 text-ink-2">{constraint}</p>
-                          </div>
+                          <Tilt as="div" max={5} className="stx-capacity-tilt mt-8">
+                            <Glass as="div" radius={20} className="stx-capacity-card">
+                              <p className="t-mono-xs text-ink-3">Capacity</p>
+                              <p className="t-body measure-body mt-2 text-ink-2">{constraint}</p>
+                            </Glass>
+                          </Tilt>
                         )}
                       </div>
+                      <p className="t-caption text-ink-3 stx-chapter-foot">
+                        {ord(k)} <span aria-hidden="true">/</span> {String(strategies.length).padStart(2, "0")}
+                      </p>
                     </div>
                   </div>
                 );
