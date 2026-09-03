@@ -57,6 +57,13 @@ const CSS = `
   font-size:16px; line-height:1.6; color:var(--color-ash);
 }
 .ac-list li:last-child{ border-bottom:1px solid rgba(255,255,255,.12); }
+
+/* PageHeader.tsx (sec-firm's, not this file's) opens every inner route with
+   80px of padding-block above the eyebrow. Stacked under a 56px sticky nav
+   on phone, that reads as dead air before the first word. Tightened here,
+   scoped to this route only, since .section-y is not this file's to edit at
+   the source. */
+@media (max-width:767px){ .section-y{ padding-block:32px 40px; } }
 `;
 
 const blocks: { n: string; h: string; p: string[] }[] = [

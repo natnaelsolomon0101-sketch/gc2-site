@@ -49,18 +49,20 @@ const CSS = `
   font-family:var(--font-display); font-weight:400;
   font-size:19px; line-height:1.3; letter-spacing:-0.01em;
   color:var(--color-cloud);
-  /* The affordance. Steel closed, orchid open. Nothing rotates, nothing
-     appears, nothing is drawn. */
-  border-bottom:1px solid var(--color-steel);
+  /* The affordance. The hairline itself is the marker: 12% white closed,
+     pure white open. Nothing rotates, nothing appears, nothing is drawn. */
+  border-bottom:1px solid rgba(255,255,255,.12);
   transition:color 180ms ease, border-bottom-color 180ms ease;
 }
 @media (min-width:769px){ .qa summary{ font-size:22px; } }
+/* The whole summary is the tap target on phone: 56px, not 44px. */
+@media (max-width:768px){ .qa summary{ min-height:56px; padding:18px 0; } }
 .qa summary::-webkit-details-marker{ display:none; }
 .qa summary::marker{ content:""; }
-.qa summary:hover{ color:var(--color-pure); border-bottom-color:var(--color-ash); }
+.qa summary:hover{ color:var(--color-pure); border-bottom-color:rgba(255,255,255,.24); }
 .qa details[open] > summary{
   color:var(--color-pure);
-  border-bottom-color:var(--color-orchid-bloom);
+  border-bottom-color:var(--color-pure);
 }
 .qa summary:focus-visible{
   outline:2px solid var(--color-pure); outline-offset:4px;
@@ -86,6 +88,13 @@ const CSS = `
 @media (prefers-reduced-motion: reduce){
   .qa summary{ transition-duration:1ms !important; }
 }
+
+/* PageHeader.tsx (sec-firm's, not this section's) opens every inner route
+   with 80px of padding-block above the eyebrow. Stacked under a 56px sticky
+   nav on phone, that reads as dead air before the first word. Tightened
+   here, scoped to this route only, since .section-y is not this file's to
+   edit at the source. */
+@media (max-width:767px){ .section-y{ padding-block:32px 40px; } }
 `;
 
 type Group = { n: string; title: string; items: { q: string; a: string[] }[] };
@@ -316,8 +325,9 @@ export default function Questions() {
           <Container>
             <div className={`grid-gc2 py-14 md:py-20 ${gi === 0 ? "rule-t" : ""}`}>
               <div className="col-span-4 md:col-span-3">
-                <p className="t-mono-xs text-fog">{g.n}</p>
-                <h2 className="t-h2 mt-3">{g.title}</h2>
+                {/* No numeral here: these are category labels (Strategy, Risk,
+                    Operations, Terms, Business), not an ordered sequence. */}
+                <h2 className="t-h2">{g.title}</h2>
               </div>
               <div className="qa col-span-4 md:col-span-8 md:col-start-5">
                 {g.items.map((item, ii) => (

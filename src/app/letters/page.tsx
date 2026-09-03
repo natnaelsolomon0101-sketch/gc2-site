@@ -57,25 +57,28 @@ function Ledger({
       <caption className="sr-only">{caption}</caption>
       <thead className="sr-only md:not-sr-only">
         <tr className="block md:table-row">
-          <th scope="col" className="t-mono-xs block pb-3 text-left text-fog md:table-cell md:w-1/2 md:pr-6">
+          <th scope="col" className="t-caption block pb-3 text-left text-fog md:table-cell md:w-1/2 md:pr-6">
             {termHead}
           </th>
-          <th scope="col" className="t-mono-xs block pb-3 text-left text-fog md:table-cell md:pr-6">
+          <th scope="col" className="t-caption block pb-3 text-left text-fog md:table-cell md:pr-6">
             {valueHead}
           </th>
         </tr>
       </thead>
       <tbody>
         {rows.map((r) => (
-          <tr key={r.term} className="rule-t block py-5 md:table-row md:py-0">
+          /* Below md the row becomes its own grid rather than a plain block
+             stack, so the term and value line up as a term-over-value pair
+             with a consistent gap, per §5.7/§7.10. */
+          <tr key={r.term} className="rule-t grid gap-y-1 py-5 md:table-row md:gap-y-0 md:py-0">
             <th
               scope="row"
               className="t-body block text-left font-normal text-fog md:table-cell md:w-1/2 md:py-6 md:pr-6 md:align-top"
             >
               {r.term}
             </th>
-            <td className="block pt-2 md:table-cell md:py-6 md:align-top">
-              <span aria-hidden="true" className="t-mono-xs block text-fog md:hidden">
+            <td className="block md:table-cell md:py-6 md:align-top">
+              <span aria-hidden="true" className="t-caption block text-fog md:hidden">
                 {valueHead}
               </span>
               <span className="t-body block text-cloud">{r.value}</span>
@@ -299,6 +302,12 @@ export default function Letters() {
 
   return (
     <>
+      {/* PageHeader.tsx (sec-firm's, not this file's) opens every inner route
+          with 80px of padding-block above the eyebrow. Stacked under a 56px
+          sticky nav on phone, that reads as dead air before the first word.
+          Tightened here, scoped to this route only, since .section-y is not
+          this file's to edit at the source. */}
+      <style dangerouslySetInnerHTML={{ __html: `@media (max-width:767px){ .section-y{ padding-block:32px 40px; } }` }} />
       <PageHeader
         eyebrow="Letters"
         title="Investor letters."
