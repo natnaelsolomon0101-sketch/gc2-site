@@ -167,13 +167,16 @@ function fullDeviceCatalog(): DeviceSpec[] {
   );
 
   // Phone
+  // "iPhone SE" in this Playwright version's device table is still the
+  // 1st-gen size (320×568 DPR2) — byte-identical to phone-floor below, so
+  // the real 375px width was never captured. "iPhone SE (3rd gen)" is the
+  // 375×667 DPR2 WebKit descriptor that actually represents a modern SE.
   const phones: [string, string, Engine, string][] = [
-    ["iphone-se", "iPhone SE 375", "webkit", "iPhone SE"],
+    ["iphone-se", "iPhone SE 375", "webkit", "iPhone SE (3rd gen)"],
     ["iphone-14", "iPhone 14 390", "webkit", "iPhone 14"],
     ["iphone-15-pro", "iPhone 15 Pro 393", "webkit", "iPhone 15 Pro"],
     ["iphone-15-pro-max", "iPhone 15 Pro Max 430", "webkit", "iPhone 15 Pro Max"],
     ["pixel-7", "Pixel 7 412", "chromium", "Pixel 7"],
-    ["galaxy-s9plus", "Galaxy S9+ 360", "chromium", "Galaxy S9+"],
   ];
   for (const [id, label, engine, devName] of phones) {
     d.push(mkNamed(id, `${label} portrait`, "phone", engine, pwDevices[devName], "portrait"));
@@ -188,6 +191,15 @@ function fullDeviceCatalog(): DeviceSpec[] {
       ),
     );
   }
+  // Galaxy S9+ is built explicitly rather than from pwDevices["Galaxy S9+"]
+  // (viewport 320×658, DPR 4.5, Chromium): a fixed literal viewport + DPR
+  // object per call, never a value derived from — or a reference shared
+  // with — Playwright's own device table, so its raster size cannot drift
+  // between routes for reasons outside this file's control.
+  d.push(mkExplicit("galaxy-s9plus", "Galaxy S9+ 320×658 portrait", "phone", "chromium", 320, 658, 4.5, true, "portrait"));
+  d.push(
+    mkExplicit("galaxy-s9plus-landscape", "Galaxy S9+ landscape", "phone", "chromium", 658, 320, 4.5, true, "landscape"),
+  );
   // Explicit addition (not a replacement of the descriptor-based
   // "iphone-15-pro-landscape" above): Playwright's named landscape
   // descriptors render at less than 767px CSS width once the emulated
