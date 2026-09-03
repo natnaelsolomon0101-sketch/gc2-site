@@ -184,6 +184,29 @@ const blocks: Block[] = [
   },
 ];
 
+/* On a phone the investors mailto lives inside the second block, after three
+   paragraphs — past the first screen on a 320 or 393 viewport, and on a
+   landscape phone past the first screen even sooner, since there is less
+   height and PageHeader's own standfirst sits between the h1 and this link.
+   Passed to PageHeader as `quickLink` (round 3, thumb-critic) rather than
+   rendered as this page's own section: (1) that puts it inside PageHeader's
+   Container, so its own `rule-t` reads as the SAME inset hairline as every
+   other divider on this page — as its own full-bleed section it was a
+   different rule treatment 200px from the inset one under the first block's
+   heading; (2) it lets PageHeader reorder it ahead of the standfirst on a
+   landscape phone via `order`, which is the only way to actually put it
+   "before the intro paragraph" there rather than just near it. This repeats
+   nothing but that block's own title and address (no new copy). */
+const investorsQuickLink = (
+  <a
+    href={`mailto:${site.emails.investors}`}
+    className="rule-t flex min-h-11 flex-col gap-2 py-5"
+  >
+    <span className="t-mono-xs text-ink-3">Existing investors</span>
+    <span className="t-h3 break-all text-ink">{site.emails.investors}</span>
+  </a>
+);
+
 export default function Contact() {
   return (
     <>
@@ -191,25 +214,8 @@ export default function Contact() {
         eyebrow="Contact"
         title="Where to write."
         standfirst="Four kinds of correspondence reach this firm and they do not want the same answer. There are two published addresses, no form, and no queue you can join. This page says which address applies to you, and what it can and cannot do."
+        quickLink={investorsQuickLink}
       />
-
-      {/* On a phone the investors mailto lives inside the second block, after
-          three paragraphs — past the first screen on a 320 or 393 viewport.
-          This repeats nothing but that block's own title and address (no new
-          copy) as a single tap-to-mail row directly under the header, so the
-          address itself is always visible without scrolling and is reachable
-          before the reader has to sort themselves into an audience. */}
-      <section className="rule-t">
-        <Container>
-          <a
-            href={`mailto:${site.emails.investors}`}
-            className="flex min-h-11 flex-col gap-2 py-5"
-          >
-            <span className="t-mono-xs text-ink-3">Existing investors</span>
-            <span className="t-h3 break-all text-ink">{site.emails.investors}</span>
-          </a>
-        </Container>
-      </section>
 
       {/* Bands alternate ground / ground-2 to match /firm and /diligence, so an
           inner page reads as the same site — and (light canvas) every band
