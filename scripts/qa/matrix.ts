@@ -188,6 +188,27 @@ function fullDeviceCatalog(): DeviceSpec[] {
       ),
     );
   }
+  // Explicit addition (not a replacement of the descriptor-based
+  // "iphone-15-pro-landscape" above): Playwright's named landscape
+  // descriptors render at less than 767px CSS width once the emulated
+  // browser chrome comes off — a landscape phone can silently inherit the
+  // ≥768px tablet/desktop grid's sibling, the portrait phone grid, instead
+  // of its own landscape composition. 734×393 carries that real narrow
+  // width explicitly so the matrix always exercises it, independent of
+  // whatever a future Playwright release ships for the named descriptor.
+  d.push(
+    mkExplicit(
+      "iphone-15-pro-landscape-734",
+      "iPhone 15 Pro landscape (734 width, sub-768 breakpoint)",
+      "phone",
+      "webkit",
+      734,
+      393,
+      3,
+      true,
+      "landscape",
+    ),
+  );
 
   // Tablet — WebKit throughout
   d.push(mkNamed("ipad-mini", "iPad Mini 768×1024 portrait", "tablet", "webkit", pwDevices["iPad Mini"], "portrait"));
