@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Container from "@/components/Container";
 import PageHeader from "@/components/PageHeader";
 import { fund } from "@/config/fund";
+import { StageStrip } from "@/components/sections/Approach";
 
 /**
  * /governance — who can say no.
@@ -109,7 +110,11 @@ const conflicts: { h: string; p: string }[] = [
   },
 ];
 
-type Block = { id: string; title: string; kicker?: string; node: React.ReactNode };
+/* `wide` blocks put their node under the heading at the full container width
+   instead of in the 7-column slot. The stage strip needs the whole container:
+   it is a container-query layout and four columns inside a 7/12 slot would
+   query the container it is not actually sitting in. */
+type Block = { id: string; title: string; kicker?: string; node: React.ReactNode; wide?: boolean };
 
 export default function Governance() {
   const blocks: Block[] = [
@@ -125,6 +130,14 @@ export default function Governance() {
           rows={authority}
         />
       ),
+    },
+    {
+      id: "stages",
+      title: "How an idea earns capital",
+      kicker:
+        "The four stages, the veto and the tail overlay, rendered from the same source as the home page so the two cannot drift apart.",
+      wide: true,
+      node: <StageStrip link={false} />,
     },
     {
       id: "committee",
@@ -254,14 +267,25 @@ export default function Governance() {
       {blocks.map((b, i) => (
         <section key={b.id} id={b.id} className={`scroll-mt-24 ${i % 2 ? "bg-abyss" : ""}`}>
           <Container>
-            <div className={`grid-gc2 py-16 md:py-24 ${i === 0 ? "rule-t" : ""}`}>
-              <div className="col-span-4 md:col-span-4">
-                <p className="t-mono-xs text-fog">{String(i + 1).padStart(2, "0")}</p>
-                <h2 className="t-h2 mt-3">{b.title}</h2>
-                {b.kicker && <p className="t-small measure-body mt-6">{b.kicker}</p>}
+            {/* No 01-06 numerals on these headings. Six governance topics are
+                not an ordered sequence, and EVERY-SCREEN.md 0.2 item 4 takes
+                numerals off anything that is not one. The four process stages
+                inside the "stages" block keep theirs, because they are. */}
+            {b.wide ? (
+              <div className={`py-16 md:py-24 ${i === 0 ? "rule-t" : ""}`}>
+                <h2 className="t-h2 hyphens-none">{b.title}</h2>
+                {b.kicker && <p className="t-small measure-body mt-4">{b.kicker}</p>}
+                <div className="mt-10 md:mt-14">{b.node}</div>
               </div>
-              <div className="col-span-4 md:col-span-7 md:col-start-6">{b.node}</div>
-            </div>
+            ) : (
+              <div className={`grid-gc2 py-16 md:py-24 ${i === 0 ? "rule-t" : ""}`}>
+                <div className="col-span-4 md:col-span-4">
+                  <h2 className="t-h2 hyphens-none">{b.title}</h2>
+                  {b.kicker && <p className="t-small measure-body mt-6">{b.kicker}</p>}
+                </div>
+                <div className="col-span-4 md:col-span-7 md:col-start-6">{b.node}</div>
+              </div>
+            )}
           </Container>
         </section>
       ))}
