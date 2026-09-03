@@ -1,3 +1,4 @@
+import { css } from "@/lib/css";
 import {
   fetchYieldCurve, geometry, asOf, TREASURY_SOURCE, TREASURY_ATTRIBUTION,
 } from "./treasury";
@@ -81,7 +82,7 @@ export default async function YieldCurve({ className = "", card = false }: Yield
       data-source={TREASURY_SOURCE}
       data-asof={curve.date}
     >
-      <style>{css}</style>
+      <style>{CSS}</style>
       {/* Always. A plot that is not named in type is a plot the reader has to
           guess at, and the guess a fund's own page invites is the wrong one. */}
       <p className={card ? "t-h3 yc-title" : "t-caption yc-title"}>
@@ -164,7 +165,7 @@ export default async function YieldCurve({ className = "", card = false }: Yield
 
    The base rule sets no clip-path, so anything that stops the animation from
    running leaves the whole line painted rather than an empty box. */
-const css = `
+const CSS = css`
 .yc { margin: 0; container-type: inline-size; }
 .yc-plot { position: relative; }
 .yc-svg {
