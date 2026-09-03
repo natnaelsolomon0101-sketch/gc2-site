@@ -72,8 +72,9 @@ export default function ContactBand() {
               Inquiries
             </h2>
             <p className="t-sub mt-7 max-w-[32ch] text-ash">
-              We speak with a small number of aligned partners each year.
-              Introductions are welcome.
+              The firm is built for a small number of long-horizon
+              relationships. Correspondence reaches us at the addresses
+              below.
             </p>
           </div>
 
