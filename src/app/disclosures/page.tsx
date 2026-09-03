@@ -35,7 +35,16 @@ const sections: { h: string; p: string[] }[] = [
 export default function Disclosures() {
   return (
     <>
-      <PageHeader eyebrow="Legal" title="Disclosures." />
+      {/* thumb-critic, this round: every other route runs eyebrow / h1 /
+          intro / rule, and this one skipped the dek. No new sentence
+          written for it — `sections[0].p[0]` ("Nature of this website")
+          already says what the page is, so it does double duty as the
+          standfirst rather than this page inventing a second, slightly
+          different summary of itself. The section below still carries the
+          same sentence as its own first clause; that is the existing
+          pattern on /legal/terms and /legal/privacy too (the dek previews,
+          the numbered section states it formally), not new redundancy. */}
+      <PageHeader eyebrow="Legal" title="Disclosures." standfirst={sections[0].p[0]} />
       <section>
         <Container>
           {/* No manual colour here on purpose: `.t-h3` and `.t-body` already

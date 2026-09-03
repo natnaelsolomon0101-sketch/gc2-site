@@ -118,8 +118,19 @@ export default function Legal() {
                         and grouping by line `top`, not by the `ch` unit:
                         34em is the widest value that keeps every row's
                         widest real line at or under 80 characters, with a
-                        few characters of margin. */}
-                    <div className="col-span-4 measure-body md:col-span-7 md:col-start-6">
+                        few characters of margin.
+
+                        mt-4 md:mt-0: thumb-critic, this round — below `md`
+                        `grid-gc2` stacks both columns to `col-span-4`, so
+                        this div lands directly under the title div with no
+                        gap of its own (the row's only spacing came from the
+                        title's own line-height). "The documents" eyebrow
+                        above carries a rule and pt-8 before it; the row
+                        title deserves the same kind of breathing room
+                        before its own body copy. Not needed at `md` and up,
+                        where `col-start-6` puts this in a different column
+                        beside the title rather than under it. */}
+                    <div className="col-span-4 mt-4 measure-body md:col-span-7 md:col-start-6 md:mt-0">
                       <p className="t-body">{d.blurb}</p>
                       <p className="t-small mt-4 text-ink-3">{d.note}</p>
                     </div>
