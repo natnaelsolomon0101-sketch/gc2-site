@@ -27,10 +27,15 @@ import { StageStrip } from "@/components/sections/Approach";
  * 506(b): no invitation to invest, no terms, no figure of any kind.
  */
 
+/* Title 52 chars rendered (the layout template appends the firm name), meta
+   description 139. "Governance" alone was accurate and told a search result
+   nothing; the two things this page is actually about are the limits and the
+   veto that overrides them. The description ends on the honest caveat —
+   fund.people is null, so every seat here is described by what it holds. */
 export const metadata: Metadata = {
-  title: "Governance",
+  title: "Governance and risk independence",
   description:
-    "Who sets the limits, who can cut a position without asking, whose mark is final, and what happens if someone is not there.",
+    "Who sets the limits, who can cut a position without asking, whose mark is final, and what happens if someone is not there. Roles, not names.",
 };
 
 /* ------------------------------------------------------------------ ledger --
