@@ -102,15 +102,21 @@ export default function Legal() {
           <div className="pb-16 md:pb-24">
             <p className="t-mono-xs rule-t pt-8 text-fog">The documents</p>
             <ul className="mt-2">
-              {documents.map((d, i) => (
+              {documents.map((d) => (
                 <li key={d.href} className="lg-row rule-t">
                   <Link href={d.href} className="grid-gc2 block py-8 md:grid md:py-10">
                     <div className="col-span-4 md:col-span-4">
-                      <p className="t-mono-xs text-fog">{String(i + 1).padStart(2, "0")}</p>
-                      <h2 className="lg-row-title t-h3 mt-3 text-pure">{d.title}</h2>
+                      <h2 className="lg-row-title t-h3 text-pure">{d.title}</h2>
                     </div>
-                    <div className="col-span-4 md:col-span-7 md:col-start-6">
-                      <p className="t-body measure-legal">{d.blurb}</p>
+                    {/* max-w-[80ch]: these are list rows, not the 60em prose
+                        measure the three document pages use — the matrix
+                        measures the widest rendered li/p line, and at
+                        landscape-phone/tablet widths this column was wide
+                        enough that the blurb's own line ran ~114ch. Capped
+                        directly rather than reusing `measure-legal`, which
+                        is the wider 60em prose tier and not this row's job. */}
+                    <div className="col-span-4 max-w-[80ch] md:col-span-7 md:col-start-6">
+                      <p className="t-body">{d.blurb}</p>
                       <p className="t-small mt-4 text-fog">{d.note}</p>
                     </div>
                   </Link>
