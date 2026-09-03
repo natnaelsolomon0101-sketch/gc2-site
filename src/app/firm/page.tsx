@@ -3,11 +3,29 @@ import Container from "@/components/Container";
 import PageHeader from "@/components/PageHeader";
 import TextLink from "@/components/TextLink";
 import { fund } from "@/config/fund";
-import { site } from "@/config/site";
+import { site, siteUrl } from "@/config/site";
 
 export const metadata: Metadata = {
   title: "The firm",
   description: "A research house that trades. How we work, how we govern risk, and where we are.",
+};
+
+/* AboutPage / Organization JSON-LD, round 4 (search): foundingDate from
+   `site.foundedISO`, foundingLocation from `site.city`'s "Miami". Nothing
+   else: no `founder`/`employee` — `fund.people` is null, and putting a
+   person in structured data the visible page won't name would be the exact
+   failure /team's own copy exists to refuse. */
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "AboutPage",
+  mainEntity: {
+    "@type": "Organization",
+    name: site.name,
+    alternateName: site.mark,
+    url: siteUrl,
+    foundingDate: site.foundedISO,
+    foundingLocation: { "@type": "Place", name: "Miami" },
+  },
 };
 
 /* ------------------------------------------------------------ key person ----
@@ -88,6 +106,10 @@ const sections: Section[] = [
 export default function Firm() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <PageHeader
         eyebrow="The firm"
         title="A research house that trades."
