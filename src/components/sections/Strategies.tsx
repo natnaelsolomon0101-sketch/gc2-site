@@ -1,39 +1,41 @@
 import { strategies } from "@/content/strategies";
 import ECBGrid from "@/components/viz/ECBGrid";
+import PinnedStrategies from "@/components/PinnedStrategies";
 
 /* ===========================================================================
-   STRATEGIES — six hairline rows.
+   STRATEGIES — hairline rows on phone, the sliding/fanning tile deck from
+   768px up.
 
-   Replaces the earlier pinned/fanned-tile deck (position: sticky over a
-   240vh–260svh scroll track, a rAF scroll listener driving which card was
-   "open"). That deck put six full-height chromatic tiles on screen at 393 —
-   about four viewports for a list of six names — and a sticky-scroll track is
-   exactly the "sticky-scroll storytelling" EVERY-SCREEN.md §8.2 rules out.
+   Round 0 replaced the deck with six hairline rows everywhere: it was six
+   full-height chromatic tiles stacked, about four viewports for a list of
+   six names on a phone. Round "bring the sliding thing back" restores the
+   deck (PinnedStrategies.tsx, a client component — the scroll-progress
+   tracking it needs is real interactivity, not a layout decision) but keeps
+   it scoped to >=768px, where the four-viewport phone cost never applied in
+   the first place: the deck's own natural height at that width is a few
+   hundred pixels, not several screens.
 
-   The row is the design: name / one-liner / markets, a 12px gap between the
-   three, 24px of padding from hairline to hairline, and the whole row is the
-   link — a real ≥44px tap target, not a decorative surface with a button
-   floating on it. Colour survives as a rationed accent (a small swatch keyed
-   to the tile hue below) rather than as a full chromatic fill, per DESIGN.md
-   principle 2 ("colour is confined to the strategy tiles" — here, a chip of
-   it). No box-shadow: DESIGN.md's "Known drift" names this file as the source
-   of the shipped shadow a real ground/surface step was meant to replace, and
-   there's no shadow left to remove that step for.
+   Both are always in the DOM; CSS alone decides which one is visible
+   (`.stx-rows`/`.stx-deck-wrap`'s min-width:768px media queries below), same
+   technique the /strategies rail already uses for its sticky-column vs.
+   horizontal-strip split — nothing here measures the window in JavaScript to
+   choose a layout. The heading and lede are written once and shared by both;
+   only the list beneath them differs.
 
-   No client JS. The first-reveal stagger is a CSS animation keyed off
-   `--dur-base` / `--stagger` (globals.css's mirror of src/lib/motion.ts), runs
-   once on load, and is gone under `prefers-reduced-motion: reduce` — so a
-   no-JS client and a reduced-motion client both get the full list, readable,
-   with nothing pinned and nothing to scroll-jack.
+   Colour: rows keep the rationed-swatch treatment from round 0 (a chip of
+   the tile hue, not a card ground — DESIGN.md principle 2). The deck's tiles
+   are full chromatic fills with the paired `-fg` token, same pairing
+   Tile.tsx and DESIGN.md's "Chromatic tiles" table define; see
+   PinnedStrategies.tsx for the rest of that rebuild's reasoning (no dead
+   ground, no clipped bodies, no phone).
 
-   Round 1: the ECB euro reference-rate grid (sec-motion's, src/components/
-   viz/ECBGrid.tsx) sits under the six rows as a quiet full-width strip —
-   "Markets" is this section's own vocabulary, so a grid of majors reads as
-   the section finishing its sentence rather than a bolted-on widget. It is
-   rendered directly, with no wrapping element of ours around it: ECBGrid
-   returns null when its feed is unreachable, and because there is no div
-   here to carry margin or a border in that case, a down feed leaves no gap
-   — the section just ends one row earlier.
+   No box-shadow anywhere in this file's own CSS (rows never had one; the
+   deck doesn't get one back — depth is the ground/surface step and a
+   hairline, same as everywhere else on the light canvas).
+
+   Motion: the rows' first-reveal stagger is unchanged from round 0
+   (`--dur-base`/`--stagger`, load-once, reduced-motion off). The deck's own
+   timings are `--dur-base`/`--dur-fast`/`--ease` throughout — see that file.
    ========================================================================= */
 
 /** Index-matched to `strategies`. A swatch, not a card ground — no text sits
@@ -49,16 +51,17 @@ const accents = [
 ];
 
 const css = `
-.stx-list { margin-top: 32px; }
-/* Phone chrome tightened so six rows of real content (not padded up to
-   fill a poster) stay close to the 2-viewport budget: the row's own 24px
-   padding and 12px gaps are the spec and are not touched here, only the
-   surrounding band/heading air, which is where the old six-tile deck's
-   height actually came from. */
+/* ---- shared heading block ------------------------------------------------ */
 @media (max-width: 767px) {
   .stx.band { padding-block: 56px 64px; }
-  .stx-list { margin-top: 24px; }
 }
+
+/* ---- phone: hairline rows ------------------------------------------------ */
+.stx-rows-wrap { margin-top: 24px; }
+@media (min-width: 768px) {
+  .stx-rows-wrap { display: none; }
+}
+
 .stx-row {
   border-top: 1px solid var(--color-hairline);
   animation: stxIn var(--dur-base) var(--ease) both;
@@ -91,13 +94,24 @@ const css = `
   border-radius: 4px; background: rgba(20,19,17,.04);
 }
 
-@media (min-width: 1280px) {
-  .stx-list { display: grid; grid-template-columns: 1fr 1fr; column-gap: 56px; margin-top: 40px; }
-  .stx-top { gap: 16px; }
+@keyframes stxIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stx-row { animation: none; }
 }
 
-/* The ECB strip. A sibling of .stx-list, not a child, so the two-column
-   split above does not touch it — full section width at every size. */
+/* ---- >=768: the deck ------------------------------------------------------ */
+.stx-deck-wrap { display: none; }
+@media (min-width: 768px) {
+  .stx-deck-wrap { display: block; margin-top: 40px; }
+}
+@media (min-width: 1280px) {
+  .stx-deck-wrap { margin-top: 48px; }
+}
+
+/* ---- the ECB strip. Full section width at every size. --------------------- */
 .stx-ecb {
   margin-top: 40px; padding-top: 24px;
   border-top: 1px solid var(--color-hairline);
@@ -107,14 +121,6 @@ const css = `
 }
 @media (min-width: 1280px) {
   .stx-ecb { margin-top: 48px; }
-}
-
-@keyframes stxIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: none; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .stx-row { animation: none; }
 }
 `;
 
@@ -133,24 +139,30 @@ export default function Strategies() {
           than by conviction.
         </p>
 
-        <ul className="stx-list">
-          {strategies.map((s, k) => (
-            <li key={s.slug} className="stx-row" style={{ ["--stx-i" as string]: k }}>
-              <a href={`/strategies#${s.slug}`} className="stx-link">
-                <span className="stx-top">
-                  <span
-                    className="stx-swatch"
-                    style={{ ["--stx-accent" as string]: accents[k] }}
-                    aria-hidden="true"
-                  />
-                  <span className="t-heading-sm stx-name">{s.name}</span>
-                </span>
-                <span className="t-small stx-one">{s.oneLiner}</span>
-                <span className="t-mono-xs stx-markets">{s.markets}</span>
-              </a>
-            </li>
-          ))}
-        </ul>
+        <div className="stx-rows-wrap">
+          <ul className="stx-list">
+            {strategies.map((s, k) => (
+              <li key={s.slug} className="stx-row" style={{ ["--stx-i" as string]: k }}>
+                <a href={`/strategies#${s.slug}`} className="stx-link">
+                  <span className="stx-top">
+                    <span
+                      className="stx-swatch"
+                      style={{ ["--stx-accent" as string]: accents[k] }}
+                      aria-hidden="true"
+                    />
+                    <span className="t-heading-sm stx-name">{s.name}</span>
+                  </span>
+                  <span className="t-small stx-one">{s.oneLiner}</span>
+                  <span className="t-mono-xs stx-markets">{s.markets}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="stx-deck-wrap">
+          <PinnedStrategies strategies={strategies} />
+        </div>
 
         <ECBGrid className="stx-ecb" />
       </div>
