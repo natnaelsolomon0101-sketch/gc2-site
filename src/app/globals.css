@@ -116,15 +116,15 @@
   /* Body stays 16px on every viewport — §7.1 says so explicitly. */
   .t-body  { font-size: 16px; line-height: 1.5; color: var(--color-ash); overflow-wrap: anywhere; }
   .t-small { font-size: 14px; line-height: 1.67; color: var(--color-ash); overflow-wrap: anywhere; }
-  .t-mono  { font-family: var(--font-mono); font-size: 12px; line-height: 2;
+  /* Conductor amendment, first matrix run: §6.3's font floor is 13px and it
+     is a hard gate, not a target — DESIGN.md's 12px mono tier and 11px
+     mono-xs tier both failed it on every route. Both raised to a flat 13px;
+     tracking and uppercase unchanged. DESIGN.md tier change, logged in the
+     final report. */
+  .t-mono  { font-family: var(--font-mono); font-size: 13px; line-height: 2;
              text-transform: uppercase; letter-spacing: .182em; font-weight: 500;
              color: var(--color-ash); }
-  /* Eyebrow tier. DESIGN.md lists this at 11px; §7.1's floor is 13px
-     everywhere, and this is the one deliberate exception, raised only to
-     12px rather than 13 because it is a tracked all-caps label, never a
-     line the reader parses continuously the way body copy is. Logged in
-     the final report as the DESIGN.md tier change it is. */
-  .t-mono-xs { font-family: var(--font-mono); font-size: 12px; line-height: 2;
+  .t-mono-xs { font-family: var(--font-mono); font-size: 13px; line-height: 2;
                text-transform: uppercase; letter-spacing: .182em; font-weight: 500;
                color: var(--color-ash); }
 
@@ -188,7 +188,8 @@
   .t-lead    { font-size: clamp(15px, calc(11.57px + 1.07vw), 18px);
                line-height: clamp(1.5, calc(1.6071 - .01786vw), 1.55);
                font-weight:300; color: var(--color-ash); overflow-wrap: anywhere; }
-  .t-caption { font-size:12px; line-height:2; font-family: var(--font-mono);
+  /* Same §6.3 floor as .t-mono/.t-mono-xs above: 12px -> 13px. */
+  .t-caption { font-size:13px; line-height:2; font-family: var(--font-mono);
                text-transform:uppercase; letter-spacing:.182em; color: var(--color-ash); }
   .t-prose   { font-size:18px; line-height:1.7; color: var(--color-ash); overflow-wrap: anywhere; }
   .rule-t { border-top:1px solid rgba(255,255,255,.12); }
@@ -209,7 +210,28 @@
                    font-size:clamp(40px, calc(28.57px + 3.57vw), 56px);
                    line-height:clamp(1.05, calc(1.1357 - .011161vw), 1.1);
                    letter-spacing:-0.02em;color:var(--color-pure);}
-  .nav-frame{height:var(--nav-h);}
+  /* Conductor amendment, first matrix run: safe-area-bottom warned on every
+     iPhone descriptor because nothing referenced env(safe-area-inset-*) at
+     all. .nav-frame is the sticky nav's own token — height grows by the top
+     inset (zero on any non-notched device, so this is a no-op there) and
+     padding-top pushes the row's content below the notch instead of
+     squeezing var(--nav-h)'s existing content height. The same element also
+     carries .wrap, which already sets padding-inline: 24px; left/right here
+     use max(24px, inset) rather than plain env() so a landscape notch (inset
+     can run ~44px) still clears, without silently dropping the 24px gutter
+     .wrap set on every device where the inset is 0 — a later same-specificity
+     rule fully replaces an earlier one for the exact property it sets, and a
+     bare env(...) here would have overridden .wrap's padding-inline with 0
+     on every non-notched device. There is no bottom-fixed element in
+     foundation's ownership row to pair this with — the sticky nav and the
+     mobile drawer overlay that would need the same treatment live in
+     SiteNav.tsx / MobileNav.tsx (sec-chrome), not here. */
+  .nav-frame{
+    height: calc(var(--nav-h) + env(safe-area-inset-top));
+    padding-top: env(safe-area-inset-top);
+    padding-left: max(24px, env(safe-area-inset-left));
+    padding-right: max(24px, env(safe-area-inset-right));
+  }
   /* vh fallback first (older Safari/WebKit, and any browser without dvh
      support at all); dvh is what actually accounts for the mobile Safari
      address bar, so it wins wherever @supports confirms it exists. */
