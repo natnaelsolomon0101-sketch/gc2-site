@@ -36,15 +36,21 @@ const FOOTER_GROUPS = [
    injects a global, unscoped <style> tag (the pattern every chrome/section
    component on this branch uses), and `Feature.tsx` (sec-framework) already
    owns a bare `.ft-link` — the collision silently painted every footer link
-   `color-void` black-on-black. Namespace every class this file defines.
+   black-on-black. Namespace every class this file defines.
+
+   LIGHT PASS (round 4, Conductor): ground-2 for the shell (one step off the
+   page, matching the drawer's own choice in SiteNav.tsx so the two
+   full-viewport chrome surfaces read as the same kind of object), ink for
+   the wordmark, ink-3 for the disclosure, hairline for every rule in the
+   table. Zero chromatic accent.
    ========================================================================= */
 const CSS = `
-.gc2-ftr-shell{ position:relative; overflow-x:hidden; }
+.gc2-ftr-shell{ position:relative; overflow-x:hidden; background:var(--color-ground-2); }
 
 .gc2-ftr-table{ display:grid; grid-template-columns:1fr; row-gap:40px; padding-top:32px; }
 @media (min-width:1024px){
   .gc2-ftr-table{ grid-template-columns:repeat(3, 1fr); column-gap:48px; row-gap:0; }
-  .gc2-ftr-col + .gc2-ftr-col{ border-left:1px solid var(--color-steel); padding-left:48px; }
+  .gc2-ftr-col + .gc2-ftr-col{ border-left:1px solid var(--color-hairline); padding-left:48px; }
 }
 /* Capped so a stacked column (<1024, where it would otherwise run the full
    .wrap width) stays a link LIST, not an 80ch+ line -- matrix measured
@@ -64,16 +70,17 @@ const CSS = `
    target-gap check exempts stacked, >=80%-width, touching targets (a
    hairline list is the pattern it names), so "no gap" only reads as
    "hairline table," never as a violation. */
-.gc2-ftr-row{ border-top:1px solid var(--color-steel); }
+.gc2-ftr-row{ border-top:1px solid var(--color-hairline); }
 .gc2-ftr-link{
   display:flex; align-items:center; width:100%;
   min-height:44px; padding-block:4px;
+  color:var(--color-ink-2);
   transition:color var(--dur-fast) var(--ease);
 }
-.gc2-ftr-link:hover{ color:var(--color-cloud); }
+.gc2-ftr-link:hover{ color:var(--color-ink); }
 
 .gc2-ftr-disclosure{ margin-top:64px; max-width:80ch; }
-.gc2-ftr-meta{ margin-top:24px; padding-top:24px; border-top:1px solid var(--color-steel); }
+.gc2-ftr-meta{ margin-top:24px; padding-top:24px; border-top:1px solid var(--color-hairline); }
 
 /* The mark. Sized to genuinely outrun the viewport at laptop/desktop widths
    (it is meant to be cropped there, per brief) while staying comfortably
@@ -87,13 +94,13 @@ const CSS = `
   font-size:clamp(104px, 34vw, 460px);
   line-height:0.8;
   letter-spacing:-0.02em;
-  color:var(--color-pure);
+  color:var(--color-ink);
   white-space:nowrap;
   text-decoration-line:none;
 }
-.gc2-ftr-mark:hover{ color:var(--color-pure); }
+.gc2-ftr-mark:hover{ color:var(--color-ink); }
 .gc2-ftr-mark:focus-visible{
-  outline:2px solid var(--color-cloud); outline-offset:6px; border-radius:var(--radius-control);
+  outline:2px solid var(--color-ink); outline-offset:6px; border-radius:var(--radius-control);
 }
 
 @media (prefers-reduced-motion: reduce){
@@ -103,18 +110,18 @@ const CSS = `
 
 export default function Footer() {
   return (
-    <footer className="gc2-ftr-shell bg-abyss">
+    <footer className="gc2-ftr-shell">
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
 
       <div className="wrap band">
         <div className="gc2-ftr-table rule-t">
           {FOOTER_GROUPS.map((g) => (
             <nav key={g.label} aria-label={g.label} className="gc2-ftr-col">
-              <h2 className="t-mono-xs text-fog gc2-ftr-col-head">{g.label}</h2>
+              <h2 className="t-mono-xs text-ink-3 gc2-ftr-col-head">{g.label}</h2>
               <ul>
                 {g.items.map((n) => (
                   <li key={n.href} className="gc2-ftr-row">
-                    <Link href={n.href} className="gc2-ftr-link t-small text-ash">
+                    <Link href={n.href} className="gc2-ftr-link t-small">
                       {n.label}
                     </Link>
                   </li>
@@ -124,7 +131,7 @@ export default function Footer() {
           ))}
         </div>
 
-        <p className="t-small text-fog gc2-ftr-disclosure">
+        <p className="t-small text-ink-3 gc2-ftr-disclosure">
           {site.name} is a private investment partnership. This website is for
           informational purposes only and does not constitute an offer to sell or a
           solicitation of an offer to buy any security. Past performance is not
@@ -133,7 +140,7 @@ export default function Footer() {
           documents.
         </p>
 
-        <div className="t-small gc2-ftr-meta flex flex-wrap justify-between gap-3 text-fog">
+        <div className="t-small gc2-ftr-meta flex flex-wrap justify-between gap-3 text-ink-3">
           <span>&copy; {new Date().getFullYear()} {site.name}. All rights reserved.</span>
           <span>{site.city}</span>
         </div>

@@ -6,9 +6,9 @@
    Design notes that are load-bearing (do not "simplify" these away):
 
    1. STICKY BORDER, CONSTANT WIDTH. The header always carries a 1px bottom
-      border. Only its COLOUR animates (transparent -> steel) past 8px of
-      scroll. A border that appears from nothing adds 1px to the header box and
-      shifts the whole page down mid-scroll.
+      border. Only its COLOUR animates (transparent -> hairline-strong) past
+      8px of scroll. A border that appears from nothing adds 1px to the
+      header box and shifts the whole page down mid-scroll.
    2. THE DRAWER IS LEFT-ALIGNED ON THE PAGE GUTTER. It reuses the same `.wrap`
       container as the header, so a drawer link's left edge is pixel-identical
       to the wordmark's left edge. A centred overlay throws away the hard-left
@@ -17,8 +17,14 @@
       toggle, and programmatic closes all route through `close()`.
    4. TWO GLYPHS ON THE WHOLE SITE: the hamburger and its open state. Both are
       two lines at 1.5px. No icon library, no chevrons, no arrows.
-   5. FOCUS RING IS LIGHT (`cloud` #f5f5f7, ~17:1 on obsidian). A dark accent
-      ring on near-black lands around 1.6:1 and fails 1.4.11.
+   5. FOCUS RING IS INK (`ink` #141311, 17.04:1 on ground). LIGHT-PASS.md: no
+      accent colour anywhere in the chrome, so the ring is the same token the
+      wordmark and every link use, not a separate colour.
+   6. LIGHT PASS (round 4, Conductor): ground/ground-2/hairline tokens
+      throughout, zero chromatic accent. The current-page underline and the
+      drawer's fifth-link (CTA) distinction used to be `iris-gleam`; both are
+      ink now -- the underline still marks "current," it just no longer
+      borrows colour to do it.
    ========================================================================== */
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -46,25 +52,25 @@ html{ scroll-padding-top: var(--nav-h); }
 
 .sn-header{
   position:sticky; top:0; z-index:50;
-  background:color-mix(in srgb, var(--color-obsidian) 82%, transparent);
+  background:color-mix(in srgb, var(--color-ground) 82%, transparent);
   backdrop-filter:blur(20px) saturate(140%);
   -webkit-backdrop-filter:blur(20px) saturate(140%);
   /* constant 1px. only the colour moves. */
   border-bottom:1px solid transparent;
   transition:border-bottom-color var(--dur-menu) var(--ease);
 }
-.sn-header[data-scrolled="true"]{ border-bottom-color:var(--color-steel); }
+.sn-header[data-scrolled="true"]{ border-bottom-color:var(--color-hairline-strong); }
 
 .sn-header :focus-visible,
 .sn-drawer :focus-visible{
-  outline:2px solid var(--color-cloud);
+  outline:2px solid var(--color-ink);
   outline-offset:3px;
   border-radius:var(--radius-control);
 }
 
-.sn-mark{ letter-spacing:-0.01em; }
+.sn-mark{ letter-spacing:-0.01em; color:var(--color-ink); }
 
-/* ---- desktop links: quiet by default, chromatic hairline when current ----
+/* ---- desktop links: quiet by default, ink when current -- no accent ----
    padding-inline (not a wider hit-slop trick) is what gets a 4-letter label
    like "Firm" to a real >=44px tap target -- the matrix measured it at 32px
    wide before this. Pad the box, never the text. */
@@ -72,15 +78,15 @@ html{ scroll-padding-top: var(--nav-h); }
   display:inline-flex; align-items:center; justify-content:center;
   min-height:44px; padding-inline:10px;
   font-size:15px; line-height:1.2; letter-spacing:0.01em;
-  color:var(--color-ash);
+  color:var(--color-ink-2);
   text-decoration-line:none;
   transition:color var(--dur-fast) var(--ease);
 }
-.sn-link:hover{ color:var(--color-pure); }
+.sn-link:hover{ color:var(--color-ink); }
 .sn-link[aria-current="page"]{
-  color:var(--color-pure);
+  color:var(--color-ink);
   text-decoration-line:underline;
-  text-decoration-color:var(--color-iris-gleam);
+  text-decoration-color:var(--color-ink);
   text-decoration-thickness:1px;
   text-underline-offset:6px;
   text-decoration-skip-ink:none;
@@ -88,26 +94,16 @@ html{ scroll-padding-top: var(--nav-h); }
 
 .sn-rule{
   display:block; width:1px; height:20px;
-  background:var(--color-steel);
+  background:var(--color-hairline-strong);
 }
-
-.sn-cta{
-  display:inline-flex; align-items:center; justify-content:center;
-  min-height:44px; padding-inline:18px;
-  border-radius:var(--radius-control);
-  background:var(--color-pure); color:var(--color-void);
-  font-size:15px; line-height:1.2; letter-spacing:0.01em;
-  transition:background-color var(--dur-fast) var(--ease);
-}
-.sn-cta:hover{ background:var(--color-cloud); }
 
 .sn-burger{
   display:inline-flex; align-items:center; justify-content:center;
   height:44px; width:44px;
-  color:var(--color-cloud);
+  color:var(--color-ink);
   transition:color var(--dur-fast) var(--ease);
 }
-.sn-burger:hover{ color:var(--color-pure); }
+.sn-burger:hover{ color:var(--color-ink-2); }
 
 /* Desktop bar vs. the drawer trigger, two rules that must never disagree:
    1. THE THRESHOLD IS 769px, matching --nav-h's own max-width:768px tier
@@ -132,10 +128,14 @@ html{ scroll-padding-top: var(--nav-h); }
 }
 @media (min-width:769px){ .sn-burger{ display:none; } }
 
-/* ---- drawer: fades, never slides; opaque; gutter-aligned ---- */
+/* ---- drawer: fades, never slides; opaque; gutter-aligned ----
+   ground-2, one step off the page ground, so the poster reads as its own
+   surface rather than the page just growing taller (LIGHT-PASS.md: "ground
+   or ground-2" -- ground-2 matches the footer's own choice below, so the
+   two full-viewport chrome surfaces read as the same kind of object). */
 .sn-drawer{
   position:fixed; inset:0; z-index:40;
-  background:var(--color-obsidian);
+  background:var(--color-ground-2);
   overflow-y:auto; overscroll-behavior:contain;
   opacity:0; visibility:hidden;
   transition:opacity var(--dur-menu) var(--ease), visibility 0s linear var(--dur-menu);
@@ -156,48 +156,47 @@ html{ scroll-padding-top: var(--nav-h); }
 }
 .sn-drawer-foot{ margin-top:auto; padding-top:48px; }
 
-.sn-eyebrow{ color:var(--color-fog); }
+.sn-eyebrow{ color:var(--color-ink-3); }
 .sn-sessions-label{ margin-top:32px; }
 .sn-sessions{ margin-top:8px; }
 
-.sn-list{ border-bottom:1px solid var(--color-steel); }
+.sn-list{ border-bottom:1px solid var(--color-hairline); }
 
 /* .t-nav-mobile (globals.css) carries the font-family/weight/size/line-height
    -- clamp(34px, ..., 40px), foundation's fluid anchor for this tier. Only
-   the chrome-specific bits (row height, rule, colour, decoration) live here. */
+   the chrome-specific bits (row height, rule, colour, decoration) live here.
+   Ink at rest, not ink-2: this is the poster's own big serif type, already
+   meant to read as the loudest thing on the surface, not a quiet nav label
+   that earns emphasis on hover. Hover steps down to ink-2 instead, the same
+   "the interactive object visibly changes" signal without any accent. */
 .sn-drawer-link{
   display:flex; align-items:center;
   min-height:64px;
-  border-top:1px solid var(--color-steel);
+  border-top:1px solid var(--color-hairline);
   letter-spacing:-0.018em;
-  color:var(--color-cloud);
+  color:var(--color-ink);
   text-decoration-line:none;
   transition:color var(--dur-fast) var(--ease);
 }
-.sn-drawer-link:hover{ color:var(--color-pure); }
+.sn-drawer-link:hover{ color:var(--color-ink-2); }
 .sn-drawer-link[aria-current="page"]{
-  color:var(--color-pure);
+  color:var(--color-ink);
   text-decoration-line:underline;
-  text-decoration-color:var(--color-iris-gleam);
+  text-decoration-color:var(--color-ink);
   text-decoration-thickness:1px;
   text-underline-offset:6px;
   text-decoration-skip-ink:none;
 }
-/* The fifth link -- Investor inquiries, folded into the same list rather than
-   a separate pill so the poster reads as one composed list, not a list plus
-   a button bolted on. Colour is the only thing that marks it as the action. */
-.sn-drawer-link[data-cta="true"]{ color:var(--color-iris-gleam); }
-.sn-drawer-link[data-cta="true"]:hover{ color:var(--color-pale-iris); }
 
 .sn-meta-link{
   display:inline-flex; align-items:center; min-height:44px; padding-block:4px;
-  color:var(--color-ash); transition:color var(--dur-fast) var(--ease);
+  color:var(--color-ink-2); transition:color var(--dur-fast) var(--ease);
   word-break:break-all;
 }
-.sn-meta-link:hover{ color:var(--color-cloud); }
+.sn-meta-link:hover{ color:var(--color-ink); }
 
 @media (prefers-reduced-motion: reduce){
-  .sn-header,.sn-link,.sn-cta,.sn-burger,.sn-drawer-link,.sn-meta-link{
+  .sn-header,.sn-link,.sn-burger,.sn-drawer-link,.sn-meta-link{
     transition-duration:1ms !important;
   }
   .sn-drawer,.sn-drawer[data-open="true"]{ transition:none; }
@@ -299,7 +298,7 @@ export default function SiteNav() {
           <Link
             href="/"
             aria-label={`${site.mark} — home`}
-            className="sn-mark t-wordmark text-pure inline-flex min-h-11 min-w-11 items-center"
+            className="sn-mark t-wordmark inline-flex min-h-11 min-w-11 items-center"
           >
             {site.mark}
           </Link>
@@ -316,7 +315,7 @@ export default function SiteNav() {
               </Link>
             ))}
             <span aria-hidden="true" className="sn-rule" />
-            <Link href={CTA.href} className="sn-cta">
+            <Link href={CTA.href} className="btn">
               {CTA.label}
             </Link>
           </nav>
@@ -365,16 +364,17 @@ export default function SiteNav() {
           <p className="t-mono-xs sn-eyebrow">Menu</p>
 
           {/* Five links, one list: the four primary routes plus the CTA,
-              same display face throughout (§5.1). The CTA is distinguished by
-              colour only — see .sn-drawer-link[data-cta] — not by a separate
-              button dropped onto the poster. */}
+              same display face throughout (§5.1). Round 0 marked the CTA
+              with an accent colour; LIGHT-PASS.md bans accent in the chrome
+              entirely, so it is now just the fifth link in the same ink
+              list -- its own label and its position do the work a colour
+              used to. */}
           <nav aria-label="Menu" className="sn-list mt-6">
             {[...nav, CTA].map((n) => (
               <Link
                 key={n.label}
                 href={n.href}
                 className="sn-drawer-link t-nav-mobile"
-                data-cta={n === CTA ? "true" : undefined}
                 aria-current={isCurrent(n.href) ? "page" : undefined}
                 onClick={() => setOpen(false)}
               >
@@ -388,7 +388,7 @@ export default function SiteNav() {
             <a href={`mailto:${site.emails.investors}`} className="sn-meta-link t-small">
               {site.emails.investors}
             </a>
-            <p className="t-small mt-2 text-fog">{site.city}</p>
+            <p className="t-small mt-2 text-ink-3">{site.city}</p>
 
             {/* SessionClock (cross-section object, OWNERSHIP.md): sec-motion
                 builds it, sec-chrome places it. It renders nothing until
