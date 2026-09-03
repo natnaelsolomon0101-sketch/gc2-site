@@ -305,10 +305,39 @@ const groups: Group[] = [
   },
 ];
 
+/* FAQPage JSON-LD (schema.org), generated from `groups` above rather than
+   hand-duplicated — every question and its FULL answer text, nothing
+   invented, no marketing wording. A hand-kept second copy is exactly the
+   drift class the rest of this file works to avoid (see the assertRowsMatchNav
+   comment on ForAllocators.tsx for the same argument applied to a different
+   page). Paragraphs within one answer are joined with a space; that is the
+   only formatting decision made here. Escaping "<" guards the inline
+   `dangerouslySetInnerHTML` against a "</script" sequence inside any answer
+   prematurely closing the tag — no answer contains one today, but the escape
+   costs nothing and removes the class of bug entirely. */
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: groups.flatMap((g) =>
+    g.items.map((item) => ({
+      "@type": "Question",
+      name: item.q,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.a.join(" "),
+      },
+    }))
+  ),
+};
+
 export default function Questions() {
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }}
+      />
 
       <PageHeader
         eyebrow="Questions"
