@@ -17,10 +17,17 @@ export const metadata: Metadata = {
  * sec-chrome), so the whole thing sits inside the first screen on a phone
  * with no sliver of the footer bleeding into view. Top and bottom are
  * deliberately unequal: the message block sits high, near where a thumb's
- * eye lands first, and the wordmark is pinned to the foot as a signature —
- * `justify-between` on purpose, not `items-center` on the whole block, which
- * would park everything in the dead middle of the screen with no reason to
- * be there.
+ * eye lands first, and the action sits low, in the bottom third, right
+ * above the wordmark — `justify-between` on the outer pair, on purpose, not
+ * `items-center` on the whole block, which would park everything in the
+ * dead middle of the screen with no reason to be there.
+ *
+ * thumb-critic, this round: the button used to sit right under the lead
+ * paragraph, ~36% down the screen at 412 with the other 60% empty below it
+ * before the wordmark. A right thumb reads the bottom third as the action
+ * zone; a control stranded above a wall of empty ground reads as
+ * unfinished, not deliberate. Moved into the same bottom group as the
+ * wordmark instead of leaving it in the top block.
  */
 export default function NotFound() {
   return (
@@ -32,22 +39,17 @@ export default function NotFound() {
             <p className="t-lead measure-lead mt-8">
               The address you followed does not lead to a page on this site.
             </p>
-            <div className="mt-12">
-              <Button href="/">Return home</Button>
-            </div>
           </div>
-          {/* self-start: without an align-items on the flex-col parent above,
-              a direct flex-column child stretches to the container's full
-              cross-axis width by default — that is what made the wordmark's
-              own <a> measure 1132px wide. This wrapper is the flex item
-              instead, so it takes its content's width and the anchor inside
-              goes back to being an ordinary inline element sized to "GC2".
-
-              The anchor's height (24px, under the 44px tap-target floor)
-              is NOT fixed here: Wordmark.tsx sets no className prop through
-              which a parent can pad it, and it is sec-chrome's file, not
-              this row's — routed to the Conductor rather than edited here. */}
-          <div className="self-start">
+          {/* items-start: without an align-items on the flex-col parent
+              above, a direct flex-column child stretches to the container's
+              full cross-axis width by default — that is what made the
+              wordmark's own <a> measure 1132px wide two rounds ago. Setting
+              it here, on the wrapper around both the button and the
+              wordmark, keeps each shrink-wrapped to its own content and
+              left-aligned rather than stretched, regardless of what the
+              outer flex row does with this wrapper's own width. */}
+          <div className="flex flex-col items-start gap-8">
+            <Button href="/">Return home</Button>
             <Wordmark />
           </div>
         </div>
