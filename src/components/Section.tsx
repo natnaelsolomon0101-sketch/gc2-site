@@ -13,7 +13,10 @@ export default function Section({
   as?: "section" | "div" | "footer";
 }) {
   return (
-    <Tag id={id} className={`${bg[surface]} ${className}`}>
+    // §7 rule 4: container-type: inline-size, so a Section decides its own
+    // layout from its own width via @container rather than the viewport —
+    // the same composition at 1920 inside a narrow column as at 768.
+    <Tag id={id} className={`${bg[surface]} [container-type:inline-size] ${className}`}>
       {children}
     </Tag>
   );
