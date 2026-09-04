@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Container from "@/components/Container";
-import PageHeader from "@/components/PageHeader";
 import TextLink from "@/components/TextLink";
 import { site } from "@/config/site";
 import { fund } from "@/config/fund";
+import EditorialHeader from "@/app/legal/_components/EditorialHeader";
 
 /**
  * /legal/terms — the terms on which this WEBSITE is published.
@@ -60,7 +60,7 @@ const CSS = `
   .t-mono, .t-mono-xs { font-size: 8pt !important; }
   a, .link { border-bottom: 0 !important; text-decoration: underline !important; }
   .rule-t { border-color: #cccccc !important; }
-  .measure-body, .measure-lead, .measure-head, .measure-prose { max-width: none !important; }
+  .measure-legal, .measure-lead, .measure-head, .measure-prose { max-width: none !important; }
   .grid-gc2 { display: block !important; }
   .section-y { padding-block: 0 12pt !important; }
   .tm-band { break-inside: avoid; page-break-inside: avoid; }
@@ -79,18 +79,18 @@ export default function Terms() {
         "A short scope, and it is the most important sentence on the page.",
       node: (
         <>
-          <p className="t-body measure-body">
+          <p className="t-body measure-legal">
             These terms apply to this website and to nothing else. They are the
             conditions on which {site.name} publishes these pages and on which you
             read them.
           </p>
-          <p className="t-body measure-body mt-6">
+          <p className="t-body measure-legal mt-6">
             They do not govern the partnership, they do not describe its terms, and
             they are not part of any agreement between you and the firm. Anything
             concerning the partnership itself is governed by its offering documents,
             and those documents govern in all respects.
           </p>
-          <p className="t-body measure-body mt-6">
+          <p className="t-body measure-legal mt-6">
             The securities disclaimers that apply to this website — the absence of
             any offer, the treatment of forward-looking statements, the absence of
             performance information — are set out at{" "}
@@ -105,12 +105,12 @@ export default function Terms() {
       title: "This website is informational",
       node: (
         <>
-          <p className="t-body measure-body">
+          <p className="t-body measure-legal">
             The contents of these pages are general in nature. They are not advice of
             any kind, they are not tailored to your circumstances, and they are not a
             recommendation to do anything.
           </p>
-          <p className="t-body measure-body mt-6">
+          <p className="t-body measure-legal mt-6">
             What is written here reflects the firm&rsquo;s position at the time of
             writing. Pages may be changed, corrected or withdrawn at any time without
             notice, and we give no undertaking to keep any particular page current.
@@ -125,17 +125,17 @@ export default function Terms() {
         "Worth stating as a term, because on most sites in this industry it would not be true.",
       node: (
         <>
-          <p className="t-body measure-body">
+          <p className="t-body measure-legal">
             This site has no account, no login, no form and no download. There is
             nothing you can submit and nothing you can register for. Reading these
             pages creates no relationship between you and the firm, and no obligation
             on either side.
           </p>
-          <p className="t-body measure-body mt-6">
+          <p className="t-body measure-legal mt-6">
             That is deliberate rather than unfinished. The reasoning is set out at{" "}
             <TextLink href="/access">Access to materials</TextLink>.
           </p>
-          <p className="t-body measure-body mt-6">
+          <p className="t-body measure-legal mt-6">
             Sending us an email does not change it either. Correspondence is
             correspondence; it establishes nothing on its own, and eligibility is
             established through the offering documents rather than through anything
@@ -149,12 +149,12 @@ export default function Terms() {
       title: "Ownership of the content",
       node: (
         <>
-          <p className="t-body measure-body">
+          <p className="t-body measure-legal">
             The text, design, images and code of this site belong to the firm or to
             the parties that licensed them to it. The firm&rsquo;s name and mark are
             its own.
           </p>
-          <p className="t-body measure-body mt-6">
+          <p className="t-body measure-legal mt-6">
             You may read these pages, print them, and keep a copy for your own
             reference or for your professional advisers. You may quote briefly from
             them with attribution. Please do not republish a page wholesale, present
@@ -171,12 +171,12 @@ export default function Terms() {
         "The clause every site has. Written plainly here rather than in the usual block of capitals.",
       node: (
         <>
-          <p className="t-body measure-body">
+          <p className="t-body measure-legal">
             This site is prepared with care, but it is provided as it stands. We do
             not promise that it is free of error or omission, that it will always be
             reachable, or that it is complete or current at the moment you read it.
           </p>
-          <p className="t-body measure-body mt-6">
+          <p className="t-body measure-legal mt-6">
             To the extent the law allows, the firm is not liable for loss arising from
             reliance on this website or from an inability to reach it. Nothing here
             limits any liability that cannot lawfully be limited, and nothing here
@@ -191,7 +191,7 @@ export default function Terms() {
       title: "Questions about this website",
       node: (
         <>
-          <p className="t-body measure-body">
+          <p className="t-body measure-legal">
             Questions about these terms, or about anything published here, may be sent
             to:
           </p>
@@ -200,7 +200,7 @@ export default function Terms() {
               {site.emails.investors}
             </TextLink>
           </p>
-          <p className="t-body measure-body mt-6">
+          <p className="t-body measure-legal mt-6">
             The firm is based in {site.city}.
           </p>
         </>
@@ -212,20 +212,17 @@ export default function Terms() {
       kicker: "Said here rather than only in an internal note, because a reader is entitled to know.",
       node: (
         <>
-          <p className="t-body measure-body">
+          <p className="t-body measure-legal">
             These terms were written to describe this website as it actually is, and
             they leave out the clauses that a template would supply but that would not
             be true of it. They have not yet been reviewed by counsel.
           </p>
-          <p className="t-body measure-body mt-6">
+          <p className="t-body measure-legal mt-6">
             They do not yet state a governing law or a forum for disputes. That is an
             omission rather than a position: the firm&rsquo;s entities and their
             jurisdictions are not published, and naming one here without a source
             would be inventing it.
           </p>
-          {fund.updatedAt && (
-            <p className="t-mono-xs mt-6 text-ink-3">Last updated {fund.updatedAt}</p>
-          )}
         </>
       ),
     },
@@ -235,10 +232,16 @@ export default function Terms() {
     <>
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
 
-      <PageHeader
+      {/* The "Last updated" stamp moved here from the closing "Status of this
+          document" block above: same fund.updatedAt gate, same null-renders-
+          nothing rule, now the foot line of the header rather than a trailing
+          paragraph, so every document in the section carries it in the same
+          place. */}
+      <EditorialHeader
         eyebrow="Legal · Terms of use"
-        title="Terms of use."
+        lines={[<>Terms of <em>use</em>.</>]}
         standfirst="These terms cover this website and nothing else. They are short because the site is small: there is no account to hold, nothing to submit, and nothing to buy. The offering documents govern everything that matters beyond it."
+        caption={fund.updatedAt ? `Effective ${fund.updatedAt}` : undefined}
       />
 
       {blocks.map((b, i) => (
@@ -248,7 +251,7 @@ export default function Terms() {
               <div className="col-span-4 md:col-span-4">
                 <p className="t-mono-xs text-ink-3">{String(i + 1).padStart(2, "0")}</p>
                 <h2 className="t-h2 mt-3">{b.title}</h2>
-                {b.kicker && <p className="t-small measure-body mt-6">{b.kicker}</p>}
+                {b.kicker && <p className="t-small measure-legal mt-6">{b.kicker}</p>}
               </div>
               <div className="col-span-4 md:col-span-7 md:col-start-6">{b.node}</div>
             </div>

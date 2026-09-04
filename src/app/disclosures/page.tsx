@@ -1,14 +1,41 @@
 import type { Metadata } from "next";
 import Container from "@/components/Container";
-import PageHeader from "@/components/PageHeader";
 import TextLink from "@/components/TextLink";
 import { site } from "@/config/site";
+import { fund } from "@/config/fund";
+import EditorialHeader from "@/app/legal/_components/EditorialHeader";
 
 export const metadata: Metadata = {
   title: "Disclosures",
   description: "Informational purposes only. Offering documents govern any investment.",
   robots: { index: true, follow: true },
 };
+
+/* Print styles, scoped to this route. Same pattern as /legal, /legal/terms
+   and /legal/privacy: the site's ground is near-black and this is one of
+   the pages people print. Not previously scoped here; added alongside the
+   editorial header so the header's ground and reveal machinery print the
+   same clean way the other three legal routes already do. */
+const CSS = `
+@page { margin: 18mm 16mm; }
+@media print {
+  .sn-header { display: none !important; }
+  footer nav { display: none !important; }
+  footer { background: transparent !important; border-top: 1px solid #cccccc; }
+  html, body { background: #ffffff !important; color: #111111 !important; }
+  section { background: transparent !important; }
+  .t-h1, .t-h2, .t-h3 { color: #000000 !important; }
+  p, li, dd, dt, td, th, span, a { color: #111111 !important; }
+  .t-h1 { font-size: 26pt !important; line-height: 1.1 !important; }
+  .t-h2 { font-size: 16pt !important; }
+  .t-h3 { font-size: 13pt !important; }
+  .t-body, .t-small, .t-lead { font-size: 10.5pt !important; line-height: 1.5 !important; }
+  .t-mono, .t-mono-xs { font-size: 8pt !important; }
+  a, .link { border-bottom: 0 !important; text-decoration: underline !important; }
+  .rule-t { border-color: #cccccc !important; }
+  .measure-legal, .measure-lead, .measure-head, .measure-prose { max-width: none !important; }
+}
+`;
 
 const sections: { h: string; p: string[] }[] = [
   { h: "Nature of this website", p: [
@@ -35,6 +62,8 @@ const sections: { h: string; p: string[] }[] = [
 export default function Disclosures() {
   return (
     <>
+      <style dangerouslySetInnerHTML={{ __html: CSS }} />
+
       {/* thumb-critic, this round: every other route runs eyebrow / h1 /
           intro / rule, and this one skipped the dek. No new sentence
           written for it — `sections[0].p[0]` ("Nature of this website")
@@ -44,14 +73,19 @@ export default function Disclosures() {
           same sentence as its own first clause; that is the existing
           pattern on /legal/terms and /legal/privacy too (the dek previews,
           the numbered section states it formally), not new redundancy. */}
-      <PageHeader eyebrow="Legal" title="Disclosures." standfirst={sections[0].p[0]} />
+      <EditorialHeader
+        eyebrow="Legal"
+        lines={[<><em>Disclosures</em>.</>]}
+        standfirst={sections[0].p[0]}
+        caption={fund.updatedAt ? `Effective ${fund.updatedAt}` : undefined}
+      />
       <section>
         <Container>
           {/* No manual colour here on purpose: `.t-h3` and `.t-body` already
               resolve to `var(--color-ink)` / `var(--color-ink-2)` from
               globals.css (17.04:1 / 7.55:1 on `ground`, DESIGN.md's measured
               table), so this section needs no token of its own. */}
-          <div className="measure-body pb-16 md:pb-24">
+          <div className="measure-legal pb-16 md:pb-24">
             {sections.map((s) => (
               <div key={s.h} className="rule-t py-8">
                 <h2 className="t-h3">{s.h}</h2>
