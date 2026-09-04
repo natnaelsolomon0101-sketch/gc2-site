@@ -38,8 +38,8 @@ const CSS = css`
 .mk-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:0;padding:0;list-style:none;}
 @media (min-width:768px){.mk-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;}}
 .mk-tile{padding:18px 18px 14px;display:flex;flex-direction:column;gap:10px;height:100%;}
-.mk-tile-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
-.mk-label{color:var(--color-ink-3);}
+.mk-val{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;}
+.mk-label{color:var(--color-ink-3);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .mk-chg{color:var(--color-ink-2);font-variant-numeric:tabular-nums;}
 .mk-chg[data-up="true"]{color:var(--color-accent-deep-iris);}
 .mk-last{margin:0;font-variant-numeric:tabular-nums;line-height:1;}
@@ -99,11 +99,11 @@ export default async function MarketsPage() {
                 <li key={q.symbol}>
                   <Tilt max={4} className="mk-tile-tilt">
                     <Glass className="mk-tile" radius={18}>
-                      <div className="mk-tile-top">
-                        <span className="t-caption mk-label">{q.label}</span>
+                      <span className="t-caption mk-label">{q.label}</span>
+                      <div className="mk-val">
+                        <p className="t-h2 mk-last">{fmtLevel(q)}</p>
                         <span className="t-caption mk-chg" data-up={q.changePct >= 0 ? "true" : "false"}>{fmtChange(q)}</span>
                       </div>
-                      <p className="t-h2 mk-last">{fmtLevel(q)}</p>
                       <Sparkline series={q.series} className="mk-spark" />
                     </Glass>
                   </Tilt>
