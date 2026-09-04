@@ -285,15 +285,22 @@ export default function YieldSurfaceCanvas({
       const c2 = project(rows[0].xs[0], floorY, zOf(0), theta);
       ctx.beginPath(); ctx.moveTo(c0.sx, c0.sy); ctx.lineTo(c1.sx, c1.sy); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(c0.sx, c0.sy); ctx.lineTo(c2.sx, c2.sy); ctx.stroke();
-      /* The yield axis stands on the NEAR-left corner. The far corner
-         already projects near the top of the box under the tilt, so an axis
-         there runs out of the frame and its upper ticks never print. */
+      /* The yield axis stands on whichever floor corner is nearest the
+         viewer at this yaw (the one that projects lowest on screen): a far
+         corner already sits near the top of the box under the tilt, so an
+         axis there runs out of the frame and its upper ticks never print. */
+      const x0 = rows[0].xs[0];
+      const xN = rows[0].xs[tenors - 1];
+      const nearX = project(x0, floorY, 0, theta).sy >= project(xN, floorY, 0, theta).sy ? x0 : xN;
+      /* Of the two ends of the near edge, the axis takes the LEFT one, the
+         way a chart's y-axis reads. */
+      const nearZ = project(nearX, floorY, zOf(0), theta).sx <= project(nearX, floorY, zOf(n - 1), theta).sx ? zOf(0) : zOf(n - 1);
       const top = chart.ticks[chart.ticks.length - 1].y + 0.04;
-      const ax0 = project(rows[0].xs[0], floorY, zOf(n - 1), theta);
-      const ax1 = project(rows[0].xs[0], top, zOf(n - 1), theta);
+      const ax0 = project(nearX, floorY, nearZ, theta);
+      const ax1 = project(nearX, top, nearZ, theta);
       ctx.beginPath(); ctx.moveTo(ax0.sx, ax0.sy); ctx.lineTo(ax1.sx, ax1.sy); ctx.stroke();
       for (const t of chart.ticks) {
-        const p = project(rows[0].xs[0], t.y, zOf(n - 1), theta);
+        const p = project(nearX, t.y, nearZ, theta);
         ctx.beginPath(); ctx.moveTo(p.sx - 5, p.sy); ctx.lineTo(p.sx, p.sy); ctx.stroke();
         queue(t.label, p.sx - 9, p.sy, "right");
       }
@@ -301,14 +308,20 @@ export default function YieldSurfaceCanvas({
       const every = width < 600 ? 3 : 2;
       for (let k = 0; k < tenors; k++) {
         if (tenors > 9 && k % every !== 0 && k !== tenors - 1) continue;
+        /* The near corner belongs to the date label on wide frames. */
+        if (k === 0 && width >= 600) continue;
         const p = project(rows[0].xs[k], floorY, zOf(n - 1), theta);
         queue(chart.tenorLabels[k], p.sx, p.sy + 14, "center");
       }
       /* The window's first date at the far-right corner. Today's is in the
          attribution, and at the near corner it fought the 30Y label. */
+      /* The window's dates sit under the two ends of the NEAR edge, so with
+         time running across the frame they read as a stock chart's x-axis. */
       if (width >= 600) {
-        const d0 = project(rows[0].xs[tenors - 1], floorY, zOf(0), theta);
-        if (d0.sx + 64 < width) queue(chart.firstDate, d0.sx + 10, d0.sy, "left");
+        const d0 = project(nearX, floorY, zOf(0), theta);
+        const d1 = project(nearX, floorY, zOf(n - 1), theta);
+        queue(chart.firstDate, d0.sx, d0.sy + 16, "center");
+        queue(chart.lastDate, d1.sx, d1.sy + 16, "center");
       }
     };
 
@@ -352,14 +365,19 @@ export default function YieldSurfaceCanvas({
       ctx.fillStyle = `rgba(${PAPER}, .9)`; ctx.fill();
       ctx.beginPath(); ctx.arc(last.sx, last.sy, 4.5, 0, Math.PI * 2);
       ctx.fillStyle = DEEP_IRIS; ctx.fill();
-      /* Leader and value pill, to the upper right of the marker. */
-      const lx = last.sx + 18;
-      const ly = last.sy - 22;
-      ctx.strokeStyle = `rgba(${DEEP_IRIS_RGB}, .6)`; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(last.sx + 6, last.sy - 6); ctx.lineTo(lx - 4, ly + 8); ctx.stroke();
+      /* Leader and value pill, to the upper right of the marker, or the
+         upper left when the marker sits near the right edge of the box. */
       const text = `${chart.seriesLabel}  ${chart.seriesLast}`;
       ctx.font = `500 12px ${mono}`;
       const w = ctx.measureText(text).width + 22;
+      const flip = last.sx + 18 + w + 8 > width;
+      const lx = flip ? last.sx - 18 - w : last.sx + 18;
+      const ly = last.sy - 22;
+      ctx.strokeStyle = `rgba(${DEEP_IRIS_RGB}, .6)`; ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(last.sx + (flip ? -6 : 6), last.sy - 6);
+      ctx.lineTo(flip ? lx + w + 4 : lx - 4, ly + 8);
+      ctx.stroke();
       const h = 26;
       const r = 13;
       ctx.beginPath();
@@ -396,7 +414,8 @@ export default function YieldSurfaceCanvas({
           if (k === 0) ctx.moveTo(p.sx, p.sy);
           else ctx.lineTo(p.sx, p.sy);
         }
-        ctx.strokeStyle = `rgba(${INK}, ${fade(sum / row.xs.length).toFixed(3)})`;
+        /* In chart mode the ribs are the quiet layer under the spines. */
+        ctx.strokeStyle = `rgba(${INK}, ${(fade(sum / row.xs.length) * (chart ? 0.55 : 1)).toFixed(3)})`;
         ctx.stroke();
       }
 
