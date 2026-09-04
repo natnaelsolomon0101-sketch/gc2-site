@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Container from "@/components/Container";
-import PageHeader from "@/components/PageHeader";
 import TextLink from "@/components/TextLink";
 import { fund } from "@/config/fund";
 import PrintButton from "./PrintButton";
+import EditorialHeader from "@/app/legal/_components/EditorialHeader";
 
 /**
  * /tearsheet — a page about tearsheets, which is not a tearsheet.
@@ -80,7 +80,7 @@ function Ledger({
               <span aria-hidden="true" className="t-mono-xs block text-ink-3 md:hidden">
                 {valueHead}
               </span>
-              <span className="t-body measure-body block text-ink">{r.value}</span>
+              <span className="t-body measure-legal block text-ink">{r.value}</span>
             </td>
           </tr>
         ))}
@@ -190,13 +190,13 @@ export default function Tearsheet() {
     kicker: "One page, struck on a schedule, built to be laid next to twenty others.",
     node: (
       <>
-        <p className="t-body measure-body">
+        <p className="t-body measure-legal">
           The top of the sheet carries identity: the entity, the manager, the jurisdiction, the
           strategy, the share class, the currency, and the date the sheet was struck. The middle
           carries the return history and the statistics derived from it. The foot carries terms,
           service providers and a contact.
         </p>
-        <p className="t-body measure-body mt-6">
+        <p className="t-body measure-legal mt-6">
           Its whole value is that it is comparable. Its whole danger is the same property: a page
           built to be compared is a page built to be skimmed, and a figure that has been skimmed
           has not been checked. The sheet is a starting point for questions, and it is worth
@@ -245,27 +245,27 @@ export default function Tearsheet() {
     title: "Why this site does not publish one",
     node: (
       <>
-        <p className="t-body measure-body">
+        <p className="t-body measure-legal">
           The partnership relies on Regulation D, Rule 506(b), which permits the firm to discuss
           the fund with people it already knows and prohibits taking it to the public. A tearsheet
           is the most portable form of taking a fund to the public that exists — it is designed to
           be forwarded. Publishing one here would put the whole partnership&rsquo;s reliance on the
           exemption at risk in order to save a reader one email.
         </p>
-        <p className="t-body measure-body mt-6">
+        <p className="t-body measure-legal mt-6">
           The second reason is simpler and would survive a change of regime. This site prints no
           figure the firm has not supplied and stood behind. There is no rounded version, no
           approximation, no last-quarter estimate and no worked example that makes an unsupplied
           number publishable, and the moment a page feels the pull to print one is the moment it
           should print nothing instead.
         </p>
-        <p className="t-body measure-body mt-6">
+        <p className="t-body measure-legal mt-6">
           That is also why there is no chart on this page and no empty frame waiting for one. A
           blank axis is a promise that a figure is coming and an invitation to imagine its shape.
           It is a placeholder wearing a suit, and it is banned here for the same reason a greyed
           row is.
         </p>
-        <p className="t-body measure-body mt-6">
+        <p className="t-body measure-legal mt-6">
           If the regime and the disclosures ever permit it, the figures will be struck by the
           administrator rather than by the desk, and they will travel with the context that makes
           them checkable. They will not arrive as a graphic on a public page.
@@ -288,11 +288,11 @@ export default function Tearsheet() {
               <TextLink standalone href={e.href}>
                 {e.label}
               </TextLink>
-              <p className="t-small measure-body mt-1">{e.note}</p>
+              <p className="t-small measure-legal mt-1">{e.note}</p>
             </li>
           ))}
         </ul>
-        <p className="t-body measure-body mt-8">
+        <p className="t-body measure-legal mt-8">
           What is missing from that list is the half a tearsheet exists for, and it is missing on
           purpose rather than by omission. An allocator who needs it should ask for it through the
           route the partnership actually runs on.
@@ -308,10 +308,13 @@ export default function Tearsheet() {
 
   return (
     <>
-      <PageHeader
+      {/* The "Last updated" stamp moved here from the closing section below:
+          same fund.updatedAt gate, now the foot line of the header. */}
+      <EditorialHeader
         eyebrow="Tearsheet"
-        title="The tearsheet."
+        lines={[<>The <em>tearsheet</em>.</>]}
         standfirst="A tearsheet is performance on one page. Under Rule 506(b) it cannot sit on a public one, and every figure that would go on ours is unpublished. So this page does the next most useful thing: it sets out what a tearsheet contains, what an allocator should refuse to accept one without, and why this site does not carry one."
+        caption={fund.updatedAt ? `Effective ${fund.updatedAt}` : undefined}
       />
 
       {/* Family-principal critic, this round: the 70dvh surface card with
@@ -350,22 +353,13 @@ export default function Tearsheet() {
               <div className="col-span-4 md:col-span-4">
                 <p className="t-mono-xs text-ink-3">{String(i + 1).padStart(2, "0")}</p>
                 <h2 className="t-h2 mt-3">{b.title}</h2>
-                {b.kicker && <p className="t-small measure-body mt-6">{b.kicker}</p>}
+                {b.kicker && <p className="t-small measure-legal mt-6">{b.kicker}</p>}
               </div>
               <div className="col-span-4 md:col-span-7 md:col-start-6">{b.node}</div>
             </div>
           </Container>
         </section>
       ))}
-
-      {/* Stamped only when there is a date to stamp. */}
-      {fund.updatedAt && (
-        <section className={blocks.length % 2 ? "bg-ground-2" : ""}>
-          <Container>
-            <p className="t-mono-xs rule-t py-8 text-ink-3">Last updated {fund.updatedAt}</p>
-          </Container>
-        </section>
-      )}
     </>
   );
 }
