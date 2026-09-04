@@ -129,16 +129,20 @@ const CSS = css`
   .hv2-lead{font-size:15.5px;line-height:1.5;max-width:26em;}
   .hv2-cta{margin-top:22px;gap:10px;}
   .hv2-btn{flex:0 1 auto;padding:12px 20px;min-height:48px;}
-  .hv2-foot{padding:0 0 118px;gap:4px 16px;}
+  /* Phones: the standing facts leave the hero foot (they are on /firm and
+     in the footer); the attribution alone owns the foot, so the two caption
+     blocks can no longer collide at 320 to 412. */
+  .hv2-foot{display:none;}
   .hv2-f2,.hv2-f3{display:none;}
   .hv2-chart .ys-source{left:20px;right:20px;bottom:calc(14px - var(--hv2-foot-h));text-align:left;max-width:none;}
 }
 @media (max-width:767px) and (max-height:700px){
-  .hv2{--hv2-chart-h:48%;--hv2-foot-h:118px;}
+  /* A short phone cannot hold the stack and the chart in one screen; the
+     hero grows to 800px and scrolls rather than laying the chart over the
+     actions (measured: the copy ends at ~410px on 320x568). */
+  .hv2{--hv2-chart-h:48%;--hv2-foot-h:100px;min-height:800px;}
   .hv2-h1{margin-bottom:12px;}
   .hv2-cta{margin-top:16px;}
-  .hv2-foot{padding-bottom:108px;}
-  .hv2-clockslot{display:none;}
 }
 
 /* ---- tablets are not big phones ------------------------------------------- */
