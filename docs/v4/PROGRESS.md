@@ -50,3 +50,4 @@
 - 2026-09-04 — Markets: watching grouped by host (Andrew Ross Sorkin added, six official CNBC/NYT Events episodes; Rubenstein kept), per-host news lists, 1280px posters with a content-flagged fallback. Regime clean. Promoted as deploy 27.
 - 2026-09-04 — Markets watching reworked per Nate: one block, one conversation per person (11), Barron's included, no host headings, compact cards. Promoted as deploy 28.
 - 2026-09-04 — Markets watching: 20 conversations, 12 with women investors/CIOs (Nate: the audience is women). Regime clean. Promoted as deploy 29.
+- 2026-09-04 — Markets watching: Shalett on-camera clip (deploy 30); cards are plain links to YouTube in a new tab, inline player and LiteVideo removed (deploy 31). Production = bde2db3.
