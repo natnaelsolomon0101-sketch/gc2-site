@@ -73,8 +73,8 @@ const CSS = css`
 /* Desktop: the chart floats in the right half, beside the words, from under
    the nav to the foot band, bleeding a little past the right edge. Under
    1024 it drops below the copy as a band (the phone stack). */
-.hv2-chart{position:absolute;left:47%;right:-2%;
-  top:calc(var(--nav-h, 72px) + 1vh);bottom:calc(var(--hv2-foot-h) + 6vh);
+.hv2-chart{position:absolute;left:49%;right:-1%;
+  top:calc(var(--nav-h, 72px) + 3vh);bottom:calc(var(--hv2-foot-h) + 7vh);
   height:auto;z-index:0;pointer-events:none;}
 @media (max-width:1023px){
   .hv2-chart{left:0;right:0;top:auto;bottom:var(--hv2-foot-h);
@@ -240,9 +240,9 @@ export default function HeroV2() {
         fit="natural"
         height={0}
         opacity={0.5}
-        yawCenter={-62}
-        yawRange={6}
-        tilt={22}
+        yawCenter={-84}
+        yawRange={3}
+        tilt={14}
         className="hv2-chart"
       />
 
