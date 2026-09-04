@@ -43,6 +43,8 @@ export type ChartSpec = {
   /** Printed first and last dates of the window. */
   firstDate: string;
   lastDate: string;
+  /** One printed date + value per row, for the hover readout. */
+  series: { date: string; value: string }[];
 };
 
 export type YieldSurfaceCanvasProps = {
@@ -125,6 +127,8 @@ export default function YieldSurfaceCanvas({
     let mono = "monospace";
     let reveal = 1;
     let tx = 0, ty = 0, cx = 0, cy = 0;   // pointer parallax: target, current
+    let px = -1, py = -1;                 // pointer in canvas px, -1 = away
+    let hoverA = 0;                       // readout opacity, eased
     const hover =
       typeof window.matchMedia === "function" &&
       window.matchMedia("(hover: hover) and (pointer: fine)").matches;
@@ -391,6 +395,60 @@ export default function YieldSurfaceCanvas({
       label(text, lx + 11, ly + 0.5, "left", 1, 12, PAPER);
     };
 
+    /* THE READOUT. With the pointer over the chart, the nearest day on the
+       highlighted series gets a crosshair down to the floor and a paper pill
+       with its date and value, like a terminal's hover. Eased in and out so
+       it never pops. Hover devices only (parallax gates the listener). */
+    const drawReadout = (theta: number) => {
+      if (!chart || !parallax) return;
+      const want = px >= 0 && reveal >= 1 ? 1 : 0;
+      hoverA += (want - hoverA) * 0.18;
+      if (hoverA < 0.02) return;
+      const k = chart.seriesIndex;
+      const n = rows.length;
+      let best = -1, bestD = Infinity;
+      const pts: { sx: number; sy: number }[] = new Array(n);
+      for (let i = 0; i < n; i++) {
+        const p = project(rows[i].xs[k], rows[i].ys[k], zOf(i), theta);
+        pts[i] = p;
+        if (px >= 0) {
+          const d = (p.sx - px) * (p.sx - px) + (p.sy - py) * (p.sy - py) * 0.35;
+          if (d < bestD) { bestD = d; best = i; }
+        }
+      }
+      if (best < 0) best = n - 1;
+      const p = pts[best];
+      const f = project(rows[best].xs[k], floorY, zOf(best), theta);
+      ctx.globalAlpha = hoverA;
+      ctx.strokeStyle = `rgba(${INK}, .45)`; ctx.lineWidth = 1;
+      ctx.setLineDash([3, 4]);
+      ctx.beginPath(); ctx.moveTo(p.sx, p.sy); ctx.lineTo(f.sx, f.sy); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.beginPath(); ctx.arc(p.sx, p.sy, 7, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${PAPER}, .95)`; ctx.fill();
+      ctx.beginPath(); ctx.arc(p.sx, p.sy, 3.5, 0, Math.PI * 2);
+      ctx.fillStyle = `rgb(${INK})`; ctx.fill();
+      const d = chart.series[best];
+      const text = d ? `${d.date}  ${chart.seriesLabel} ${d.value}` : "";
+      ctx.font = `500 12px ${mono}`;
+      const w = ctx.measureText(text).width + 22;
+      const h = 26, r = 13;
+      const flip = p.sx + 16 + w + 8 > width;
+      const lx = flip ? p.sx - 16 - w : p.sx + 16;
+      const ly = p.sy + 24;
+      ctx.beginPath();
+      ctx.moveTo(lx + r, ly - h / 2);
+      ctx.arcTo(lx + w, ly - h / 2, lx + w, ly + h / 2, r);
+      ctx.arcTo(lx + w, ly + h / 2, lx, ly + h / 2, r);
+      ctx.arcTo(lx, ly + h / 2, lx, ly - h / 2, r);
+      ctx.arcTo(lx, ly - h / 2, lx + w, ly - h / 2, r);
+      ctx.closePath();
+      ctx.fillStyle = `rgba(${PAPER}, .96)`; ctx.fill();
+      ctx.strokeStyle = `rgba(${INK}, .28)`; ctx.stroke();
+      label(text, lx + 11, ly + 0.5, "left", 1, 12, INK);
+      ctx.globalAlpha = 1;
+    };
+
     const draw = (theta: number) => {
       ctx.clearRect(0, 0, width, boxH);
       ctx.lineJoin = "round";
@@ -450,6 +508,7 @@ export default function YieldSurfaceCanvas({
 
       drawSeriesLine(theta);
       flush();
+      drawReadout(theta);
     };
 
     const frame = (t: number) => {
@@ -466,6 +525,10 @@ export default function YieldSurfaceCanvas({
     const onPointer = (e: PointerEvent) => {
       tx = (e.clientX / window.innerWidth - 0.5) * 2;
       ty = (e.clientY / window.innerHeight - 0.5) * 2;
+      const r = canvas.getBoundingClientRect();
+      const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+      px = inside ? e.clientX - r.left : -1;
+      py = inside ? e.clientY - r.top : -1;
     };
     if (parallax) window.addEventListener("pointermove", onPointer, { passive: true });
 
