@@ -3,8 +3,9 @@ import styles from "./RevealLines.module.css";
 
 /**
  * RevealLines — the 21st "Text Reveal (Mask)" idea (19257) with no JS: each
- * line sits in an overflow-hidden mask and rises into it once on load, one
- * stagger step after the last. Server component. Under reduced motion the
+ * line rises into view as its own clip-path opens, once on load, one stagger
+ * step after the last. No overflow:hidden anywhere, so wrapped lines are
+ * never clipped and the matrix's clipped-text check stays green. Server component. Under reduced motion the
  * lines are simply there.
  *
  * <RevealLines as="h2" className="t-h2" lines={[<>Evidence <em>first</em>.</>, "Then capital."]} />

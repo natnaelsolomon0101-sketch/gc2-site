@@ -1,9 +1,15 @@
+/* Each line rises into view as its own clip opens. The clip is on the LINE
+   (clip-path), not an overflow:hidden wrapper: a wrapper mask clipped
+   wrapped lines mid-animation and tripped the matrix's clipped-text check on
+   every route. clip-path ends slightly outside the box so ascenders and
+   descenders are never touched at rest. */
 @keyframes uiLineUp {
-  from { transform: translate3d(0, 110%, 0); opacity: 0; }
-  to   { transform: none; opacity: 1; }
+  from { transform: translate3d(0, 70%, 0); opacity: 0; clip-path: inset(0 0 100% 0); }
+  60%  { opacity: 1; }
+  to   { transform: none; opacity: 1; clip-path: inset(-.15em 0 -.2em 0); }
 }
 .block { display: block; }
-.mask  { display: block; overflow: hidden; padding-bottom: .06em; margin-bottom: -.06em; }
+.mask  { display: block; }
 .line  { display: block; animation: uiLineUp var(--dur-draw) var(--ease) both; }
 @media (prefers-reduced-motion: reduce) {
   .line { animation: none; }
