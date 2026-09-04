@@ -88,7 +88,7 @@ export const stages: Stage[] = [
     label: "Adversarial review",
     heading: "Every idea is argued against before it is funded.",
     body:
-      "The desk argues the other side in good faith and the author defends the idea in front of the room. Nothing earns capital because the house believes it — there is no house view that overrides the person carrying the risk.",
+      "The desk argues the other side in good faith and the author defends the idea in front of the room. Nothing earns capital because the house believes it; there is no house view that overrides the person carrying the risk.",
     holder: "The desk, in the room",
     gateLabel: "Advances when",
     gate: "It survives the case made against it, argued by people who wanted it to fail.",

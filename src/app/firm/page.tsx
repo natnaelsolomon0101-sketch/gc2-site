@@ -119,7 +119,7 @@ const sections: Section[] = [
     "So the method is written rather than remembered. The data is ours and the models are ours, which means they can be read, argued with and run by someone who did not build them. A position is owned by a named person precisely so its reasoning has to survive the desk before it gets capital, and the tail overlay is permanent so the book's worst case never depends on anyone being at a screen to defend it.",
     "None of that makes the exposure disappear, and we would rather say so than dress it. Staying small is a choice, and this is what the choice costs: someone who can run the book is not the same as someone who would run it the same way. An allocator should price that instead of being reassured out of asking about it.",
     "The useful questions are the specific ones. Which decisions stop when a particular person is unavailable, and which carry on. Whether the models and the data behind them can be run by someone who did not write them. Whether the answer is different for a week away and a permanent departure. What the fund documents, rather than a public page, commit the manager to.",
-    "Ask the administrator and the brokers to confirm the operational half of any answer instead of taking it from us. What happens on the day itself — who holds authority, who is told, and in what order — is set out under governance.",
+    "Ask the administrator and the brokers to confirm the operational half of any answer instead of taking it from us. What happens on the day itself, who holds authority, who is told, and in what order, is set out under governance.",
   ],
     node: (
       <>

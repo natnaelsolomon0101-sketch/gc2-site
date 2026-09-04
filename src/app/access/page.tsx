@@ -42,7 +42,7 @@ export const metadata: Metadata = {
    rendered HTML for form, input and submit elements. Both run before commit.
    ========================================================================== */
 
-const SUBJECT = `Introduction — ${site.mark}`;
+const SUBJECT = `Introduction: ${site.mark}`;
 const MAILTO = `mailto:${site.emails.investors}?subject=${encodeURIComponent(SUBJECT)}`;
 
 const CSS = `
@@ -63,8 +63,8 @@ const blocks: { n: string; h: string; p: string[] }[] = [
     n: "01",
     h: "Why there is nothing to download here",
     p: [
-      "The partnership relies on Regulation D, Rule 506(b). Under that rule the firm may discuss the fund only with investors with whom it already has a relationship — one that existed before the conversation about the fund began, and that is substantive enough for the firm to form a view on eligibility.",
-      "A website cannot create that relationship, and neither can a form. An email field that returns a link, a box you tick to assert your own status, a button marked “request access” that grants it in the same second — none of those establish anything. They produce a record that looks like diligence and is not one.",
+      "The partnership relies on Regulation D, Rule 506(b). Under that rule the firm may discuss the fund only with investors with whom it already has a relationship, one that existed before the conversation about the fund began, and that is substantive enough for the firm to form a view on eligibility.",
+      "A website cannot create that relationship, and neither can a form. An email field that returns a link, a box you tick to assert your own status, a button marked “request access” that grants it in the same second: none of those establish anything. They produce a record that looks like diligence and is not one.",
       "So the materials are not behind a gate on this page. They are behind a relationship, which is slower, and which is the actual requirement rather than a decorative version of it.",
     ],
   },
@@ -77,7 +77,7 @@ const blocks: { n: string; h: string; p: string[] }[] = [
     n: "03",
     h: "What happens then",
     p: [
-      "Each enquiry is read by the people who manage the money. That is the reason this takes time — sometimes a long time — and the reason we would rather not promise a turnaround we would meet only in a quiet month.",
+      "Each enquiry is read by the people who manage the money. That is the reason this takes time, sometimes a long time, and the reason we would rather not promise a turnaround we would meet only in a quiet month.",
       "If there is a fit, the next step is a conversation rather than a document. Materials come after that, if both sides still think the reading is worth it, and the offering documents govern everything once they arrive.",
       "Eligibility is established through those documents. It is not established by anything anyone ticks on a website, including this one.",
     ],

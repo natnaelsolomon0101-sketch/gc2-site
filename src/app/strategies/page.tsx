@@ -70,7 +70,7 @@ export const metadata: Metadata = {
   // sentence, condensed — "what constrains their capacity" -> "what
   // constrains capacity", "the conditions under which" -> "when".
   description:
-    "Six strategies across liquid global markets, governed by one risk framework — what constrains capacity, and when we would stop running one.",
+    "Six strategies across liquid global markets, governed by one risk framework: what constrains capacity, and when we would stop running one.",
 };
 
 /* Two-digit ordinals, computed from position in the array that actually
@@ -144,7 +144,7 @@ const stopConditions: { h: string; p: string }[] = [
   },
   {
     h: "The exit stops being credible",
-    p: "The test was never whether a position can be held. It is whether it can be reduced in the conditions that would make us want to reduce it. Where the market a book depends on no longer clears at a size we could leave through, the book stops — and it stops while the exit still exists, rather than at the point the question gets settled for us.",
+    p: "The test was never whether a position can be held. It is whether it can be reduced in the conditions that would make us want to reduce it. Where the market a book depends on no longer clears at a size we could leave through, the book stops, and it stops while the exit still exists, rather than at the point the question gets settled for us.",
   },
   {
     h: "The six stop being six",
@@ -156,7 +156,7 @@ const stopConditions: { h: string; p: string }[] = [
   },
   {
     h: "Nobody can defend it",
-    p: "Every position has a named owner who defends it in front of the desk. Where the owner cannot — because the reasoning has quietly been replaced by the P&L, or because the person who understood the position is no longer here — risk can cut it without the desk agreeing. A book that survives only because it is nobody's job to argue against it is already gone.",
+    p: "Every position has a named owner who defends it in front of the desk. Where the owner cannot, because the reasoning has quietly been replaced by the P&L, or because the person who understood the position is no longer here, risk can cut it without the desk agreeing. A book that survives only because it is nobody's job to argue against it is already gone.",
   },
   {
     h: "The operation cannot carry it",

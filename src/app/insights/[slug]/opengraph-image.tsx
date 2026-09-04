@@ -20,7 +20,7 @@ export async function generateImageMetadata(
   const { slug } = await params;
   const note = notes.find((n) => n.slug === slug);
   return [{ id: "note", size: OG_SIZE, contentType: OG_CONTENT_TYPE,
-            alt: note ? `${note.title} — ${note.dek}` : "" }];
+            alt: note ? `${note.title}: ${note.dek}` : "" }];
 }
 
 export default async function Image(

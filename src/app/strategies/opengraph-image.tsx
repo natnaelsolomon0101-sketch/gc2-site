@@ -8,7 +8,7 @@ import { ogImage, ogAlt, OG_SIZE, OG_CONTENT_TYPE } from "@/components/viz/og";
 const card = {
   title: "Strategies",
   description:
-    "Six strategies across liquid global markets, governed by one risk framework — what constrains their capacity, and the conditions under which we would stop running one.",
+    "Six strategies across liquid global markets, governed by one risk framework: what constrains their capacity, and the conditions under which we would stop running one.",
 };
 
 export const alt = ogAlt(card);

@@ -116,7 +116,7 @@ const groups: Group[] = [
       {
         q: "What is your capacity, and how do you measure it?",
         a: [
-          "We underwrite market impact before we underwrite edge, and that ordering is deliberate. A capacity number produced after months of work on a signal drifts toward the number that lets the work continue — nobody lies, the estimate simply acquires a constituency.",
+          "We underwrite market impact before we underwrite edge, and that ordering is deliberate. A capacity number produced after months of work on a signal drifts toward the number that lets the work continue. Nobody lies, the estimate simply acquires a constituency.",
           "The estimate is made against the market we would face while exiting under stress, not the median conditions on a screen. That number is materially smaller, and it is the only one that has ever mattered, because the day capacity is tested is never an average day.",
           "No capacity figure appears on this website. The method is the part you can actually check; the number is a conversation with the work in front of you.",
         ],
@@ -131,7 +131,7 @@ const groups: Group[] = [
       {
         q: "Why hold this rather than a multi-strategy platform?",
         a: [
-          "Not because we can do something a platform cannot. Because of size. We size against the market we would face while exiting under stress, and a small book can hold — and, more to the point, can leave — positions a large one cannot.",
+          "Not because we can do something a platform cannot. Because of size. We size against the market we would face while exiting under stress, and a small book can hold, and more to the point can leave, positions a large one cannot.",
           "Several strategies that work beautifully in research do not survive our own capacity question, and we do not run them. That is the entire argument. A family that does not find it persuasive should not be here, and we would rather establish that early than late.",
         ],
       },
@@ -145,7 +145,7 @@ const groups: Group[] = [
         q: "How do you define leverage, and what are the limits?",
         a: [
           "The definition is the question. Gross notional overstates risk in a book carrying options and futures to the point of being useless. Margin-to-equity understates it in exactly the conditions where margin models are calm. Delta-adjusted exposure hides convexity, and convexity is the point of one of the six books.",
-          "We would rather hand a family more than one measure and let it form its own view than pick the flattering one. The limits themselves are set by the Investment Committee, which sets mandate and limits and does not pick trades. They are a term, and no term appears on this website — ask for them in writing and read the clause rather than the summary of it.",
+          "We would rather hand a family more than one measure and let it form its own view than pick the flattering one. The limits themselves are set by the Investment Committee, which sets mandate and limits and does not pick trades. They are a term, and no term appears on this website. Ask for them in writing and read the clause rather than the summary of it.",
         ],
       },
       {
@@ -167,7 +167,7 @@ const groups: Group[] = [
         a: [
           "We are not going to give you a figure here, and it is worth being exact about why.",
           `The firm was formed in ${site.foundedLabel}, so the honest answer today is that there is not yet a meaningful one. What we will say in public is how the book is sized: to survive the tail rather than to flatter the mean. When there is a record, you get the worst period in a conversation, month by month, with what we did and what we would do differently.`,
-          "This website carries no performance of any kind — no result, no loss, no ratio. The partnership relies on Regulation D Rule 506(b), and a public page discussing results is precisely what that rule does not permit. It is also a restriction we happen to agree with: a drawdown figure stripped of the period, the positioning and the decisions around it tells a family almost nothing, and tends to be quoted back as though it did.",
+          "This website carries no performance of any kind: no result, no loss, no ratio. The partnership relies on Regulation D Rule 506(b), and a public page discussing results is precisely what that rule does not permit. It is also a restriction we happen to agree with: a drawdown figure stripped of the period, the positioning and the decisions around it tells a family almost nothing, and tends to be quoted back as though it did.",
         ],
       },
       {
@@ -193,8 +193,8 @@ const groups: Group[] = [
       {
         q: "Who strikes the NAV?",
         a: [
-          "The answer a family should insist on is a third-party name and a copy of the valuation policy — not a description of a process, and not the manager's own word about the manager's own marks.",
-          "That name is not on this website yet, and the rule this site is built on is the reason. Nothing appears here — no provider, no auditor, no person, no figure — that the firm has not confirmed in writing for publication. When it is confirmed, it appears. Until then we give the name and the agreement directly rather than write it on a page, which is slower and is the correct way round.",
+          "The answer a family should insist on is a third-party name and a copy of the valuation policy, not a description of a process, and not the manager's own word about the manager's own marks.",
+          "That name is not on this website yet, and the rule this site is built on is the reason. Nothing appears here (no provider, no auditor, no person, no figure) that the firm has not confirmed in writing for publication. When it is confirmed, it appears. Until then we give the name and the agreement directly rather than write it on a page, which is slower and is the correct way round.",
         ],
       },
       {
@@ -207,7 +207,7 @@ const groups: Group[] = [
       {
         q: "What if the administrator is late?",
         a: [
-          "The reporting commitments this site will carry — estimate timing, final timing, audit delivery, the K-1 date — are not on it yet. When they are, they are commitments, and the case worth asking about is the one we miss rather than the one we meet.",
+          "The reporting commitments this site will carry (estimate timing, final timing, audit delivery, the K-1 date) are not on it yet. When they are, they are commitments, and the case worth asking about is the one we miss rather than the one we meet.",
           "A cadence a manager only holds to in a good quarter is not a cadence. What a family should extract from any manager on this question is who tells them, how quickly, and whether it is the family asking or the manager telling. We would rather publish a date and be held to it than describe our reporting as timely.",
         ],
       },
@@ -215,7 +215,7 @@ const groups: Group[] = [
         q: "What happens if the person running this stops being able to run it?",
         a: [
           "This website names nobody, and that is deliberate: no person appears here until the firm has confirmed the name for publication. It does not make the key-person question go away, and in a firm this size it is the largest single risk a family takes.",
-          "The mitigations that are real are the ones written down — the process, the independence of risk from the desk, and whatever the offering documents say about a key-person event. Ask what those documents say, then read the clause rather than accept a summary of it.",
+          "The mitigations that are real are the ones written down: the process, the independence of risk from the desk, and whatever the offering documents say about a key-person event. Ask what those documents say, then read the clause rather than accept a summary of it.",
         ],
       },
     ],
@@ -228,7 +228,7 @@ const groups: Group[] = [
         q: "Why can I not see the terms on this website?",
         a: [
           "Because of the rule the partnership relies on. Under Regulation D Rule 506(b) the fund may not be taken to the public, and a page listing fee, lock-up and redemption mechanics to anyone arriving from a search engine is exactly that.",
-          "It is not coyness and it is not a funnel. There is no gate on this site that opens when you type an email address, because a gate like that would not create the relationship the rule requires — it would only produce a record that looks like one. How the sequence actually works is set out on the access page.",
+          "It is not coyness and it is not a funnel. There is no gate on this site that opens when you type an email address, because a gate like that would not create the relationship the rule requires; it would only produce a record that looks like one. How the sequence actually works is set out on the access page.",
         ],
       },
       {
@@ -239,7 +239,7 @@ const groups: Group[] = [
         ],
       },
       {
-        q: "What would a gate actually do — to me, and to the family that redeems first?",
+        q: "What would a gate actually do, to me and to the family that redeems first?",
         a: [
           "A gate exists to remove the first-mover advantage in a run. Its cost is that it converts a liquidity problem into a governance problem: somebody decides, and everybody else lives with the decision.",
           "The questions worth asking are who can invoke it, on what test, whether that person is independent of the desk, and what has to be disclosed afterwards. Read those answers as clauses with the documents in front of you, not as sentences on a website.",
@@ -255,7 +255,7 @@ const groups: Group[] = [
       {
         q: "Are there side letters, and would I be told?",
         a: [
-          "The useful question is not whether side letters exist — in a fund of any size they usually do — but whether the most-favoured-nation provision reaches you, what is carved out of it, and whether you see the letters or only a summary of them.",
+          "The useful question is not whether side letters exist (in a fund of any size they usually do) but whether the most-favoured-nation provision reaches you, what is carved out of it, and whether you see the letters or only a summary of them.",
           "Our policy on that is a term, and terms are not published here. A manager who answers “no side letters” without being asked about carve-outs has answered a narrower question than the one you asked.",
         ],
       },
@@ -275,7 +275,7 @@ const groups: Group[] = [
       {
         q: "How long can the management company operate on the revenue it has?",
         a: [
-          "Runway is the question that tells a family whether a manager will be forced into decisions it does not want to make — accepting capital it should decline, or cutting the operations budget before the research budget.",
+          "Runway is the question that tells a family whether a manager will be forced into decisions it does not want to make: accepting capital it should decline, or cutting the operations budget before the research budget.",
           "The figure belongs to the management company rather than the fund, and it is a diligence answer rather than a public one. What is public is the shape of the firm: it was built small on purpose and has stayed small, and headcount is a constraint we chose rather than one we are waiting to escape.",
         ],
       },

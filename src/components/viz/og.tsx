@@ -128,7 +128,7 @@ export type OgCard = {
 /** Alt text for the card, so the `og:image:alt` a screen reader hears is the
  *  card's actual content and not "Open Graph image". */
 export function ogAlt({ title, description }: OgCard): string {
-  return `${title} — ${opening(description)}`;
+  return `${title}: ${opening(description)}`;
 }
 
 export function ogImage({
