@@ -62,6 +62,23 @@ export async function generateMetadata(
   };
 }
 
+
+/* Reading progress: a hairline of deep iris across the very top of the
+   viewport that fills as the article scrolls. Scroll-driven and CSS only,
+   the same mechanism as the hero's scroll-away; where animation-timeline is
+   unsupported the line simply is not there. */
+const PROGRESS_CSS = `
+.note-progress{position:fixed;top:0;left:0;right:0;height:2px;z-index:60;
+  background:var(--color-accent-deep-iris);transform:scaleX(0);transform-origin:0 50%;
+  pointer-events:none;display:none;}
+@supports (animation-timeline: scroll()){
+  .note-progress{display:block;animation:noteProgress linear both;
+    animation-timeline:scroll(root block);}
+}
+@keyframes noteProgress{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media print{.note-progress{display:none !important;}}
+`;
+
 export default async function Note({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const idx = notes.findIndex((n) => n.slug === slug);
@@ -103,6 +120,8 @@ export default async function Note({ params }: { params: Promise<{ slug: string 
 
   return (
     <article>
+      <style>{PROGRESS_CSS}</style>
+      <div className="note-progress" aria-hidden="true" />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
