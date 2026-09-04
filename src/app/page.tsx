@@ -11,7 +11,7 @@ import { site, siteUrl } from "@/config/site";
 import { notes, formatDate } from "@/content/notes";
 
 export const metadata: Metadata = {
-  title: `${site.name} — Private investment partnership, Miami`,
+  title: `${site.name} · Private investment partnership, Miami`,
   description:
     "A private investment partnership running concentrated, systematic strategies across liquid global markets.",
 };

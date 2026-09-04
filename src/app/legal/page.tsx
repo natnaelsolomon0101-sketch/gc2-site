@@ -94,7 +94,7 @@ export default function Legal() {
       <EditorialHeader
         eyebrow="Legal"
         lines={[<><em>Legal</em>.</>]}
-        standfirst="Three short documents. Between them they cover this website — what it says, how it may be used, and what it does with data. What governs the partnership is a different thing entirely, and it is not on this website."
+        standfirst="Three short documents. Between them they cover this website: what it says, how it may be used, and what it does with data. What governs the partnership is a different thing entirely, and it is not on this website."
         caption={fund.updatedAt ? `Effective ${fund.updatedAt}` : undefined}
       />
 

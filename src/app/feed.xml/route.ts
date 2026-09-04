@@ -13,7 +13,7 @@ import { notes } from "@/content/notes";
    (a reader, an aggregator) where a relative link would resolve against
    the WRONG origin. */
 
-const CHANNEL_TITLE = `Notes from the desk — ${site.name}`;
+const CHANNEL_TITLE = `Notes from the desk · ${site.name}`;
 const CHANNEL_DESCRIPTION = "Commentary from the desk on regime, risk, convexity, and capacity.";
 
 function escapeXml(s: string): string {

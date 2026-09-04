@@ -8,7 +8,7 @@ import { ogImage, ogAlt, OG_SIZE, OG_CONTENT_TYPE } from "@/components/viz/og";
 const card = {
   title: "Contact",
   description:
-    "Two published addresses and no form. Which one to use if you are an allocator, an existing investor, a journalist, or a counterparty — and what each can and cannot do.",
+    "Two published addresses and no form. Which one to use if you are an allocator, an existing investor, a journalist, or a counterparty, and what each can and cannot do.",
 };
 
 export const alt = ogAlt(card);
