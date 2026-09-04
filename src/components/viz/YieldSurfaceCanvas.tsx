@@ -38,6 +38,8 @@ export type ChartSpec = {
   seriesLabel: string;
   /** Last value of the highlighted series, printed. */
   seriesLast: string;
+  /** Signed day-over-day change of the highlighted series, printed ("+0.03"). */
+  seriesDelta: string;
   /** Three printed yield ticks, low to high, and their model-space y. */
   ticks: { label: string; y: number }[];
   /** Printed first and last dates of the window. */
@@ -133,6 +135,11 @@ export default function YieldSurfaceCanvas({
       typeof window.matchMedia === "function" &&
       window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     const parallax = !!chart && hover && !isStatic && !reduced;
+    /* Touch devices get the readout on tap instead of hover: it holds for a
+       moment, then fades, and the (otherwise still) phone frame animates
+       only while it is showing. */
+    const touchable = !!chart && !hover && !isStatic;
+    let touchUntil = 0;
 
     const yawAt = (ms: number) =>
       ((yawCenter + yawRange * Math.sin((ms / HALF_CYCLE_MS) * Math.PI)) * Math.PI) / 180;
@@ -408,7 +415,7 @@ export default function YieldSurfaceCanvas({
       ctx.fillStyle = DEEP_IRIS; ctx.fill();
       /* Leader and value pill, to the upper right of the marker, or the
          upper left when the marker sits near the right edge of the box. */
-      const text = `${chart.seriesLabel}  ${chart.seriesLast}`;
+      const text = `${chart.seriesLabel}  ${chart.seriesLast}  ${chart.seriesDelta}`;
       ctx.font = `500 12px ${mono}`;
       const w = ctx.measureText(text).width + 22;
       const flip = flat || last.sx + 18 + w + 8 > width;
@@ -437,7 +444,7 @@ export default function YieldSurfaceCanvas({
        with its date and value, like a terminal's hover. Eased in and out so
        it never pops. Hover devices only (parallax gates the listener). */
     const drawReadout = (theta: number) => {
-      if (!chart || !parallax) return;
+      if (!chart || !(parallax || touchable)) return;
       const want = px >= 0 && reveal >= 1 ? 1 : 0;
       hoverA += (want - hoverA) * 0.18;
       if (hoverA < 0.02) return;
@@ -575,9 +582,19 @@ export default function YieldSurfaceCanvas({
       /* A phone gets the draw-in and then a still frame: the ambient rock
          costs a slow handset main-thread time it does not have (Lighthouse
          mobile TBT), and nothing on a phone hovers it. */
-      if (phone && chart && reveal >= 1) { raf = 0; return; }
+      if (phone && chart && reveal >= 1 && performance.now() > touchUntil && hoverA < 0.02) { raf = 0; return; }
       raf = requestAnimationFrame(frame);
     };
+    const onTap = (e: PointerEvent) => {
+      const r = canvas.getBoundingClientRect();
+      const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+      if (!inside) { px = -1; py = -1; return; }
+      px = e.clientX - r.left; py = e.clientY - r.top;
+      touchUntil = performance.now() + 2600;
+      if (!raf && animate) raf = requestAnimationFrame(frame);
+      window.setTimeout(() => { if (performance.now() >= touchUntil) { px = -1; py = -1; } }, 2650);
+    };
+    if (touchable) window.addEventListener("pointerdown", onTap, { passive: true });
     const onPointer = (e: PointerEvent) => {
       tx = (e.clientX / window.innerWidth - 0.5) * 2;
       ty = (e.clientY / window.innerHeight - 0.5) * 2;
@@ -643,6 +660,7 @@ export default function YieldSurfaceCanvas({
       observer?.disconnect();
       window.removeEventListener("resize", onResize);
       window.removeEventListener("pointermove", onPointer);
+      window.removeEventListener("pointerdown", onTap);
       document.removeEventListener("visibilitychange", onVisibility);
     };
   }, [rows, height, tilt, depth, yawCenter, yawRange, fit, opacity, isStatic, chart]);

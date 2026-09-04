@@ -134,14 +134,19 @@ export default async function YieldSurface({
       (years < 1 ? `${Math.round(years * 12)}M` : `${years}Y`);
     let seriesIndex = tenors.findIndex((y) => y === 10);
     if (seriesIndex < 0) seriesIndex = tenors.length - 1;
-    const lastRow = history[history.length - 1];
+    const lastRow = kept[kept.length - 1];
+    const prevRow = kept[kept.length - 2];
     const lastRate = lastRow.points[seriesIndex].rate;
+    const delta = prevRow ? lastRate - prevRow.points[seriesIndex].rate : 0;
     const mid = (min + max) / 2;
     chart = {
       tenorLabels: tenors.map(labelFor),
       seriesIndex,
       seriesLabel: labelFor(tenors[seriesIndex]),
       seriesLast: `${lastRate.toFixed(2)}%`,
+      /* Day-over-day move of the highlighted series, in percentage points,
+         signed; the previous published day, not "yesterday". */
+      seriesDelta: `${delta >= 0 ? "+" : "-"}${Math.abs(delta).toFixed(2)}`,
       ticks: [min, mid, max].map((r) => ({ label: `${r.toFixed(1)}%`, y: yOf(r) })),
       firstDate: shortDate(rows[0].date),
       lastDate: shortDate(asOfDate),
