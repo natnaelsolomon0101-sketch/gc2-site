@@ -4,7 +4,6 @@ import RevealLines from "@/components/ui/RevealLines";
 import Glass from "@/components/ui/Glass";
 import Tilt from "@/components/ui/Tilt";
 import Sparkline from "@/components/viz/Sparkline";
-import LiteVideo from "@/components/LiteVideo";
 import { css } from "@/lib/css";
 import { fetchQuotes, fmtLevel, fmtChange, fmtAsOf, MARKETS_SOURCE } from "@/lib/markets";
 import { fetchCnbc, fetchTape, fmtWhen } from "@/lib/news";
@@ -53,21 +52,21 @@ const CSS = css`
 .mk-row-meta{display:block;color:var(--color-ink-3);}
 .mk-row:hover .mk-row-title{text-decoration:underline;text-underline-offset:3px;}
 .mk-vid-title{margin:0 0 4px;color:var(--color-ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.mk-vid-cap .t-caption{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mk-vid-cap .t-caption{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--color-ink-3);}
 .mk-vids{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:0;padding:0;list-style:none;}
 @media (min-width:768px){.mk-vids{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}}
 @media (min-width:1024px){.mk-vids{grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;}}
 .mk-vid{overflow:hidden;}
-.mk-vid-media{position:relative;aspect-ratio:16/9;background:var(--color-surface);}
-.lv-poster{position:absolute;inset:0;width:100%;height:100%;padding:0;border:0;background:none;cursor:pointer;}
-.lv-poster img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.85);}
+.mk-vid-link{display:block;color:inherit;text-decoration:none;}
+.mk-vid-link:focus-visible{outline:2px solid var(--color-ink);outline-offset:2px;}
+.mk-vid-media{position:relative;display:block;aspect-ratio:16/9;background:var(--color-surface);overflow:hidden;}
+.mk-vid-media img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.85);transition:transform var(--dur-base) var(--ease);}
+.mk-vid-link:hover .mk-vid-media img{transform:scale(1.03);}
+.mk-vid-link:hover .mk-vid-title{text-decoration:underline;text-underline-offset:3px;}
 .lv-play{position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:999px;
   display:grid;place-items:center;background:var(--color-ink);color:var(--color-ground);
   transition:transform var(--dur-fast) var(--ease);}
-.lv-poster:hover .lv-play{transform:scale(1.06);}
-.lv-poster:focus-visible{outline:2px solid var(--color-ink);outline-offset:2px;}
-.lv-frame{position:absolute;inset:0;width:100%;height:100%;border:0;}
-.mk-vid-cap{padding:10px 12px 12px;}
+.mk-vid-cap{display:block;padding:10px 12px 12px;}
 .mk-vid-cap p{margin:0;}
 .mk-vid-cap .t-caption{color:var(--color-ink-3);margin-top:4px;}
 .mk-foot{margin:0;color:var(--color-ink-3);max-width:80ch;}
@@ -170,11 +169,32 @@ export default async function MarketsPage() {
               {people.map((v) => (
                 <li key={v.id}>
                   <Glass as="div" radius={18} className="mk-vid">
-                    <div className="mk-vid-media"><LiteVideo id={v.id} title={`${v.name}: ${v.title}`} poster={v.poster} /></div>
-                    <div className="mk-vid-cap">
-                      <p className="t-small mk-vid-title">{v.name}: {v.title}</p>
-                      <p className="t-caption">{v.channel} · YouTube</p>
-                    </div>
+                    {/* The whole card opens the video on YouTube in a new tab:
+                        no player on the page, nothing to hydrate. */}
+                    <a
+                      className="mk-vid-link"
+                      href={`https://www.youtube.com/watch?v=${v.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${v.name}: ${v.title} (opens on YouTube)`}
+                    >
+                      <span className="mk-vid-media">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={`https://i.ytimg.com/vi/${v.id}/${v.poster === "sd" ? "sddefault" : "maxresdefault"}.jpg`}
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                        />
+                        <span className="lv-play" aria-hidden="true">
+                          <svg viewBox="0 0 24 24" width="22" height="22"><path d="M8 5v14l11-7z" fill="currentColor" /></svg>
+                        </span>
+                      </span>
+                      <span className="mk-vid-cap">
+                        <span className="t-small mk-vid-title">{v.name}: {v.title}</span>
+                        <span className="t-caption">{v.channel} · YouTube</span>
+                      </span>
+                    </a>
                   </Glass>
                 </li>
               ))}
@@ -186,7 +206,7 @@ export default async function MarketsPage() {
       <section className="mk-sec">
         <div className="wrap">
           <p className="t-small mk-foot">
-            Prices are delayed public data from {MARKETS_SOURCE}. Headlines belong to their publishers and link to them; the firm does not endorse them. Videos play through YouTube's player from their channels. None of this is a view of the firm, a recommendation, or fund performance, and none of it is an offer.
+            Prices are delayed public data from {MARKETS_SOURCE}. Headlines belong to their publishers and link to them; the firm does not endorse them. Videos open on YouTube, on their channels. None of this is a view of the firm, a recommendation, or fund performance, and none of it is an offer.
           </p>
         </div>
       </section>
