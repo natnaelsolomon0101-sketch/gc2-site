@@ -1,6 +1,5 @@
 import { css } from "@/lib/css";
 import YieldSurfaceCanvas, { type SurfaceRow, type ChartSpec } from "./YieldSurfaceCanvas";
-import YieldLandscapeCanvas from "./YieldLandscapeCanvas";
 import {
   fetchYieldHistory, asOf, TENORS, TREASURY_SOURCE, TREASURY_ATTRIBUTION,
 } from "./treasury";
@@ -16,13 +15,13 @@ import {
  * today, but how the shape has been moving — the front end lifting, the belly
  * rolling, the long end standing still.
  *
- * THREE MATERIALS, ONE SURFACE. `mode="wire"` is the drawing: ink polylines at
+ * TWO MATERIALS, ONE SURFACE. `mode="wire"` is the drawing: ink polylines at
  * low alpha, a mesh you see through. `mode="chart"` is the wire drawn as the
  * instrument it is — floor grid, tenor and date axes, yield ticks, the
  * ten-year as a bold line with an area ribbon and a marker on its last value.
- * `mode="painted"` is the same rows as filled, lit, depth-fogged hills. Same
- * fetch, same projection, same rock; the difference is entirely in what the
- * canvas does with the numbers.
+ * Same fetch, same projection, same rock; the difference is entirely in what
+ * the canvas does with the numbers. (A painted-hills mode was built in r9a
+ * and removed once the owner chose the chart; see git history 08236b9.)
  *
  * SERVER-FETCHED, ISR 6h, PASSED AS PROPS. The island never talks to Treasury.
  * If the fetch fails this renders nothing — no placeholder mesh, no last-known
@@ -49,28 +48,22 @@ export type YieldSurfaceProps = {
   /**
    * "band" is a shallow slab shaped to fill a wide short slot, anchored into
    * the right two-thirds. "natural" is the deeper landscape, centred, for a
-   * slot nearer square. "landscape" is the painted shape.
+   * slot nearer square.
    */
-  fit?: "band" | "natural" | "landscape";
+  fit?: "band" | "natural";
   /** Alpha ceiling for the history strokes (wire/chart). Default 0.45. */
   opacity?: number;
-  /** "wire" strokes a mesh; "chart" strokes it with its instrument furniture;
-   *  "painted" fills a landscape. Default "wire". */
-  mode?: "wire" | "chart" | "painted";
-  /** Painted only: fallback horizon as a fraction of the box height when
-   *  --ys-horizon is not set in CSS. Default 0.44. */
-  horizon?: number;
+  /** "wire" strokes a mesh; "chart" strokes it with its instrument furniture.
+   *  Default "wire". */
+  mode?: "wire" | "chart";
   /** Force the single static frame — no rAF, no observer. */
   static?: boolean;
   className?: string;
 };
 
 const SHAPE = {
-  band:      { tilt: 16, depth: 0.95, span: 1,   amplitude: 0.52 },
-  natural:   { tilt: 22, depth: 1.0,  span: 1,   amplitude: 0.62 },
-  /* The painted shape is wide: time runs across the frame at 2.3 half-units
-     against a 0.9 tenor depth, which is what a 3:1 first screen needs. */
-  landscape: { tilt: 19, depth: 0.9,  span: 2.3, amplitude: 0.72 },
+  band:    { tilt: 16, depth: 0.95, amplitude: 0.52 },
+  natural: { tilt: 22, depth: 1.0,  amplitude: 0.62 },
 } as const;
 
 const shortDate = (iso: string) =>
@@ -86,15 +79,13 @@ export default async function YieldSurface({
   fit,
   opacity = 0.45,
   mode = "wire",
-  horizon = 0.44,
   static: isStatic = false,
   className = "",
 }: YieldSurfaceProps) {
-  const painted = mode === "painted";
-  const shapeKey = fit ?? (painted ? "landscape" : "band");
+  const shapeKey = fit ?? "band";
   const shape = SHAPE[shapeKey];
-  const yc = yawCenter ?? (painted ? 0 : 45);
-  const yr = yawRange ?? (painted ? 8 : 30);
+  const yc = yawCenter ?? 45;
+  const yr = yawRange ?? 30;
 
   const history = await fetchYieldHistory(90);
   if (!history || history.length < 2) return null;
@@ -159,36 +150,23 @@ export default async function YieldSurface({
 
   return (
     <figure
-      className={`ys ${painted ? "ys-painted " : ""}${className}`}
+      className={`ys ${className}`}
       data-source={TREASURY_SOURCE}
       data-asof={asOfDate}
     >
       <style>{CSS}</style>
-      {painted ? (
-        <YieldLandscapeCanvas
-          rows={rows}
-          tilt={tilt ?? shape.tilt}
-          depth={shape.depth}
-          span={shape.span}
-          yawCenter={yc}
-          yawRange={yr}
-          horizon={horizon}
-          isStatic={isStatic}
-        />
-      ) : (
-        <YieldSurfaceCanvas
+      <YieldSurfaceCanvas
           rows={rows}
           height={height}
           tilt={tilt ?? shape.tilt}
           depth={shape.depth}
           yawCenter={yc}
           yawRange={yr}
-          fit={shapeKey === "natural" ? "natural" : "band"}
+          fit={shapeKey}
           opacity={opacity}
           isStatic={isStatic}
           chart={chart}
-        />
-      )}
+      />
       <figcaption className="t-caption ys-source">
         {TREASURY_ATTRIBUTION} par yield curves, last {rows.length} days · as of{" "}
         {asOf(asOfDate)} · Public market data. Not fund performance.
@@ -200,7 +178,4 @@ export default async function YieldSurface({
 const CSS = css`
   .ys { margin: 0; }
   .ys-source { display: block; margin-top: 14px; hyphens: none; }
-  /* Painted fills whatever box the caller positions it in; it sets no
-     position of its own so the caller's absolute/inset wins. */
-  .ys-painted canvas { position: absolute; inset: 0; }
 `;
