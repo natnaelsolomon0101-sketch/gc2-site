@@ -1,116 +1,171 @@
 /**
  * The favicon set. `npx tsx scripts/make-icons.ts`.
  *
+ * ROUND 8 (owner, 4 Sep 2026, TRANSFORM.md): the paper "G" is gone. The mark is
+ * now a TILE — a rounded square in deep iris (--color-accent-deep-iris) with the
+ * G in DM Serif Display **Italic** in paper, optically centred. The apple-touch
+ * icon is the same tile in orchid bloom (--color-accent-orchid-bloom) with the G
+ * in ink, which is the footer's own colour pair: the icon a woman long-presses
+ * onto her home screen is the pink one.
+ *
+ * WHY A TILE AND NOT A LETTER ON PAPER. The old set was ink on the page ground,
+ * so at 16px in a browser tab, on a light tab strip, it was a dark smudge on a
+ * background the same colour as the tab. A favicon has to hold its own edge at
+ * 16 device pixels; a solid coloured tile is the only thing that reliably does.
+ * The tile is also what makes the mark legible on a phone home screen, where it
+ * sits on an arbitrary wallpaper.
+ *
+ * WHY ITALIC. The site's one typographic move is the italic operative word in
+ * deep iris (TRANSFORM.md rule 2). The mark is that move, compressed to one
+ * glyph: the italic G is the site's voice, not a generic serif capital.
+ *
+ * THE GLYPH IS THE REAL OUTLINE, NOT A <text> ELEMENT AND NOT A FAUX SLANT.
+ * `src/app/fonts/DMSerifDisplay-Italic.ttf` is vendored beside the Regular the
+ * OG cards already use (SIL OFL, same licence file). GLYPH_G below is its "G"
+ * contour, lifted with fontTools' SVGPathPen, units per em 1000, bbox
+ * (48,-17)-(661,678). Setting the mark as <text font-family="serif"> would
+ * render whatever the viewer's OS had lying around — a different mark on every
+ * machine — and skewing the Regular by -12deg is a faux italic, which is not
+ * the same drawing: the true italic G has a different bowl, a different spur
+ * and a swash-ended crossbar.
+ *
+ * ONE SOURCE OF TRUTH. `svg()` below draws the mark; every artifact in the set
+ * is that same SVG rasterised, and `src/app/icon.svg` is that same SVG written
+ * to disk. There is no second drawing to keep in sync.
+ *
  * Google shows a site's own favicon in mobile results only when it finds a
  * square icon, at least 48x48 and a multiple of 48, at a stable crawlable URL,
  * consistent across the site — and it strongly prefers /favicon.ico plus a
- * <link rel="icon">. Before this the site had one 32x32 SVG, so the results
- * page drew a globe.
- *
- * The mark is the wordmark: "GC2" in DM Serif Display, ink on the paper ground,
- * tight-cropped with an even margin and no border. Rendered from the SAME
- * vendored TTF the Open Graph cards and the share kit use — setting it in a
- * named serif would render whatever the machine had lying around, which is a
- * different mark on every build.
- *
- * AT 16 AND 32 THE MARK IS "G". Three glyphs across 16 device pixels is five
- * pixels each; it renders as a grey smudge, and a smudge is worse than no
- * favicon because it still occupies the slot. The G alone is the wordmark's own
- * first letter at a legible size, which is what src/app/icon.svg has always
- * drawn. 48 and above carry the full GC2 — that is the size Google actually
- * asks for and the size a browser tab uses on a retina screen.
- *
- * The ICO is written by hand rather than pulled from a package: it is a 6-byte
- * header, a 16-byte directory entry per image, and the PNG bytes. PNG-in-ICO is
- * read by every browser still shipping and by Googlebot, and this is not worth
- * a dependency.
+ * <link rel="icon">. That is why the .ico carries 16/32/48 and why the set is
+ * one drawing in every size.
  */
 import { chromium } from "playwright";
-import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { writeFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import zlib from "node:zlib";
 import { site } from "../src/config/site";
 
-const GROUND = "#f7f5f0";
+/* Tokens, copied by value because a build script cannot read globals.css.
+   These are --color-ground, --color-ink, --color-accent-deep-iris and
+   --color-accent-orchid-bloom, and nothing else. */
+const PAPER = "#f7f5f0";
 const INK = "#141311";
+const DEEP_IRIS = "#4b49aa";
+const ORCHID = "#dd90d8";
 
 const APP = join(process.cwd(), "src", "app");
 const PUBLIC = join(process.cwd(), "public");
-const FONT = join(APP, "fonts", "DMSerifDisplay-Regular.ttf");
 
-/** Below this the full wordmark is a smudge; see the note above. */
-const WORDMARK_FLOOR = 48;
+/** DM Serif Display Italic, "G". See the header note. */
+const GLYPH_G =
+  "M357 -17Q212 -17 130 60Q48 136 48 274Q48 360 78 434Q107 507 160 562Q214 617 " +
+  "286 648Q357 678 441 678Q546 678 636 628L612 471H602L564 575Q548 621 526 640Q503 " +
+  "658 453 658Q376 658 317 608Q258 557 225 470Q192 382 192 270Q192 187 214 127Q237 " +
+  "67 275 35Q313 3 361 3Q387 3 402 14Q418 24 423 55L429 86Q434 118 441 160Q448 202 " +
+  "453 241Q463 294 410 311L388 318L390 328H661L659 318L637 308Q600 293 592 252L549 " +
+  "25Q505 6 460 -6Q416 -17 357 -17Z";
 
-async function page() {
-  const ttf = (await readFile(FONT)).toString("base64");
+/* The mark is drawn in a 32-unit square and scaled; every number below is in
+   those units.
+
+   SIZE. The glyph's ink box (695 units tall, 613 wide) is fitted to 17.6 of the
+   32, i.e. 55% of the tile height and 48% of its width. Smaller and the tile
+   reads as a coloured square with something in it; larger and the italic's
+   top-right terminal touches the corner radius.
+
+   OPTICAL CENTRE, not geometric. Two corrections, both small and both because
+   the eye does not measure bounding boxes: the italic leans right, so its mass
+   sits right of its box and the glyph moves 0.2 units LEFT of centre; and a
+   cap-height letter centred on its own box reads slightly low, so it moves 0.3
+   units UP. Verified against the 512 render, not guessed.
+
+   CORNER RADIUS 7.2/32 = 22.5%, the iOS-ish superellipse approximation. It is
+   the same on every size including the apple icon, which iOS masks again with
+   its own squircle: a full-bleed square there would be masked to something
+   noticeably rounder than the browser-tab mark, and this set is one mark. */
+const GLYPH_BOX = { x0: 48, y0: -17, x1: 661, y1: 678 };
+const GLYPH_H = 17.6;
+const NUDGE_X = -0.2;
+const NUDGE_Y = -0.3;
+const RADIUS = 7.2;
+
+const SCALE = GLYPH_H / (GLYPH_BOX.y1 - GLYPH_BOX.y0);
+const CX = (GLYPH_BOX.x0 + GLYPH_BOX.x1) / 2;
+const CY = (GLYPH_BOX.y0 + GLYPH_BOX.y1) / 2;
+/* Font space is y-up, SVG is y-down: (x, y) -> (TX + s*x, TY - s*y). */
+const TX = 16 + NUDGE_X - SCALE * CX;
+const TY = 16 + NUDGE_Y + SCALE * CY;
+
+const n = (v: number) => Number(v.toFixed(4)).toString();
+
+/** The mark, as standalone SVG markup. `size` sets width/height; the artwork is
+ *  always the same 32-unit drawing. */
+function svg(tile: string, glyph: string, size = 32) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="${size}" height="${size}" role="img" aria-label="${site.mark}">
+  <rect width="32" height="32" rx="${RADIUS}" ry="${RADIUS}" fill="${tile}"/>
+  <path transform="translate(${n(TX)} ${n(TY)}) scale(${n(SCALE)} ${n(-SCALE)})" fill="${glyph}" d="${GLYPH_G}"/>
+</svg>
+`;
+}
+
+/** The file written to src/app/icon.svg, with the note a reader needs. */
+function iconSvgFile() {
+  /* NO DOUBLE HYPHEN ANYWHERE IN THIS COMMENT. XML forbids "--" inside a
+     comment, and an SVG that names its CSS custom properties literally
+     ("<--color-accent-deep-iris>") is a parse error, not a warning: the
+     browser renders the error page instead of the icon and the tab falls back
+     to a globe. Verified live at /icon.svg. Token names are spelled out in
+     words below for that reason. */
+  return `<!-- GENERATED by scripts/make-icons.ts. Do not hand edit; run the script.
+
+     The GC2 mark: a rounded square in the deep iris accent token (#4b49aa)
+     with the "G" of DM Serif Display Italic in the paper ground token
+     (#f7f5f0), optically centred. The path is the real glyph outline, lifted
+     from the vendored src/app/fonts/DMSerifDisplay-Italic.ttf. A <text>
+     element in a named serif would render whatever the viewer's machine had
+     lying around, which is a different mark on every screen, and a skewed
+     Regular is a faux italic, not this drawing.
+
+     Every other file in the set (favicon.ico, icon.png, apple-icon.png,
+     public/icon-192.png, public/icon-512.png, public/logo.png) is this same
+     artwork rasterised, so the whole set agrees, which is one of the things
+     Google checks before it will show a site's own favicon instead of a
+     globe. The apple touch icon is the one deliberate variant: an orchid
+     bloom tile (#dd90d8) with an ink glyph, the footer's own colour pair. -->
+${svg(DEEP_IRIS, PAPER)}`;
+}
+
+/* ------------------------------------------------------------------------- */
+
+async function raster() {
   const browser = await chromium.launch();
   const ctx = await browser.newContext({ deviceScaleFactor: 1 });
   const p = await ctx.newPage();
-  await p.setContent(
-    `<style>
-      @font-face{font-family:"GC2 Display";font-style:normal;font-weight:400;
-        font-display:block;src:url(data:font/ttf;base64,${ttf}) format("truetype")}
-      html,body{margin:0;padding:0;background:${GROUND}}
-      #box{display:flex;align-items:center;justify-content:center;background:${GROUND}}
-      #mark{font-family:"GC2 Display";color:${INK};line-height:1;white-space:nowrap;
-        letter-spacing:-0.02em}
-     </style>
-     <div id="box"><span id="mark">GC2</span></div>`,
-    { waitUntil: "load" }
-  );
-  await p.evaluate(async () => {
-    await document.fonts.ready;
-    await document.fonts.load('400 100px "GC2 Display"');
-  });
-  if (!(await p.evaluate(() => document.fonts.check('400 100px "GC2 Display"')))) {
-    throw new Error("DM Serif Display did not load; the mark would render in a fallback");
-  }
-  return { browser, p };
-}
 
-/** Renders one square PNG with the mark fitted to `size` minus an even margin. */
-async function render(p: Awaited<ReturnType<typeof page>>["p"], size: number) {
-  const text = size >= WORDMARK_FLOOR ? "GC2" : "G";
-  /* 12% margin on the wordmark, 16% on the single letter: one glyph needs more
-     air around it to read as a mark rather than as a crop. */
-  const margin = Math.max(1, Math.round(size * (text === "GC2" ? 0.12 : 0.16)));
-  const inner = size - margin * 2;
+  /** One square PNG of `markup` at `size`, transparent outside the tile's
+   *  corner radius. */
+  const shot = async (markup: string, size: number) => {
+    await p.setViewportSize({ width: size, height: size });
+    await p.setContent(
+      `<style>html,body{margin:0;padding:0;background:transparent}
+        #box{width:${size}px;height:${size}px;line-height:0}
+        svg{display:block;width:${size}px;height:${size}px}</style>
+       <div id="box">${markup}</div>`,
+      { waitUntil: "load" }
+    );
+    return p.locator("#box").screenshot({ type: "png", omitBackground: true });
+  };
 
-  await p.setViewportSize({ width: size, height: size });
-  const fitted = await p.evaluate(
-    ({ size, text, inner }) => {
-      const box = document.getElementById("box") as HTMLElement;
-      const mark = document.getElementById("mark") as HTMLElement;
-      box.style.width = `${size}px`;
-      box.style.height = `${size}px`;
-      mark.textContent = text;
-      /* Fit by measurement, not by a ratio guess: the wordmark is width-bound
-         and the single letter is height-bound, and the two want different
-         font sizes for the same box. */
-      let fs = inner;
-      for (let i = 0; i < 24; i++) {
-        mark.style.fontSize = `${fs}px`;
-        const r = mark.getBoundingClientRect();
-        const over = Math.max(r.width / inner, r.height / inner);
-        if (Math.abs(over - 1) < 0.01) break;
-        fs = fs / over;
-      }
-      mark.style.fontSize = `${fs}px`;
-      return Math.round(fs * 100) / 100;
-    },
-    { size, text, inner }
-  );
-  const buf = await p.locator("#box").screenshot({ type: "png" });
-  return { buf, text, fitted };
+  return { browser, shot };
 }
 
 /* CRC-32, for the PNG chunks rewritten below. */
 const CRC_TABLE = (() => {
   const t = new Uint32Array(256);
-  for (let n = 0; n < 256; n++) {
-    let c = n;
+  for (let i = 0; i < 256; i++) {
+    let c = i;
     for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
-    t[n] = c >>> 0;
+    t[i] = c >>> 0;
   }
   return t;
 })();
@@ -132,16 +187,12 @@ function chunk(type: string, data: Buffer) {
  * Re-encode an 8-bit RGB PNG as 8-bit RGBA.
  *
  * Chromium writes colour type 2 — no alpha channel — whenever the surface it
- * captured is fully opaque, and `omitBackground` does not change that because
- * the element paints its own ground. Next's image pipeline then refuses the
- * ICO outright: "Format error decoding Ico: The PNG is not in RGBA format!".
- *
- * The alternative fixes are worse. Making one corner pixel alpha 254 to force
- * the encoder's hand puts a real, if imperceptible, hole in the mark. Adding an
- * image library adds a dependency for a build-time script that runs once. So:
- * inflate the IDATs, undo the five PNG filters, append an opaque alpha byte per
- * pixel, and write the chunks back with fresh CRCs. The pixels are unchanged —
- * only the channel count is.
+ * captured is fully opaque. Next's image pipeline then refuses the ICO outright:
+ * "Format error decoding Ico: The PNG is not in RGBA format!". The rounded tile
+ * has transparent corners, so in practice every capture here is already type 6
+ * and this is a guard rather than a conversion — but a future square variant
+ * would trip it, and the fix is eleven lines of PNG filtering rather than a
+ * dependency, so it stays.
  */
 function toRgba(png: Buffer): Buffer {
   const sig = png.subarray(0, 8);
@@ -186,8 +237,8 @@ function toRgba(png: Buffer): Buffer {
       else if (filter === 2) v += b;
       else if (filter === 3) v += (a + b) >> 1;
       else if (filter === 4) {
-        const p = a + b - c;
-        const pa = Math.abs(p - a), pb = Math.abs(p - b), pc = Math.abs(p - c);
+        const q = a + b - c;
+        const pa = Math.abs(q - a), pb = Math.abs(q - b), pc = Math.abs(q - c);
         v += pa <= pb && pa <= pc ? a : pb <= pc ? b : c;
       }
       line[i] = v & 0xff;
@@ -220,7 +271,8 @@ function toRgba(png: Buffer): Buffer {
  * ICO container. Header: reserved(2)=0, type(2)=1 (icon), count(2). Then one
  * 16-byte directory entry per image — width, height (0 means 256), palette
  * count, reserved, planes, bit depth, byte length, byte offset — then the
- * images themselves, here as PNG.
+ * images themselves, here as PNG. PNG-in-ICO is read by every browser still
+ * shipping and by Googlebot, and this is not worth a dependency.
  */
 function ico(images: { size: number; buf: Buffer }[]) {
   const header = Buffer.alloc(6);
@@ -247,76 +299,85 @@ function ico(images: { size: number; buf: Buffer }[]) {
 }
 
 async function main() {
-  const { browser, p } = await page();
   await mkdir(PUBLIC, { recursive: true });
+  const { browser, shot } = await raster();
 
-  const made: string[] = [];
-  const out = new Map<number, Buffer>();
+  const IRIS_MARK = svg(DEEP_IRIS, PAPER);
+  const ORCHID_MARK = svg(ORCHID, INK);
+
   /* 16 and 32 are for the ICO only. 48/96/144/192 are Google's multiples of 48;
      180 is the iOS home-screen size; 512 is the manifest's large icon and the
      schema.org logo. */
-  for (const size of [16, 32, 48, 96, 144, 180, 192, 512]) {
-    const { buf, text, fitted } = await render(p, size);
-    out.set(size, buf);
-    made.push(`${String(size).padStart(3)}  "${text}" at ${fitted}px  ${buf.length}B`);
+  const iris = new Map<number, Buffer>();
+  for (const size of [16, 32, 48, 96, 144, 192, 512]) {
+    iris.set(size, await shot(IRIS_MARK, size));
   }
+  const apple = await shot(ORCHID_MARK, 180);
   await browser.close();
 
-  const write = async (path: string, buf: Buffer, label: string) => {
-    await writeFile(path, buf);
-    console.log(`  ${label.padEnd(26)} ${buf.length}B`);
+  const write = async (path: string, buf: Buffer | string, label: string) => {
+    const b = typeof buf === "string" ? Buffer.from(buf) : buf;
+    await writeFile(path, b);
+    console.log(`  ${label.padEnd(32)} ${b.length}B`);
   };
 
-  /* public/, not src/app/. As a Next file convention it emitted its own hashed
-     <link rel="icon"> ALONGSIDE the one the metadata block declares — the one
-     icon convention `metadata.icons` does not suppress — so the page carried
-     two links for the same bytes. Served from public/ there is no convention,
-     the metadata entry is the single declaration, and /favicon.ico is a
-     stable URL with no cache-busting query, which is what a crawler wants. */
+  await write(join(APP, "icon.svg"), iconSvgFile(), "src/app/icon.svg");
+
+  /* public/, not src/app/. As a Next file convention favicon.ico emits its own
+     hashed <link rel="icon"> ALONGSIDE the one the metadata block declares —
+     the one icon convention `metadata.icons` does not suppress — so the page
+     would carry two links for the same bytes. Served from public/ there is no
+     convention, the metadata entry is the single declaration, and /favicon.ico
+     is a stable URL with no cache-busting query, which is what a crawler
+     wants. */
   await write(join(PUBLIC, "favicon.ico"),
-    ico([16, 32, 48].map((size) => ({ size, buf: toRgba(out.get(size)!) }))),
+    ico([16, 32, 48].map((size) => ({ size, buf: toRgba(iris.get(size)!) }))),
     "public/favicon.ico 16/32/48");
-  await write(join(APP, "icon.png"), out.get(512)!, "src/app/icon.png 512");
-  await write(join(APP, "apple-icon.png"), out.get(180)!, "src/app/apple-icon.png 180");
-  await write(join(PUBLIC, "logo.png"), out.get(512)!, "public/logo.png 512");
-  /* The manifest's own two sizes, as real files rather than as the 512 scaled
-     down by whichever launcher happens to be asking. */
-  await write(join(PUBLIC, "icon-192.png"), out.get(192)!, "public/icon-192.png");
-  await write(join(PUBLIC, "icon-512.png"), out.get(512)!, "public/icon-512.png");
+  await write(join(APP, "icon.png"), iris.get(512)!, "src/app/icon.png 512");
+  await write(join(APP, "apple-icon.png"), apple, "src/app/apple-icon.png 180 orchid");
+  await write(join(PUBLIC, "logo.png"), iris.get(512)!, "public/logo.png 512");
+  await write(join(PUBLIC, "icon-192.png"), iris.get(192)!, "public/icon-192.png");
+  await write(join(PUBLIC, "icon-512.png"), iris.get(512)!, "public/icon-512.png");
 
   /* The manifest is generated here rather than hand-written, so the fund name
      is read out of src/config/site.ts like everywhere else — README's rule is
      that the name has one home, and a checked-in JSON file is exactly where a
      second copy goes stale. It stays at /site.webmanifest (a public file)
      rather than moving to Next's app/manifest.ts convention, which would serve
-     it at /manifest.webmanifest and change the URL the metadata declares. */
+     it at /manifest.webmanifest and change the URL the metadata declares.
+
+     theme_color stays PAPER: it is the browser-chrome colour and it has to
+     agree with the `themeColor` in src/app/layout.tsx's viewport export, which
+     is the page's own canvas. background_color is the SPLASH colour, the frame
+     the icon is shown in while the app boots, and that is now the tile's own
+     deep iris so the mark sits on its own ground rather than floating on paper.
+
+     `purpose: "any maskable"` on the 512 is honest here and was not before: a
+     maskable icon has to survive being cropped to the launcher's own shape,
+     and this mark is a full-bleed tile with the glyph at 55% of the height,
+     well inside the 80% safe zone. The old paper wordmark would have been
+     clipped. */
   await write(
     join(PUBLIC, "site.webmanifest"),
-    Buffer.from(
-      JSON.stringify(
-        {
-          name: site.name,
-          short_name: site.mark,
-          start_url: "/",
-          display: "minimal-ui",
-          /* Both the ground: the site does not change under
-             prefers-color-scheme and neither should its chrome. */
-          background_color: GROUND,
-          theme_color: GROUND,
-          icons: [
-            { src: "/icon-192.png", sizes: "192x192", type: "image/png" },
-            { src: "/icon-512.png", sizes: "512x512", type: "image/png" },
-          ],
-        },
-        null,
-        2
-      ) + "\n"
-    ),
+    JSON.stringify(
+      {
+        name: site.name,
+        short_name: site.mark,
+        start_url: "/",
+        display: "minimal-ui",
+        background_color: DEEP_IRIS,
+        theme_color: PAPER,
+        icons: [
+          { src: "/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+          { src: "/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any maskable" },
+          { src: "/apple-icon.png", sizes: "180x180", type: "image/png", purpose: "any" },
+        ],
+      },
+      null,
+      2
+    ) + "\n",
     "public/site.webmanifest"
   );
-
-  console.log("\n  rendered:");
-  for (const m of made) console.log("   " + m);
 }
 
 main();
