@@ -27,7 +27,7 @@ export const people: Person[] = [
   { name: "Savita Subramanian", role: "BofA, head of US equity strategy", id: "mT9D_gYWIEk", title: "A muddle ahead for stocks", channel: "Bloomberg Television" },
   { name: "Bill Ackman", role: "Pershing Square", id: "Dr0-83M-z50", title: "A blueprint for the next decade of wealth", channel: "Forbes" },
   { name: "Katie Koch", role: "TCW", id: "Tvi7NKp5bhY", title: "Bloomberg Wealth, with David Rubenstein", channel: "David Rubenstein" },
-  { name: "Lisa Shalett", role: "Morgan Stanley Wealth Management CIO", id: "56ONZlVJ_Jk", title: "On Fed cuts", channel: "Bloomberg Podcasts" },
+  { name: "Lisa Shalett", role: "Morgan Stanley Wealth Management CIO", id: "6t7HyW69sNI", title: "On the odds of a recession", channel: "CNBC Television" },
   { name: "Stanley Druckenmiller", role: "Duquesne Family Office", id: "-5Weeox0Xus", title: "In Good Company, with Nicolai Tangen", channel: "Norges Bank Investment Management" },
   { name: "Saira Malik", role: "Nuveen CIO", id: "r-daSirHec8", title: "The risks she is watching", channel: "CNBC Television" },
   { name: "Abby Joseph Cohen", role: "Columbia Business School, formerly Goldman Sachs", id: "Q2esy2po-XE", title: "On AI stocks and a weaker dollar", channel: "Bloomberg Television" },
