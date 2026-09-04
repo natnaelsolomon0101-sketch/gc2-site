@@ -109,12 +109,12 @@ export default async function YieldSurface({
   const span = max - min || 1;
   const yOf = (rate: number) => ((rate - min) / span - 0.5) * shape.amplitude;
 
-  const rows: SurfaceRow[] = history
-    /* Every row has to carry the same tenors in the same order or the spines
-       would join a 2-year on one day to a 3-year on the next. A short row is
-       dropped rather than interpolated: a hole in this feed is a day Treasury
-       did not publish that tenor, and inventing it is inventing data. */
-    .filter((row) => row.points.length === tenors.length)
+  /* Every row has to carry the same tenors in the same order or the spines
+     would join a 2-year on one day to a 3-year on the next. A short row is
+     dropped rather than interpolated: a hole in this feed is a day Treasury
+     did not publish that tenor, and inventing it is inventing data. */
+  const kept = history.filter((row) => row.points.length === tenors.length);
+  const rows: SurfaceRow[] = kept
     .map((row) => ({
       date: row.date,
       xs: row.points.map((p) => ((Math.log(p.years) - lo) / (hi - lo)) * 2 - 1),
@@ -145,6 +145,11 @@ export default async function YieldSurface({
       ticks: [min, mid, max].map((r) => ({ label: `${r.toFixed(1)}%`, y: yOf(r) })),
       firstDate: shortDate(rows[0].date),
       lastDate: shortDate(asOfDate),
+      /* One printed value per kept day, for the hover readout. */
+      series: kept.map((row) => ({
+        date: shortDate(row.date),
+        value: `${row.points[seriesIndex].rate.toFixed(2)}%`,
+      })),
     };
   }
 
