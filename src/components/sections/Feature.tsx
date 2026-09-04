@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { strategies } from "@/content/strategies";
 import FactsRow from "@/components/FactsRow";
+import CountRow from "@/components/CountRow";
+import { stages } from "@/content/stages";
+import { allocatorNav } from "@/config/nav";
+import { site } from "@/config/site";
 import Statement from "@/components/Statement";
 import Glass from "@/components/ui/Glass";
 import Tilt from "@/components/ui/Tilt";
@@ -149,6 +153,14 @@ const CSS = css`
   .ft-link:hover svg{transform:translateX(3px);}
 }
 
+/* The numbers row: four large numerals over their mono captions, counting up
+   on first view (CountRow). Bold Stats on the site's structural facts only. */
+.countrow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 24px;
+  margin:0 0 28px;padding:0;}
+@media (min-width:768px){ .countrow{grid-template-columns:repeat(4,minmax(0,1fr));gap:24px 32px;margin-bottom:36px;} }
+.countrow-item{display:flex;flex-direction:column;gap:6px;margin:0;}
+.countrow-value{margin:0;font-variant-numeric:tabular-nums;color:var(--color-ink);line-height:1;}
+.countrow-label{margin:0;color:var(--color-ink-3);}
 .ft-foot{margin-top:40px;}
 @media (min-width:768px){ .ft-foot{margin-top:56px;} }
 
@@ -242,6 +254,14 @@ export default function Feature() {
         </div>
 
         <div className="ft-foot fade-in fade-7">
+          <CountRow
+            items={[
+              { value: strategies.length, label: "Strategies", pad: 2 },
+              { value: stages.length, label: "Stages an idea passes", pad: 2 },
+              { value: allocatorNav.length, label: "Allocator pages", pad: 2 },
+              { value: site.founded, label: "Founded" },
+            ]}
+          />
           <FactsRow />
         </div>
       </div>
