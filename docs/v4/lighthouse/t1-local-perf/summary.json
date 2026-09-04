@@ -1,0 +1,72 @@
+{
+  "round": "t1-local-perf",
+  "base": "http://localhost:3000",
+  "durationMs": 13697,
+  "routes": [
+    "/"
+  ],
+  "results": [
+    {
+      "route": "/",
+      "preset": "mobile",
+      "file": "home--mobile.json",
+      "performance": 91,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 3335.9507500000004,
+      "clsScore": 0.001674309312648926,
+      "tbtMs": 96.34974999999986,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 300
+        },
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "savingsMs": null
+        },
+        {
+          "id": "forced-reflow-insight",
+          "title": "Forced reflow",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/",
+      "preset": "desktop",
+      "file": "home--desktop.json",
+      "performance": 100,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 707.7155,
+      "clsScore": 0.001558429793071243,
+      "tbtMs": 0,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 40
+        },
+        {
+          "id": "forced-reflow-insight",
+          "title": "Forced reflow",
+          "savingsMs": null
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    }
+  ]
+}

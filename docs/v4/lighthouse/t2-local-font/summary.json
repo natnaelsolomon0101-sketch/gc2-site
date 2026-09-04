@@ -1,0 +1,72 @@
+{
+  "round": "t2-local-font",
+  "base": "http://localhost:3000",
+  "durationMs": 41295,
+  "routes": [
+    "/"
+  ],
+  "results": [
+    {
+      "route": "/",
+      "preset": "mobile",
+      "file": "home--mobile.json",
+      "performance": 41,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 4702.443,
+      "clsScore": 0.02290111213109253,
+      "tbtMs": 5018.2595,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 300
+        },
+        {
+          "id": "first-contentful-paint",
+          "title": "First Contentful Paint",
+          "savingsMs": null
+        },
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/",
+      "preset": "desktop",
+      "file": "home--desktop.json",
+      "performance": 81,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 1897.9055000000003,
+      "clsScore": 0.008833394040218311,
+      "tbtMs": 31,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 40
+        },
+        {
+          "id": "first-contentful-paint",
+          "title": "First Contentful Paint",
+          "savingsMs": null
+        },
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    }
+  ]
+}

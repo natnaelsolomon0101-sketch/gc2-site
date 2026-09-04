@@ -1,0 +1,72 @@
+{
+  "round": "t1-prod",
+  "base": "https://girlscantrade2.com",
+  "durationMs": 14760,
+  "routes": [
+    "/"
+  ],
+  "results": [
+    {
+      "route": "/",
+      "preset": "desktop",
+      "file": "home--desktop.json",
+      "performance": 86,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 595.55,
+      "clsScore": 0.001558429793071243,
+      "tbtMs": 313,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 0
+        },
+        {
+          "id": "total-blocking-time",
+          "title": "Total Blocking Time",
+          "savingsMs": null
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/",
+      "preset": "mobile",
+      "file": "home--mobile.json",
+      "performance": 71,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 2627.2309999999998,
+      "clsScore": 0,
+      "tbtMs": 1464.5,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 150
+        },
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "savingsMs": null
+        },
+        {
+          "id": "total-blocking-time",
+          "title": "Total Blocking Time",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    }
+  ]
+}

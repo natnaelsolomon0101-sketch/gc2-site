@@ -1,0 +1,72 @@
+{
+  "round": "t2-local-font-c",
+  "base": "http://localhost:3000",
+  "durationMs": 27449,
+  "routes": [
+    "/"
+  ],
+  "results": [
+    {
+      "route": "/",
+      "preset": "mobile",
+      "file": "home--mobile.json",
+      "performance": 92,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 1595.6669000000002,
+      "clsScore": 0.02290111213109253,
+      "tbtMs": 296.4999999999993,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 0
+        },
+        {
+          "id": "total-blocking-time",
+          "title": "Total Blocking Time",
+          "savingsMs": null
+        },
+        {
+          "id": "speed-index",
+          "title": "Speed Index",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/",
+      "preset": "desktop",
+      "file": "home--desktop.json",
+      "performance": 94,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 1119.5665,
+      "clsScore": 0.06848750926655575,
+      "tbtMs": 28.999999999999773,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 20
+        },
+        {
+          "id": "speed-index",
+          "title": "Speed Index",
+          "savingsMs": null
+        },
+        {
+          "id": "forced-reflow-insight",
+          "title": "Forced reflow",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    }
+  ]
+}

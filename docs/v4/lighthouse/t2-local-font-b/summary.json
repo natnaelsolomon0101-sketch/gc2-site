@@ -1,0 +1,72 @@
+{
+  "round": "t2-local-font-b",
+  "base": "http://localhost:3000",
+  "durationMs": 22544,
+  "routes": [
+    "/"
+  ],
+  "results": [
+    {
+      "route": "/",
+      "preset": "mobile",
+      "file": "home--mobile.json",
+      "performance": 81,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 3678.1508000000003,
+      "clsScore": 0.02290111213109253,
+      "tbtMs": 319,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 300
+        },
+        {
+          "id": "first-contentful-paint",
+          "title": "First Contentful Paint",
+          "savingsMs": null
+        },
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "route": "/",
+      "preset": "desktop",
+      "file": "home--desktop.json",
+      "performance": 97,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 1266.0531,
+      "clsScore": 0.00842619560458804,
+      "tbtMs": 7.000000000000227,
+      "inpMs": null,
+      "opportunities": [
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "savingsMs": 10
+        },
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "savingsMs": null
+        },
+        {
+          "id": "forced-reflow-insight",
+          "title": "Forced reflow",
+          "savingsMs": null
+        }
+      ],
+      "error": null
+    }
+  ]
+}
