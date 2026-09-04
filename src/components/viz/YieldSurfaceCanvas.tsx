@@ -156,6 +156,11 @@ export default function YieldSurfaceCanvas({
        `tilt`, then divide by depth. `f` is the perspective term: nearer points
        (smaller z) spread further from the centre, which is the entire reason
        this reads as a landscape rather than as a chart with slanted lines. */
+    /* FLAT: a chart with the camera almost level is a normal chart. Ribs
+       come off (they would be vertical hatching), the floor grid becomes
+       horizontal gridlines at the ticks, and each tenor's line gets its
+       label at its right end like a legend. */
+    const flat = !!chart && tilt <= 8;
     const tiltRad = (tilt * Math.PI) / 180;
     const ct = Math.cos(tiltRad);
     const st = Math.sin(tiltRad);
@@ -211,7 +216,7 @@ export default function YieldSurfaceCanvas({
       /* On a phone the chart is width-bound and would be a postage stamp;
          let it run 22% past the edges there — the floor's corners bleed, the
          axis and the marker stay inside. */
-      const fitW = chart && width < 600 ? width * 1.22 : width;
+      const fitW = chart ? (width < 600 ? width * 1.22 : width * 1.06) : width;
       scale = Math.min(
         (fitW / 2 - padX) / (maxX || 1),
         (boxH / 2 - padY) / (maxY || 1)
@@ -270,6 +275,32 @@ export default function YieldSurfaceCanvas({
       const tenors = rows[0].xs.length;
       const n = rows.length;
       ctx.lineWidth = 1;
+      if (flat) {
+        const k = chart.seriesIndex;
+        const xk = rows[0].xs[k];
+        /* Horizontal gridlines at the ticks, across the window. */
+        for (const t of chart.ticks) {
+          const a = project(xk, t.y, zOf(0), theta);
+          const b = project(xk, t.y, zOf(n - 1), theta);
+          ctx.strokeStyle = `rgba(${INK}, .10)`;
+          ctx.beginPath(); ctx.moveTo(a.sx, a.sy); ctx.lineTo(b.sx, b.sy); ctx.stroke();
+          queue(t.label, a.sx - 10, a.sy, "right");
+        }
+        /* Baseline and y-axis. */
+        const f0 = project(xk, floorY, zOf(0), theta);
+        const f1 = project(xk, floorY, zOf(n - 1), theta);
+        const top = chart.ticks[chart.ticks.length - 1].y + 0.04;
+        const a1 = project(xk, top, zOf(0), theta);
+        ctx.strokeStyle = `rgba(${INK}, .22)`;
+        ctx.beginPath(); ctx.moveTo(f0.sx, f0.sy); ctx.lineTo(f1.sx, f1.sy); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(f0.sx, f0.sy); ctx.lineTo(a1.sx, a1.sy); ctx.stroke();
+        /* Dates under the baseline, and a mid date for scale. */
+        if (width >= 600) {
+          queue(chart.firstDate, f0.sx, f0.sy + 16, "left");
+          queue(chart.lastDate, f1.sx, f1.sy + 16, "right");
+        }
+        return;
+      }
       /* Floor grid: a line along time at every tenor, and across tenor every
          fifteen days. Ink at 8% — it is a floor, not a fence. */
       ctx.strokeStyle = `rgba(${INK}, .09)`;
@@ -298,15 +329,19 @@ export default function YieldSurfaceCanvas({
       const x0 = rows[0].xs[0];
       const xN = rows[0].xs[tenors - 1];
       const nearX = project(x0, floorY, 0, theta).sy >= project(xN, floorY, 0, theta).sy ? x0 : xN;
-      /* Of the two ends of the near edge, the axis takes the LEFT one, the
-         way a chart's y-axis reads. */
-      const nearZ = project(nearX, floorY, zOf(0), theta).sx <= project(nearX, floorY, zOf(n - 1), theta).sx ? zOf(0) : zOf(n - 1);
+      /* The y-axis stands on whichever floor corner projects LEFTMOST, the
+         way a chart's y-axis reads, so its ticks never sit inside the mesh. */
+      let axX = x0, axZ = zOf(0), axSx = Infinity;
+      for (const cx of [x0, xN]) for (const cz of [zOf(0), zOf(n - 1)]) {
+        const sx = project(cx, floorY, cz, theta).sx;
+        if (sx < axSx) { axSx = sx; axX = cx; axZ = cz; }
+      }
       const top = chart.ticks[chart.ticks.length - 1].y + 0.04;
-      const ax0 = project(nearX, floorY, nearZ, theta);
-      const ax1 = project(nearX, top, nearZ, theta);
+      const ax0 = project(axX, floorY, axZ, theta);
+      const ax1 = project(axX, top, axZ, theta);
       ctx.beginPath(); ctx.moveTo(ax0.sx, ax0.sy); ctx.lineTo(ax1.sx, ax1.sy); ctx.stroke();
       for (const t of chart.ticks) {
-        const p = project(nearX, t.y, nearZ, theta);
+        const p = project(axX, t.y, axZ, theta);
         ctx.beginPath(); ctx.moveTo(p.sx - 5, p.sy); ctx.lineTo(p.sx, p.sy); ctx.stroke();
         queue(t.label, p.sx - 9, p.sy, "right");
       }
@@ -376,7 +411,7 @@ export default function YieldSurfaceCanvas({
       const text = `${chart.seriesLabel}  ${chart.seriesLast}`;
       ctx.font = `500 12px ${mono}`;
       const w = ctx.measureText(text).width + 22;
-      const flip = last.sx + 18 + w + 8 > width;
+      const flip = flat || last.sx + 18 + w + 8 > width;
       const lx = flip ? last.sx - 18 - w : last.sx + 18;
       const ly = last.sy - 22;
       ctx.strokeStyle = `rgba(${DEEP_IRIS_RGB}, .6)`; ctx.lineWidth = 1;
@@ -463,7 +498,12 @@ export default function YieldSurfaceCanvas({
          every day — ninety 1px lines inside a 300px band is a grey wash, and a
          wireframe you cannot see through is a fill by another name. */
       ctx.lineWidth = 1;
-      for (let i = 0; i < rows.length - 1; i += 3) {
+      /* Front-on (low tilt) the ribs are short and dense; every fifth day
+         at reduced alpha keeps them as depth cues rather than hatching. */
+      const front = !!chart && tilt < 16;
+      const ribStep = front ? 5 : 3;
+      for (let i = 0; i < rows.length - 1; i += ribStep) {
+        if (flat) break;
         const row = rows[i];
         const z = zOf(i);
         let sum = 0;
@@ -475,7 +515,7 @@ export default function YieldSurfaceCanvas({
           else ctx.lineTo(p.sx, p.sy);
         }
         /* In chart mode the ribs are the quiet layer under the spines. */
-        ctx.strokeStyle = `rgba(${INK}, ${(fade(sum / row.xs.length) * (chart ? 0.55 : 1)).toFixed(3)})`;
+        ctx.strokeStyle = `rgba(${INK}, ${(fade(sum / row.xs.length) * (front ? 0.4 : chart ? 0.55 : 1)).toFixed(3)})`;
         ctx.stroke();
       }
 
@@ -492,12 +532,21 @@ export default function YieldSurfaceCanvas({
           if (i === 0) ctx.moveTo(p.sx, p.sy);
           else ctx.lineTo(p.sx, p.sy);
         }
-        ctx.strokeStyle = `rgba(${INK}, ${(fade(sum / rows.length) * 0.8).toFixed(3)})`;
+        ctx.strokeStyle = `rgba(${INK}, ${(fade(sum / rows.length) * (flat ? 0.55 : 0.8)).toFixed(3)})`;
         ctx.stroke();
+        if (flat && chart && width >= 600) {
+          const every = tenors > 9 ? 2 : 1;
+          if (k % every === 0 || k === tenors - 1) {
+            const e = project(rows[rows.length - 1].xs[k], rows[rows.length - 1].ys[k], zOf(rows.length - 1), theta);
+            queue(chart.tenorLabels[k], e.sx + 8, e.sy, "left");
+          }
+        }
       }
 
-      /* Today, at full alpha in the one accent. */
+      /* Today, at full alpha in the one accent. In flat mode that curve is
+         the right edge seen end-on, so it is skipped. */
       const today = rows[rows.length - 1];
+      if (!flat) {
       ctx.beginPath();
       for (let k = 0; k < today.xs.length; k++) {
         const p = project(today.xs[k], today.ys[k], zOf(rows.length - 1), theta);
@@ -507,6 +556,7 @@ export default function YieldSurfaceCanvas({
       ctx.strokeStyle = DEEP_IRIS;
       ctx.lineWidth = 1.5;
       ctx.stroke();
+      }
 
       drawSeriesLine(theta);
       flush();
