@@ -139,7 +139,9 @@ export default function YieldSurfaceCanvas({
     const bobAt = (ms: number) => Math.sin((ms / BOB_MS) * Math.PI * 2) * BOB_PX;
 
     const resize = () => {
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      /* Retina on desktop; 1.5x on phones, where the 2x backing store was
+         the single largest paint cost per frame. */
+      dpr = Math.min(window.devicePixelRatio || 1, phone ? 1.5 : 2);
       width = canvas.clientWidth;
       boxH = height > 0 ? height : canvas.clientHeight;
       canvas.width = Math.round(width * dpr);
@@ -520,6 +522,10 @@ export default function YieldSurfaceCanvas({
       cy += (ty - cy) * PARALLAX_EASE;
       bob = bobAt(ms) + cy * PARALLAX_PX;
       draw(yawAt(ms) + (cx * PARALLAX_DEG * Math.PI) / 180);
+      /* A phone gets the draw-in and then a still frame: the ambient rock
+         costs a slow handset main-thread time it does not have (Lighthouse
+         mobile TBT), and nothing on a phone hovers it. */
+      if (phone && chart && reveal >= 1) { raf = 0; return; }
       raf = requestAnimationFrame(frame);
     };
     const onPointer = (e: PointerEvent) => {
