@@ -57,6 +57,7 @@ const GRAIN =
 const GRAIN_URL = `url("data:image/svg+xml,${encodeURIComponent(GRAIN)}")`;
 
 const HEADER_CSS = css`
+.gv-em{font-style:italic;color:var(--color-accent-deep-iris);}
 .gov-hd{position:relative;isolation:isolate;overflow:hidden;}
 .gov-hd-bg{position:absolute;inset:0;pointer-events:none;contain:layout paint style;z-index:0;}
 .gov-hd-wash{position:absolute;inset:0;
@@ -89,7 +90,7 @@ function GovernanceHeader() {
         <div className="gov-hd-inner flex flex-col pt-6 pb-8 md:pt-12 md:pb-14 lg:pt-20 lg:pb-20">
           <p className="t-mono text-ink-3">Governance</p>
           <h1 className="t-h1 measure-head mt-4 md:mt-6 hyphens-none">
-            <RevealLines lines={["Governance."]} />
+            <RevealLines lines={[<><em className="gv-em">Governance</em>.</>]} />
           </h1>
           <p className="t-lead measure-lead mt-6 md:mt-8">
             The question behind every governance page is what stops one person from blowing
