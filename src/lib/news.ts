@@ -81,10 +81,11 @@ export const fetchTape = () =>
     "Google News", 8, true,
   );
 
-export const fetchRubenstein = () =>
+/** Headlines about a named host, last 30 days, recognised publishers only. */
+export const fetchAbout = (query: string) =>
   feed(
-    "https://news.google.com/rss/search?q=%22David+Rubenstein%22+when:30d&hl=en-US&gl=US&ceid=US:en",
-    "Google News", 5, true,
+    `https://news.google.com/rss/search?q=${encodeURIComponent(query)}+when:30d&hl=en-US&gl=US&ceid=US:en`,
+    "Google News", 4, true,
   );
 
 export function fmtWhen(iso: string): string {
