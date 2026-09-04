@@ -177,6 +177,15 @@ export default async function YieldSurface({
           isStatic={isStatic}
           chart={chart}
       />
+      {/* The canvas is aria-hidden; this is what a screen reader gets instead
+          of a picture: the chart's one headline number, from the feed. */}
+      {chart && (
+        <p className="sr-only">
+          {chart.seriesLabel} U.S. Treasury yield {chart.seriesLast}, {chart.seriesDelta} on the
+          day, {chart.firstDate} to {chart.lastDate}. Range across all tenors{" "}
+          {chart.ticks[0].label} to {chart.ticks[chart.ticks.length - 1].label}.
+        </p>
+      )}
       <figcaption className="t-caption ys-source">
         {TREASURY_ATTRIBUTION} par yield curves, last {rows.length} days · as of{" "}
         {asOf(asOfDate)} · Public market data. Not fund performance.
